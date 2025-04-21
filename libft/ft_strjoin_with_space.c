@@ -1,0 +1,38 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_strjoin_with_space.c                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/10/04 18:36:49 by edarmaev          #+#    #+#             */
+/*   Updated: 2025/04/17 19:07:55 by edarmaev         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "libft.h"
+
+char	*ft_strjoin_with_space(char const *s1, char const *s2)
+{
+	char	*strjoin;
+	size_t	i;
+	size_t	j;
+
+	if (!s1 || !s2)
+		return (NULL);
+	i = ft_strlen(s1);
+	j = ft_strlen(s2);
+	strjoin = (char *)malloc((i + j + 2) * sizeof(char));
+	if (strjoin == NULL)
+		return (NULL);
+	i = 0;
+	j = 0;
+	while (s1[j])
+		strjoin[i++] = s1[j++];
+	j = 0;
+	strjoin[i++] = ' ';
+	while (s2[j])
+		strjoin[i++] = s2[j++];
+	strjoin[i] = '\0';
+	return (strjoin);
+}
