@@ -6,41 +6,61 @@
 /*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/04/21 13:25:23 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/04/21 22:53:34 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	msh_execute(t_cmd *cmd)
+void	msh_free(t_msh *msh)
 {
-	if (cmd->pathname && access(cmd->pathname, X_OK) == -1)
-		ft_printf("%s\n", "permission denied");
-	if (cmd->pathname && access(cmd->pathname, X_OK) == 0)
-		execve(cmd->pathname, cmd->cmd, cmd->envp);
-	ft_printf("%s\n", "error");
+	if (msh->cmd)
+		ft_free_array(msh->cmd);
+	if (msh->pathname)
+		ft_free(&msh->pathname);
 }
 
-char	*msh_pathname_r(char **paths, t_cmd *cmd)
+void	msh_exit(t_msh *msh, char *msg)
+{
+	ft_putendl_fd(msg, 2);
+	msh_free(msh);
+	exit(msh->status);
+}
+
+void	msh_execute(t_msh *msh)
+{
+	if (!msh->pathname)
+	{
+		msh->status = 127;
+		msh_exit(msh, "command not found");
+	}
+	else if (msh->pathname && access(msh->pathname, X_OK) == -1)
+	{
+		msh->status = 126;
+		msh_exit(msh, "permission denied");
+	}
+	else if (msh->pathname && access(msh->pathname, X_OK) == 0)
+		execve(msh->pathname, msh->cmd, msh->envp);
+	msh_exit(msh, "execve failed");
+}
+
+char	*msh_pathname_r(t_msh *msh, char **paths)
 {
 	char	*pathname;
 	char	*tmp;
 	int		i;
 
 	i = -1;
+	pathname = NULL;
 	while (paths[++i])
 	{
 		tmp = ft_strjoin(paths[i], "/");
 		if (!tmp)
-		{
-			ft_printf("%s\n", "ft_strjoin failed");
-		}
-		pathname = ft_strjoin(tmp, cmd->cmd[0]);
+			msh_exit(msh, "ft_strjoin failed");
+		pathname = ft_strjoin(tmp, msh->cmd[0]);
 		free(tmp);
 		if (!pathname)
-		{
-			ft_printf("%s\n", "ft_strjoin failed");
-		}
+			msh_exit(msh, "ft_strjoin failed");
 		if (access(pathname, F_OK) == 0)
 			return (pathname);
 		free(pathname);
@@ -48,65 +68,52 @@ char	*msh_pathname_r(char **paths, t_cmd *cmd)
 	return (NULL);
 }
 
-char	*msh_pathname_a(t_cmd *cmd)
-{
-	char	*pathname;
-
-	pathname = ft_strcopy(cmd->cmd[0]);
-	if (!pathname)
-		ft_printf("%s\n", "strcopy failed");
-	if (access(pathname, F_OK) == 0)
-		return (pathname);
-	free(pathname);
-	return (NULL);
-}
-
-void	msh_pathname(t_cmd *cmd)
+void	msh_pathname(t_msh *msh)
 {
 	char	**paths;
 
-	cmd->pathname = NULL;
-	if (cmd->cmd[0])
+	if (access(msh->cmd[0], F_OK) == 0)
 	{
-		if (cmd->cmd[0][0] == '/' || (cmd->cmd[0][0] == '.'
-				&& cmd->cmd[0][1] == '/') || (cmd->cmd[0][0] == '.'
-				&& cmd->cmd[0][1] == '.' && cmd->cmd[0][2] == '/'))
-			cmd->pathname = msh_pathname_a(cmd);
-		else
+		msh->pathname = msh->cmd[0];
+	}
+	else
+	{
+		msh->pathname = NULL;
+		while (*msh->envp && ft_strncmp(*msh->envp, "PATH=", 5) != 0)
+			msh->envp++;
+		if (*msh->envp)
 		{
-			while (*cmd->envp && ft_strncmp(*cmd->envp, "PATH=", 5) != 0)
-				cmd->envp++;
-			if (*cmd->envp)
+			paths = ft_split(*msh->envp + 5, ':');
+			if (!paths)
+				msh_exit(msh, "ft_split failed");
+			msh->pathname = msh_pathname_r(msh, paths);
+			ft_free_array(paths);
+			if (!msh->pathname)
 			{
-				paths = ft_split(*cmd->envp + 5, ':');
-				if (!paths)
-					ft_printf("%s\n", "ft_split failed");
-				else 
-					cmd->pathname = msh_pathname_r(paths, cmd);
-				ft_free_array(paths);
+				msh->status = 127;
+				msh_exit(msh, "command not found");
 			}
 		}
 	}
 }
 
-void	msh_cmd(t_cmd *cmd, char **argv, char **envp)
+void	msh_initialize(t_msh *msh, char **argv, char **envp)
 {
-	cmd->cmd = ft_split(argv[1], ' ');
-	if (!cmd->cmd)
-		ft_printf("%s\n", "split failed");
-	cmd->envp = envp;
-	msh_pathname(cmd);
-	if (!cmd->pathname)
-		ft_printf("%s\n", "oopsie");
+	msh->status = 1;
+	msh->cmd = ft_split(argv[1], ' ');
+	if (!msh->cmd)
+		msh_exit(msh, "split failed");
+	msh->envp = envp;
+	msh_pathname(msh);
 }
 
 int	main(int argc, char **argv, char **envp)
 {
-	t_cmd cmd;
+	t_msh	msh;
 
 	if (argc < 2)
-		ft_printf("%s\n", "command is missing");
-	msh_cmd(&cmd, argv, envp);
-	msh_execute(&cmd);
+		ft_printf("%s\n", "enter command");
+	msh_initialize(&msh, argv, envp);
+	msh_execute(&msh);
 	return (0);
 }
