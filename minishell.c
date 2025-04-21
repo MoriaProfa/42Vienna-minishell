@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/04/21 22:53:34 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/04/21 23:49:14 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,17 +68,16 @@ char	*msh_pathname_r(t_msh *msh, char **paths)
 	return (NULL);
 }
 
-void	msh_pathname(t_msh *msh)
+char	*msh_pathname(t_msh *msh)
 {
 	char	**paths;
+	char	*pathname;
 
+	pathname = NULL;
 	if (access(msh->cmd[0], F_OK) == 0)
-	{
-		msh->pathname = msh->cmd[0];
-	}
+		pathname = msh->cmd[0];
 	else
 	{
-		msh->pathname = NULL;
 		while (*msh->envp && ft_strncmp(*msh->envp, "PATH=", 5) != 0)
 			msh->envp++;
 		if (*msh->envp)
@@ -86,15 +85,38 @@ void	msh_pathname(t_msh *msh)
 			paths = ft_split(*msh->envp + 5, ':');
 			if (!paths)
 				msh_exit(msh, "ft_split failed");
-			msh->pathname = msh_pathname_r(msh, paths);
+			pathname = msh_pathname_r(msh, paths);
 			ft_free_array(paths);
-			if (!msh->pathname)
-			{
-				msh->status = 127;
-				msh_exit(msh, "command not found");
-			}
 		}
 	}
+	return (pathname);
+}
+
+char	**ft_copy_array(char **array)
+{
+	char	**copy;
+	int		i;
+
+	copy = NULL;
+	if (!array)
+		return (NULL);
+	i = 0;
+	while (array[i])
+		i++;
+	copy = (char **)malloc(sizeof(char *) * (i + 1));
+	if (!copy)
+		return (NULL);
+	copy[i] = NULL;
+	while (--i >= 0)
+	{
+		copy[i] = ft_strcopy(array[i]);
+		if (!copy[i])
+		{
+			ft_free_array(copy);
+			return (NULL);
+		}
+	}
+	return (copy);
 }
 
 void	msh_initialize(t_msh *msh, char **argv, char **envp)
@@ -103,8 +125,10 @@ void	msh_initialize(t_msh *msh, char **argv, char **envp)
 	msh->cmd = ft_split(argv[1], ' ');
 	if (!msh->cmd)
 		msh_exit(msh, "split failed");
-	msh->envp = envp;
-	msh_pathname(msh);
+	msh->envp = ft_copy_array(envp);
+	if (!msh->envp)
+		msh_exit(msh, "array copy failed");
+	msh->pathname = msh_pathname(msh);
 }
 
 int	main(int argc, char **argv, char **envp)
