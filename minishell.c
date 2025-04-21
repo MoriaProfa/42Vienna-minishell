@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/04/21 23:49:14 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/04/22 00:59:38 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 void	msh_free(t_msh *msh)
 {
+	if (msh->input)
+		ft_free(&msh->input);
 	if (msh->cmd)
 		ft_free_array(msh->cmd);
 	if (msh->pathname)
@@ -119,10 +121,41 @@ char	**ft_copy_array(char **array)
 	return (copy);
 }
 
+static char	*msh_read(ssize_t rr)
+{
+	char	buf[2];
+	char	*tmp;
+	char	*out;
+
+	out = NULL;
+	while (rr > 0)
+	{
+		rr = read(0, buf, 1);
+		if (rr == -1)
+			return (ft_free(&out), NULL);
+		buf[rr] = 0;
+		if (buf[0] == '\n')
+			return (out);
+		if (!out)
+			out = ft_strcopy(buf);
+		else
+		{
+			tmp = out;
+			out = ft_strjoin(tmp, buf);
+			ft_free(&tmp);
+		}
+	}
+	return (out);
+}
+
 void	msh_initialize(t_msh *msh, char **argv, char **envp)
 {
 	msh->status = 1;
-	msh->cmd = ft_split(argv[1], ' ');
+	msh->input = msh_read(1);
+	ft_printf("%s\n", msh->input);
+	(void)argv;
+	msh->cmd = ft_split(msh->input, ' ');
+	// msh->cmd = ft_split(argv, ' ');
 	if (!msh->cmd)
 		msh_exit(msh, "split failed");
 	msh->envp = ft_copy_array(envp);
@@ -134,10 +167,12 @@ void	msh_initialize(t_msh *msh, char **argv, char **envp)
 int	main(int argc, char **argv, char **envp)
 {
 	t_msh	msh;
+	
 
-	if (argc < 2)
-		ft_printf("%s\n", "enter command");
+	if (argc > 1)
+		ft_printf("%s\n", "oops");
 	msh_initialize(&msh, argv, envp);
 	msh_execute(&msh);
+	msh_free(&msh);
 	return (0);
 }

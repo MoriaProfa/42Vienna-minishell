@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/04/21 22:51:16 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/04/22 00:18:57 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 
 typedef struct s_msh
 {
+	char	*input;
 	char	**cmd;
 	char	**envp;
 	char	*pathname;
