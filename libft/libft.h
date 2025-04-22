@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 15:03:49 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/04/09 13:25:39 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/04/22 10:32:15 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ void	ft_putendl_fd(char *s, int fd);
 void	ft_putnbr_fd(int n, int fd);
 char	**ft_split(char const *s, char c);
 void	ft_free_array(char **arr);
+char	**ft_copy_array(char **array);
 void	ft_free(char **p);
 
 #endif
