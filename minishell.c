@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/04/22 10:39:22 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/04/22 18:19:17 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,12 @@
 
 void	msh_free(t_msh *msh)
 {
-	if (msh->input)
-		ft_free(&msh->input);
-	if (msh->cmd)
-		ft_free_array(msh->cmd);
-	if (msh->pathname)
-		ft_free(&msh->pathname);
+	if (msh->in_str)
+		ft_free(&msh->in_str);
+	if (msh->cmd.cmd)
+		ft_free_array(msh->cmd.cmd);
+	if (msh->cmd.pathname)
+		ft_free(&msh->cmd.pathname);
 }
 
 void	msh_exit(t_msh *msh, char *msg)
@@ -31,18 +31,18 @@ void	msh_exit(t_msh *msh, char *msg)
 
 void	msh_execute(t_msh *msh)
 {
-	if (!msh->pathname)
+	if (!msh->cmd.pathname)
 	{
 		msh->status = 127;
 		msh_exit(msh, "command not found");
 	}
-	else if (msh->pathname && access(msh->pathname, X_OK) == -1)
+	else if (msh->cmd.pathname && access(msh->cmd.pathname, X_OK) == -1)
 	{
 		msh->status = 126;
 		msh_exit(msh, "permission denied");
 	}
-	else if (msh->pathname && access(msh->pathname, X_OK) == 0)
-		execve(msh->pathname, msh->cmd, msh->envp);
+	else if (msh->cmd.pathname && access(msh->cmd.pathname, X_OK) == 0)
+		execve(msh->cmd.pathname, msh->cmd.cmd, msh->envp);
 	msh_exit(msh, "execve failed");
 }
 
@@ -59,7 +59,7 @@ char	*msh_pathname_r(t_msh *msh, char **paths)
 		tmp = ft_strjoin(paths[i], "/");
 		if (!tmp)
 			msh_exit(msh, "ft_strjoin failed");
-		pathname = ft_strjoin(tmp, msh->cmd[0]);
+		pathname = ft_strjoin(tmp, msh->cmd.cmd[0]);
 		free(tmp);
 		if (!pathname)
 			msh_exit(msh, "ft_strjoin failed");
@@ -76,8 +76,8 @@ char	*msh_pathname(t_msh *msh)
 	char	*pathname;
 
 	pathname = NULL;
-	if (access(msh->cmd[0], F_OK) == 0)
-		pathname = msh->cmd[0];
+	if (access(msh->cmd.cmd[0], F_OK) == 0)
+		pathname = msh->cmd.cmd[0];
 	else
 	{
 		while (*msh->envp && ft_strncmp(*msh->envp, "PATH=", 5) != 0)
@@ -94,7 +94,7 @@ char	*msh_pathname(t_msh *msh)
 	return (pathname);
 }
 
-static char	*msh_read(ssize_t rr)
+char	*msh_read(ssize_t rr)
 {
 	char	buf[2];
 	char	*tmp;
@@ -119,43 +119,75 @@ static char	*msh_read(ssize_t rr)
 		}
 	}
 	return (out);
-}
+} 
 
-void	msh_fork(t_msh msh)
+void	msh_fork(t_msh *msh)
 {
-	
+	msh->pid.pid = fork();
+	if (msh->pid.pid == -1)
+		msh_exit(msh, "fork failed");
+	if (msh->pid.pid == 0)
+	{
+		msh_execute(msh);
+	}
 }
 
-void	msh_pipe(t_msh msh)
+t_cmd	*msh_new_cmd(t_msh *msh, char *content)
 {
-	
+	t_cmd	*new;
+
+	new = (t_cmd *)malloc(sizeof(t_cmd));
+	if (!new)
+		msh_exit(msh, "malloc failed");
+	new->cmd = ft_split(content, ' ');
+	if (!new->cmd)
+		msh_exit(msh, "array copy failed");
+	new->pathname = msh_pathname(msh);
+	new->next = NULL;
+	return (new);
 }
 
-void	msh_initialize(t_msh *msh, char **argv, char **envp)
+t_cmd	*msh_add_cmd(t_msh *msh, char *content)
+{
+	t_cmd	*new;
+
+	new = msh_new_cmd(msh, content);
+	if (!new->cmd)
+		msh_exit(msh, "couldn't create new entry");
+	new->next = NULL;
+	return (new);
+}
+
+void	msh_initialize(t_msh *msh, char **envp)
 {
 	msh->status = 1;
-	msh->input = msh_read(1);
-	(void)argv;
-	msh->cmd = ft_split(msh->input, ' ');
-	// msh->cmd = ft_split(argv, ' ');
-	if (!msh->cmd)
+	msh->in_str = msh_read(1);
+	if (!msh->in_str)
+		msh_exit(msh, "couldn't read");
+	msh->in_arr = ft_split(msh->in_str, '|');
+	if (!msh->in_arr)
 		msh_exit(msh, "split failed");
+	while (*msh->in_arr)
+		msh->cmd = *msh_add_cmd(msh, msh->in_arr++);
+	// msh->cmd.cmd = ft_split(msh->in_arr[0], ' ');
+	// if (!msh->cmd.cmd)
+	// 	msh_exit(msh, "split failed");
 	msh->envp = ft_copy_array(envp);
 	if (!msh->envp)
 		msh_exit(msh, "array copy failed");
-	msh->pathname = msh_pathname(msh);
+	// msh->cmd.pathname = msh_pathname(msh);
 }
 
 int	main(int argc, char **argv, char **envp)
 {
 	t_msh	msh;
 
-	if (argc > 1)
+	if (argc > 2)
 		ft_printf("%s\n", "oops");
 	while (argv[0])
 	{
-		msh_initialize(&msh, argv, envp);
-		msh_execute(&msh);
+		msh_initialize(&msh, envp);
+		msh_fork(&msh);
 		msh_free(&msh);
 	}
 	return (0);
