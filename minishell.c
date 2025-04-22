@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/04/22 18:19:17 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/04/22 21:06:24 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,7 +141,7 @@ t_cmd	*msh_new_cmd(t_msh *msh, char *content)
 		msh_exit(msh, "malloc failed");
 	new->cmd = ft_split(content, ' ');
 	if (!new->cmd)
-		msh_exit(msh, "array copy failed");
+		msh_exit(msh, "split failed");
 	new->pathname = msh_pathname(msh);
 	new->next = NULL;
 	return (new);
@@ -150,31 +150,51 @@ t_cmd	*msh_new_cmd(t_msh *msh, char *content)
 t_cmd	*msh_add_cmd(t_msh *msh, char *content)
 {
 	t_cmd	*new;
+	t_cmd	*current;
 
 	new = msh_new_cmd(msh, content);
 	if (!new->cmd)
 		msh_exit(msh, "couldn't create new entry");
-	new->next = NULL;
+	if (!&msh->cmd)
+		msh->cmd = *new;
+	else
+	{
+		current = &msh->cmd;
+		while (current->next)
+			current = current->next;
+		current->next = new;
+	}
 	return (new);
 }
 
 void	msh_initialize(t_msh *msh, char **envp)
 {
+	t_cmd	tmp;
+
 	msh->status = 1;
 	msh->in_str = msh_read(1);
 	if (!msh->in_str)
 		msh_exit(msh, "couldn't read");
 	msh->in_arr = ft_split(msh->in_str, '|');
+	while (*msh->in_arr)
+	{
+		ft_printf("%s\n", *msh->in_arr++);
+	}
+	// exit(42);
 	if (!msh->in_arr)
 		msh_exit(msh, "split failed");
 	while (*msh->in_arr)
-		msh->cmd = *msh_add_cmd(msh, msh->in_arr++);
+	{
+		tmp = *msh_new_cmd(msh, *msh->in_arr++);
+		msh->cmd = tmp;
+	}
+	msh->envp = envp;
 	// msh->cmd.cmd = ft_split(msh->in_arr[0], ' ');
 	// if (!msh->cmd.cmd)
 	// 	msh_exit(msh, "split failed");
-	msh->envp = ft_copy_array(envp);
-	if (!msh->envp)
-		msh_exit(msh, "array copy failed");
+	// msh->envp = ft_copy_array(envp);
+	// if (!msh->envp)
+	// 	msh_exit(msh, "array copy failed");
 	// msh->cmd.pathname = msh_pathname(msh);
 }
 
