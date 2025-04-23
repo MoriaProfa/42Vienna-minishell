@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/04/23 18:56:58 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/04/23 19:17:52 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ typedef struct s_msh
 	char	**in_arr;
 	char	***cmd;
 	char	**pathname;
+	int		n;
 	char	**envp;
 	int		status;
 	pid_t	*pid;

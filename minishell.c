@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/04/23 19:08:57 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/04/23 19:19:55 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,7 +140,6 @@ void	msh_fork(t_msh *msh, int i)
 void	msh_initialize(t_msh *msh, char **envp)
 {
 	int		i;
-	size_t	j;
 
 	i = 0;
 	msh->status = 1;
@@ -151,11 +150,11 @@ void	msh_initialize(t_msh *msh, char **envp)
 	msh->in_arr = ft_split(msh->in_str, '|');
 	if (!msh->in_arr)
 		msh_error(msh, "split failed");
-	j = ft_array_size(msh->in_arr) + 1;
-	msh->cmd = (char ***)malloc(sizeof(char **) * j);
+	msh->n = (int)ft_array_size(msh->in_arr);
+	msh->cmd = (char ***)malloc(sizeof(char **) * (msh->n + 1));
 	if (!msh->cmd)
 		msh_error(msh, "malloc failed");
-	msh->pathname = (char **)malloc(sizeof(char *) * j);
+	msh->pathname = (char **)malloc(sizeof(char *) * (msh->n + 1));
 	if (!msh->pathname)
 		msh_error(msh, "malloc oopsie");
 	while (msh->in_arr[i])
@@ -183,7 +182,7 @@ int	main(int argc, char **argv, char **envp)
 	{
 		msh_initialize(&msh, envp);
 		msh_fork(&msh, 0);
-		// msh_free(&msh);
+		//msh_free(&msh);
 	}
 	return (0);
 }
