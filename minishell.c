@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/04/23 18:18:03 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/04/23 19:08:57 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,11 @@ void	msh_free(t_msh *msh)
 {
 	if (msh->in_str)
 		ft_free(&msh->in_str);
-	if (msh->cmd)
-		ft_array_free(msh->cmd);
+	while (*msh->cmd)
+	{
+		if (*msh->cmd)
+			ft_array_free(*msh->cmd);
+	}
 	if (msh->pathname)
 		ft_array_free(msh->pathname);
 }
@@ -25,7 +28,7 @@ void	msh_free(t_msh *msh)
 void	msh_error(t_msh *msh, char *msg)
 {
 	ft_putendl_fd(msg, 2);
-	//msh_free(msh);
+	msh_free(msh);
 	exit(msh->status);
 }
 
@@ -36,7 +39,7 @@ void	msh_execute(t_msh *msh, int i)
 		msh->status = 127;
 		msh_error(msh, "command not found");
 	}
-	else if (msh->pathname[i] && access(msh->cmd[i], X_OK) == -1)
+	else if (msh->pathname[i] && access(msh->pathname[i], X_OK) == -1)
 	{
 		msh->status = 126;
 		msh_error(msh, "permission denied");
@@ -121,7 +124,7 @@ char	*msh_read(ssize_t rr)
 		}
 	}
 	return (out);
-} 
+}
 
 void	msh_fork(t_msh *msh, int i)
 {
@@ -137,6 +140,7 @@ void	msh_fork(t_msh *msh, int i)
 void	msh_initialize(t_msh *msh, char **envp)
 {
 	int		i;
+	size_t	j;
 
 	i = 0;
 	msh->status = 1;
@@ -147,12 +151,20 @@ void	msh_initialize(t_msh *msh, char **envp)
 	msh->in_arr = ft_split(msh->in_str, '|');
 	if (!msh->in_arr)
 		msh_error(msh, "split failed");
+	j = ft_array_size(msh->in_arr) + 1;
+	msh->cmd = (char ***)malloc(sizeof(char **) * j);
+	if (!msh->cmd)
+		msh_error(msh, "malloc failed");
+	msh->pathname = (char **)malloc(sizeof(char *) * j);
+	if (!msh->pathname)
+		msh_error(msh, "malloc oopsie");
 	while (msh->in_arr[i])
 	{
-		msh->cmd = ft_split(msh->in_arr[i], ' ');
-		if (!msh->cmd)
+		msh->cmd[i] = ft_split(msh->in_arr[i], ' ');
+		if (!msh->cmd[i])
 			msh_error(msh, "split failed");
-		msh->pathname = msh_pathname(msh, i++);
+		msh->pathname[i] = msh_pathname(msh, i);
+		i++;
 	}
 	msh->pid = (pid_t *)malloc(sizeof(pid_t) * (i - 1));
 	if (!msh->pid)
@@ -171,7 +183,7 @@ int	main(int argc, char **argv, char **envp)
 	{
 		msh_initialize(&msh, envp);
 		msh_fork(&msh, 0);
-		//msh_free(&msh);
+		// msh_free(&msh);
 	}
 	return (0);
 }
