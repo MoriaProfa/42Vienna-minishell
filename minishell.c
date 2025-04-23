@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/04/22 21:06:24 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/04/23 18:18:03 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,53 +16,53 @@ void	msh_free(t_msh *msh)
 {
 	if (msh->in_str)
 		ft_free(&msh->in_str);
-	if (msh->cmd.cmd)
-		ft_free_array(msh->cmd.cmd);
-	if (msh->cmd.pathname)
-		ft_free(&msh->cmd.pathname);
+	if (msh->cmd)
+		ft_array_free(msh->cmd);
+	if (msh->pathname)
+		ft_array_free(msh->pathname);
 }
 
-void	msh_exit(t_msh *msh, char *msg)
+void	msh_error(t_msh *msh, char *msg)
 {
 	ft_putendl_fd(msg, 2);
-	msh_free(msh);
+	//msh_free(msh);
 	exit(msh->status);
 }
 
-void	msh_execute(t_msh *msh)
+void	msh_execute(t_msh *msh, int i)
 {
-	if (!msh->cmd.pathname)
+	if (!msh->pathname[i])
 	{
 		msh->status = 127;
-		msh_exit(msh, "command not found");
+		msh_error(msh, "command not found");
 	}
-	else if (msh->cmd.pathname && access(msh->cmd.pathname, X_OK) == -1)
+	else if (msh->pathname[i] && access(msh->cmd[i], X_OK) == -1)
 	{
 		msh->status = 126;
-		msh_exit(msh, "permission denied");
+		msh_error(msh, "permission denied");
 	}
-	else if (msh->cmd.pathname && access(msh->cmd.pathname, X_OK) == 0)
-		execve(msh->cmd.pathname, msh->cmd.cmd, msh->envp);
-	msh_exit(msh, "execve failed");
+	else if (msh->pathname[i] && access(msh->pathname[i], X_OK) == 0)
+		execve(msh->pathname[i], msh->cmd[i], msh->envp);
+	msh_error(msh, "execve failed");
 }
 
-char	*msh_pathname_r(t_msh *msh, char **paths)
+char	*msh_pathname_r(t_msh *msh, char **paths, int i)
 {
 	char	*pathname;
 	char	*tmp;
-	int		i;
+	int		j;
 
-	i = -1;
+	j = -1;
 	pathname = NULL;
-	while (paths[++i])
+	while (paths[++j])
 	{
-		tmp = ft_strjoin(paths[i], "/");
+		tmp = ft_strjoin(paths[j], "/");
 		if (!tmp)
-			msh_exit(msh, "ft_strjoin failed");
-		pathname = ft_strjoin(tmp, msh->cmd.cmd[0]);
+			msh_error(msh, "ft_strjoin failed");
+		pathname = ft_strjoin(tmp, msh->cmd[i][0]);
 		free(tmp);
 		if (!pathname)
-			msh_exit(msh, "ft_strjoin failed");
+			msh_error(msh, "ft_strjoin failed");
 		if (access(pathname, F_OK) == 0)
 			return (pathname);
 		free(pathname);
@@ -70,25 +70,27 @@ char	*msh_pathname_r(t_msh *msh, char **paths)
 	return (NULL);
 }
 
-char	*msh_pathname(t_msh *msh)
+char	*msh_pathname(t_msh *msh, int i)
 {
 	char	**paths;
 	char	*pathname;
+	int		j;
 
+	j = 0;
 	pathname = NULL;
-	if (access(msh->cmd.cmd[0], F_OK) == 0)
-		pathname = msh->cmd.cmd[0];
+	if (access(msh->cmd[i][0], F_OK) == 0)
+		pathname = msh->cmd[i][0];
 	else
 	{
-		while (*msh->envp && ft_strncmp(*msh->envp, "PATH=", 5) != 0)
-			msh->envp++;
-		if (*msh->envp)
+		while (msh->envp[j] && ft_strncmp(msh->envp[j], "PATH=", 5) != 0)
+			j++;
+		if (msh->envp[j])
 		{
-			paths = ft_split(*msh->envp + 5, ':');
+			paths = ft_split(msh->envp[j] + 5, ':');
 			if (!paths)
-				msh_exit(msh, "ft_split failed");
-			pathname = msh_pathname_r(msh, paths);
-			ft_free_array(paths);
+				msh_error(msh, "ft_split failed");
+			pathname = msh_pathname_r(msh, paths, i);
+			ft_array_free(paths);
 		}
 	}
 	return (pathname);
@@ -121,81 +123,42 @@ char	*msh_read(ssize_t rr)
 	return (out);
 } 
 
-void	msh_fork(t_msh *msh)
+void	msh_fork(t_msh *msh, int i)
 {
-	msh->pid.pid = fork();
-	if (msh->pid.pid == -1)
-		msh_exit(msh, "fork failed");
-	if (msh->pid.pid == 0)
+	msh->pid[i] = fork();
+	if (msh->pid[i] == -1)
+		msh_error(msh, "fork failed");
+	if (msh->pid[i] == 0)
 	{
-		msh_execute(msh);
+		msh_execute(msh, i);
 	}
-}
-
-t_cmd	*msh_new_cmd(t_msh *msh, char *content)
-{
-	t_cmd	*new;
-
-	new = (t_cmd *)malloc(sizeof(t_cmd));
-	if (!new)
-		msh_exit(msh, "malloc failed");
-	new->cmd = ft_split(content, ' ');
-	if (!new->cmd)
-		msh_exit(msh, "split failed");
-	new->pathname = msh_pathname(msh);
-	new->next = NULL;
-	return (new);
-}
-
-t_cmd	*msh_add_cmd(t_msh *msh, char *content)
-{
-	t_cmd	*new;
-	t_cmd	*current;
-
-	new = msh_new_cmd(msh, content);
-	if (!new->cmd)
-		msh_exit(msh, "couldn't create new entry");
-	if (!&msh->cmd)
-		msh->cmd = *new;
-	else
-	{
-		current = &msh->cmd;
-		while (current->next)
-			current = current->next;
-		current->next = new;
-	}
-	return (new);
 }
 
 void	msh_initialize(t_msh *msh, char **envp)
 {
-	t_cmd	tmp;
+	int		i;
 
+	i = 0;
 	msh->status = 1;
+	msh->envp = envp;
 	msh->in_str = msh_read(1);
 	if (!msh->in_str)
-		msh_exit(msh, "couldn't read");
+		msh_error(msh, "couldn't read");
 	msh->in_arr = ft_split(msh->in_str, '|');
-	while (*msh->in_arr)
-	{
-		ft_printf("%s\n", *msh->in_arr++);
-	}
-	// exit(42);
 	if (!msh->in_arr)
-		msh_exit(msh, "split failed");
-	while (*msh->in_arr)
+		msh_error(msh, "split failed");
+	while (msh->in_arr[i])
 	{
-		tmp = *msh_new_cmd(msh, *msh->in_arr++);
-		msh->cmd = tmp;
+		msh->cmd = ft_split(msh->in_arr[i], ' ');
+		if (!msh->cmd)
+			msh_error(msh, "split failed");
+		msh->pathname = msh_pathname(msh, i++);
 	}
-	msh->envp = envp;
-	// msh->cmd.cmd = ft_split(msh->in_arr[0], ' ');
-	// if (!msh->cmd.cmd)
-	// 	msh_exit(msh, "split failed");
-	// msh->envp = ft_copy_array(envp);
-	// if (!msh->envp)
-	// 	msh_exit(msh, "array copy failed");
-	// msh->cmd.pathname = msh_pathname(msh);
+	msh->pid = (pid_t *)malloc(sizeof(pid_t) * (i - 1));
+	if (!msh->pid)
+		msh_error(msh, "malloc error");
+	while (i >= 0)
+		msh->pid[i--] = -1;
 }
 
 int	main(int argc, char **argv, char **envp)
@@ -207,8 +170,8 @@ int	main(int argc, char **argv, char **envp)
 	while (argv[0])
 	{
 		msh_initialize(&msh, envp);
-		msh_fork(&msh);
-		msh_free(&msh);
+		msh_fork(&msh, 0);
+		//msh_free(&msh);
 	}
 	return (0);
 }

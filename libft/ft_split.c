@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/06 17:06:37 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/04/17 19:06:13 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/04/23 18:08:02 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ static char	**ft_fillarray(size_t counter, size_t len, char **arr, char *copy)
 		arr[j] = (char *)malloc(sizeof(char) * (ft_strlen(&copy[i]) + 1));
 		if (arr[j] == NULL)
 		{
-			ft_free_array(arr);
+			ft_array_free(arr);
 			return (free(copy), NULL);
 		}
 		while (copy[i] != '\0')

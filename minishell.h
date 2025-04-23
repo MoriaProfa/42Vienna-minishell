@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/04/22 17:37:57 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/04/23 17:42:19 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,27 +20,15 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 
-typedef struct s_cmd
-{
-	char			**cmd;
-	char			*pathname;
-	struct s_cmd	*next;
-}					t_cmd;
-
-typedef struct s_pid
-{
-	pid_t			pid;
-	struct s_pid	*next;
-}					t_pid;
-
 typedef struct s_msh
 {
-	char			*in_str;
-	char			**in_arr;
-	char			**envp;
-	int				status;
-	t_cmd			cmd;
-	t_pid			pid;
-}					t_msh;
+	char	*in_str;
+	char	**in_arr;
+	char	**cmd;
+	char	**pathname;
+	char	**envp;
+	int		status;
+	pid_t	**pid;
+}			t_msh;
 
 #endif

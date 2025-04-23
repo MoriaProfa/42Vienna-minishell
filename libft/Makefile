@@ -38,8 +38,9 @@ MY_SOURCES = ft_atoi.c ft_atol.c \
 				ft_putstr_fd.c ft_putendl_fd.c \
 				ft_putnbr_fd.c \
 				ft_split.c \
-				ft_free_array.c \
-				ft_copy_array.c \
+				ft_array_free.c \
+				ft_array_copy.c \
+				ft_array_size.c \
 				ft_free.c
 
 MY_OBJECTS = $(MY_SOURCES:.c=.o)
