@@ -6,23 +6,37 @@
 /*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/04/23 19:19:55 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/04/24 15:36:47 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+void	msh_cmd_free(char ***cmd)
+{
+	int i;
+
+	i = 0;
+	while (cmd[i])
+	{
+		ft_array_free(cmd[i]);
+		cmd[i++] = NULL;
+	}
+	free(cmd);
+}
+
 void	msh_free(t_msh *msh)
 {
 	if (msh->in_str)
 		ft_free(&msh->in_str);
-	while (*msh->cmd)
-	{
-		if (*msh->cmd)
-			ft_array_free(*msh->cmd);
-	}
+	if (msh->in_arr)
+		ft_array_free(msh->in_arr);
+	if (msh->cmd)
+		msh_cmd_free(msh->cmd);
 	if (msh->pathname)
 		ft_array_free(msh->pathname);
+	if (msh->pid)
+		free(msh->pid);
 }
 
 void	msh_error(t_msh *msh, char *msg)
@@ -165,24 +179,40 @@ void	msh_initialize(t_msh *msh, char **envp)
 		msh->pathname[i] = msh_pathname(msh, i);
 		i++;
 	}
-	msh->pid = (pid_t *)malloc(sizeof(pid_t) * (i - 1));
+	msh->pid = (pid_t *)malloc(sizeof(pid_t) * (msh->n + 1));
 	if (!msh->pid)
 		msh_error(msh, "malloc error");
-	while (i >= 0)
-		msh->pid[i--] = -1;
+	i = -1;
+	while (++i < msh->n)
+		msh->pid[i] = -1;
 }
 
 int	main(int argc, char **argv, char **envp)
 {
 	t_msh	msh;
+	int		i;
 
 	if (argc > 2)
 		ft_printf("%s\n", "oops");
-	while (argv[0])
+	(void)argv;
+	msh_initialize(&msh, envp);
+	i = -1;
+	while (++i < msh.n)
 	{
-		msh_initialize(&msh, envp);
-		msh_fork(&msh, 0);
-		//msh_free(&msh);
+		ft_printf("%s\n", msh.cmd[i][0]);
+		ft_printf("%s\n", msh.pathname[i]);
+		ft_printf("%d\n", msh.pid[i]);
 	}
+	msh_free(&msh);
+	// while (argv[0])
+	// {
+	// 	msh_initialize(&msh, envp);
+	// 	i = 0;
+	// 	while (i < msh.n)
+	// 	{
+	// 		msh_fork(&msh, i++);
+	// 	}
+	// 	//msh_free(&msh);
+	// }
 	return (0);
 }
