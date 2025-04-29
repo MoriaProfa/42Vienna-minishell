@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/04/24 15:36:47 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/04/29 19:43:51 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	msh_cmd_free(char ***cmd)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (cmd[i])
@@ -140,20 +140,28 @@ char	*msh_read(ssize_t rr)
 	return (out);
 }
 
-void	msh_fork(t_msh *msh, int i)
+void	msh_fork(t_msh *msh, int i, int fd_in, int fd_out)
 {
 	msh->pid[i] = fork();
 	if (msh->pid[i] == -1)
 		msh_error(msh, "fork failed");
 	if (msh->pid[i] == 0)
 	{
+		if (fd_in != -1)
+			dup2(fd_in, STDIN_FILENO);
+		if (fd_out != -1)
+			dup2(fd_out, STDOUT_FILENO);
+		if (fd_in != -1)
+			close(fd_in);
+		if (fd_out != -1)
+			close(fd_out);
 		msh_execute(msh, i);
 	}
 }
 
 void	msh_initialize(t_msh *msh, char **envp)
 {
-	int		i;
+	int	i;
 
 	i = 0;
 	msh->status = 1;
@@ -185,6 +193,38 @@ void	msh_initialize(t_msh *msh, char **envp)
 	i = -1;
 	while (++i < msh->n)
 		msh->pid[i] = -1;
+	msh->fd[0] = -1;
+	msh->fd[1] = -1;
+	msh->fd_in = -1;
+	msh->fd_out = -1;
+}
+
+void	msh_pipeline(t_msh *msh, int i)
+{
+	while (i < msh->n)
+	{
+		if (i < msh->n - 1)
+		{
+			if (pipe(msh->fd) == -1)
+				msh_error(msh, "pipe failed");
+			msh->fd_out = msh->fd[1];
+		}
+		msh_fork(msh, i, msh->fd_in, msh->fd_out);
+		if (msh->fd_in != -1)
+			close(msh->fd_in);
+		if (i < msh->n - 1)
+		{
+			close(msh->fd[1]);       // close write end
+			msh->fd_in = msh->fd[0];      // keep read end for next command
+		}
+		i++;
+	}
+	i = 0;
+	while (i < msh->n)
+	{
+		waitpid(msh->pid[i], &msh->status, 0);
+		i++;
+	}
 }
 
 int	main(int argc, char **argv, char **envp)
@@ -196,23 +236,8 @@ int	main(int argc, char **argv, char **envp)
 		ft_printf("%s\n", "oops");
 	(void)argv;
 	msh_initialize(&msh, envp);
-	i = -1;
-	while (++i < msh.n)
-	{
-		ft_printf("%s\n", msh.cmd[i][0]);
-		ft_printf("%s\n", msh.pathname[i]);
-		ft_printf("%d\n", msh.pid[i]);
-	}
+	i = 0;
+	msh_pipeline(&msh, 0);
 	msh_free(&msh);
-	// while (argv[0])
-	// {
-	// 	msh_initialize(&msh, envp);
-	// 	i = 0;
-	// 	while (i < msh.n)
-	// 	{
-	// 		msh_fork(&msh, i++);
-	// 	}
-	// 	//msh_free(&msh);
-	// }
 	return (0);
 }
