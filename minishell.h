@@ -19,6 +19,8 @@
 # include <stdio.h>
 # include <sys/types.h>
 # include <sys/wait.h>
+# include <readline/readline.h>
+# include <readline/history.h>
 
 typedef struct s_msh
 {
