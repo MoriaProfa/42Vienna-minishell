@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/04/29 19:43:51 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/05/07 15:18:17 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -239,5 +239,5 @@ int	main(int argc, char **argv, char **envp)
 	i = 0;
 	msh_pipeline(&msh, 0);
 	msh_free(&msh);
-	return (0);
+	return (0); //testcomment from Babsy
 }
