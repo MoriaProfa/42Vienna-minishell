@@ -11,15 +11,15 @@ MY_OBJECTS = $(MY_SOURCES:.c=.o)
 all: $(NAME)
 
 $(NAME): $(MY_OBJECTS)
-		cd ft_printf && $(MAKE)
-		$(CC) $(CFLAGS) $(MY_OBJECTS) ft_printf/libftprintf.a -o $(NAME)
+		cd libft && $(MAKE)
+		$(CC) $(CFLAGS) $(MY_OBJECTS) libft/libft.a -o $(NAME)
 
 clean:
-		cd ft_printf && $(MAKE) clean
+		cd libft && $(MAKE) clean
 		rm -f $(MY_OBJECTS)
 
 fclean:
-		cd ft_printf && $(MAKE) fclean
+		cd libft && $(MAKE) fclean
 		rm -f $(NAME) $(MY_OBJECTS)
 
 re:		fclean $(NAME)

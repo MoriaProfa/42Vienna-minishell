@@ -13,7 +13,6 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include "ft_printf/ft_printf.h" //<stdarg.h>
 # include "libft/libft.h" 
 //<stdint.h>
 //<stdlib.h> (malloc, free, getenv)
