@@ -233,7 +233,7 @@ int	main(int argc, char **argv, char **envp)
 	//int		i;
 
 	if (argc > 2)
-		ft_putendl_fd("oops", 2); //so it prints on stderr, not stdout like it does with printf
+		ft_putendl_fd("Not enough arguments", 2);
 	(void)argv;
 	msh_initialize(&msh, envp);
 	//i = 0;
