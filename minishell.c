@@ -214,8 +214,8 @@ void	msh_pipeline(t_msh *msh, int i)
 			close(msh->fd_in);
 		if (i < msh->n - 1)
 		{
-			close(msh->fd[1]);       // close write end
-			msh->fd_in = msh->fd[0];      // keep read end for next command
+			close(msh->fd[1]);// close write end
+			msh->fd_in = msh->fd[0];// keep read end for next command
 		}
 		i++;
 	}
@@ -230,13 +230,11 @@ void	msh_pipeline(t_msh *msh, int i)
 int	main(int argc, char **argv, char **envp)
 {
 	t_msh	msh;
-	//int		i;
 
 	if (argc > 2)
 		ft_putendl_fd("Not enough arguments", 2);
 	(void)argv;
 	msh_initialize(&msh, envp);
-	//i = 0;
 	msh_pipeline(&msh, 0);
 	msh_free(&msh);
 	return (0);
