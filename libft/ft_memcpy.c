@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   ft_memcpy.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 19:35:00 by edarmaev          #+#    #+#             */
 /*   Updated: 2025/04/17 21:13:39 by edarmaev         ###   ########.fr       */

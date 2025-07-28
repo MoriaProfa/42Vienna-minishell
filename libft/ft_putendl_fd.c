@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   ft_putendl_fd.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/06 16:41:27 by edarmaev          #+#    #+#             */
 /*   Updated: 2025/03/25 15:34:51 by edarmaev         ###   ########.fr       */

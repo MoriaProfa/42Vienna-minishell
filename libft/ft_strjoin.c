@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strjoin.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/04 18:36:49 by edarmaev          #+#    #+#             */
 /*   Updated: 2025/03/25 15:41:09 by edarmaev         ###   ########.fr       */

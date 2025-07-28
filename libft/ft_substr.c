@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   ft_substr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/04 16:50:43 by edarmaev          #+#    #+#             */
 /*   Updated: 2025/04/16 22:46:27 by edarmaev         ###   ########.fr       */

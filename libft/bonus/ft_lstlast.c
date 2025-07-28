@@ -6,15 +6,15 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 18:38:57 by astehl            #+#    #+#             */
-/*   Updated: 2025/07/28 17:52:28 by astehl           ###   ########.fr       */
+/*   Updated: 2025/07/28 17:09:02 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../libft.h"
 
-t_list  *ft_lstlast(t_list *lst)
+t_list	*ft_lstlast(t_list *lst)
 {
-    while (lst->next)
-        lst = lst->next;
-    return (lst);
+	while (lst->next)
+		lst = lst->next;
+	return (lst);
 }
