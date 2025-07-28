@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strcopy.c                                       :+:      :+:    :+:   */
+/*   ft_strcpy.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,7 +12,7 @@
 
 #include "../libft.h"
 
-char	*ft_strcopy(char *str)
+char	*ft_strcpy(char *str)
 {
 	char	*copy;
 	int		i;

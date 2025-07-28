@@ -29,7 +29,7 @@ char	**ft_copy_array(char **array)
 	copy[i] = NULL;
 	while (--i >= 0)
 	{
-		copy[i] = ft_strcopy(array[i]);
+		copy[i] = ft_strcpy(array[i]);
 		if (!copy[i])
 		{
 			ft_array_free(copy);

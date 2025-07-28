@@ -42,7 +42,7 @@ MY_SOURCES = ft_atoi.c \
 				advanced_libft/ft_array_copy.c \
 				advanced_libft/ft_array_size.c \
 				advanced_libft/ft_atol.c \
-				advanced_libft/ft_strcopy.c \
+				advanced_libft/ft_strcpy.c \
 				advanced_libft/ft_strjoin_with_space.c \
 				advanced_libft/ft_free.c
 

@@ -129,7 +129,7 @@ char	*msh_read(ssize_t rr)
 		if (buf[0] == '\n')
 			return (out);
 		if (!out)
-			out = ft_strcopy(buf);
+			out = ft_strcpy(buf);
 		else
 		{
 			tmp = out;
