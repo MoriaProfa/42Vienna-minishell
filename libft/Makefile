@@ -2,7 +2,7 @@ NAME = libft.a
 
 CC = cc
 
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -MMD -MP
 
 MY_SOURCES = ft_atoi.c \
 				ft_bzero.c \
@@ -57,10 +57,13 @@ BONUS_SOURCES = bonus/ft_lstadd_back.c \
 				bonus/ft_lstsize.c
 
 MY_OBJECTS = $(MY_SOURCES:.c=.o)
-
 BONUS_OBJECTS = $(BONUS_SOURCES:.c=.o)
 
+MY_DEPENDENCIES = $(MY_SOURCES:.c=.d)
+BONUS_DEPENDENCIES = $(BONUS_SOURCES:.c=.d)
+
 all: $(NAME)
+-include $(MY_DEPENDENCIES) $(BONUS_DEPENDENCIES)
 
 $(NAME): $(MY_OBJECTS)
 	ar rcs $(NAME) $(MY_OBJECTS)
@@ -69,7 +72,7 @@ bonus: $(MY_OBJECTS) $(BONUS_OBJECTS)
 	ar rcs $(NAME) $(MY_OBJECTS) $(BONUS_OBJECTS)
 
 clean:
-	rm -f $(MY_OBJECTS) $(BONUS_OBJECTS)
+	rm -f $(MY_OBJECTS) $(BONUS_OBJECTS) $(MY_DEPENDENCIES) $(BONUS_DEPENDENCIES)
 
 fclean: clean
 	rm -f $(NAME)
