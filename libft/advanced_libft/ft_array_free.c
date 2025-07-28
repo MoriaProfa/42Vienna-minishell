@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   ft_array_free.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 10:59:06 by edarmaev          #+#    #+#             */
 /*   Updated: 2025/04/23 19:10:44 by edarmaev         ###   ########.fr       */
