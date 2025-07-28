@@ -12,7 +12,7 @@
 
 #include "../libft.h"
 
-char	**ft_copy_array(char **array)
+char	**ft_array_copy(char **array)
 {
 	char	**copy;
 	int		i;
