@@ -1,37 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strcopy.c                                       :+:      :+:    :+:   */
+/*   ft_array_size.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/03 20:34:06 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/04/17 19:07:19 by edarmaev         ###   ########.fr       */
+/*   Created: 2025/04/23 18:04:25 by edarmaev          #+#    #+#             */
+/*   Updated: 2025/04/23 18:13:44 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "../libft.h"
 
-char	*ft_strcopy(char *str)
+size_t	ft_array_size(char **array)
 {
-	char	*copy;
-	int		i;
-	size_t	size;
+	size_t	i;
 
 	i = 0;
-	if (str)
-	{
-		size = ft_strlen(str) + 1;
-		copy = (char *)malloc(size * sizeof(char));
-		if (copy == NULL)
-			return (NULL);
-		while (str[i])
-		{
-			copy[i] = str[i];
-			i++;
-		}
-		copy[i] = '\0';
-		return (copy);
-	}
-	return (NULL);
+	while (array && array[i])
+		i++;
+	return (i);
 }

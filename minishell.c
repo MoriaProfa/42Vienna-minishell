@@ -230,14 +230,14 @@ void	msh_pipeline(t_msh *msh, int i)
 int	main(int argc, char **argv, char **envp)
 {
 	t_msh	msh;
-	int		i;
+	//int		i;
 
 	if (argc > 2)
-		ft_printf("%s\n", "oops");
+		ft_putendl_fd("oops", 2); //so it prints on stderr, not stdout like it does with printf
 	(void)argv;
 	msh_initialize(&msh, envp);
-	i = 0;
+	//i = 0;
 	msh_pipeline(&msh, 0);
 	msh_free(&msh);
-	return (0); //testcomment from Babsy
+	return (0);
 }

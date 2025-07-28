@@ -4,7 +4,7 @@ CC = cc
 
 CFLAGS = -Wall -Wextra -Werror
 
-MY_SOURCES = ft_atoi.c ft_atol.c \
+MY_SOURCES = ft_atoi.c \
 				ft_bzero.c \
 				ft_calloc.c \
 				ft_isalnum.c \
@@ -28,20 +28,23 @@ MY_SOURCES = ft_atoi.c ft_atol.c \
 				ft_tolower.c \
 				ft_toupper.c \
 				ft_substr.c \
-				ft_strjoin.c ft_strjoin_with_space.c \
-				ft_strcopy.c \
+				ft_strjoin.c \
 				ft_strtrim.c \
 				ft_itoa.c \
 				ft_strmapi.c \
 				ft_striteri.c \
 				ft_putchar_fd.c \
-				ft_putstr_fd.c ft_putendl_fd.c \
+				ft_putstr_fd.c \
+				ft_putendl_fd.c \
 				ft_putnbr_fd.c \
 				ft_split.c \
-				ft_array_free.c \
-				ft_array_copy.c \
-				ft_array_size.c \
-				ft_free.c
+				advanced_libft/ft_array_free.c \
+				advanced_libft/ft_array_copy.c \
+				advanced_libft/ft_array_size.c \
+				advanced_libft/ft_atol.c \
+				advanced_libft/ft_strcopy.c \
+				advanced_libft/ft_strjoin_with_space.c \
+				advanced_libft/ft_free.c
 
 MY_OBJECTS = $(MY_SOURCES:.c=.o)
 
