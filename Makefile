@@ -11,7 +11,7 @@ MY_OBJECTS = $(MY_SOURCES:.c=.o)
 all: $(NAME)
 
 $(NAME): $(MY_OBJECTS)
-		cd libft && $(MAKE)
+		cd libft && $(MAKE) bonus
 		$(CC) $(CFLAGS) $(MY_OBJECTS) libft/libft.a -o $(NAME)
 
 clean:

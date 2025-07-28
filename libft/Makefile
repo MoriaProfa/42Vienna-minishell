@@ -46,19 +46,34 @@ MY_SOURCES = ft_atoi.c \
 				advanced_libft/ft_strjoin_with_space.c \
 				advanced_libft/ft_free.c
 
+BONUS_SOURCES = bonus/ft_lstadd_back.c \
+				bonus/ft_lstadd_front.c \
+				bonus/ft_lstclear.c \
+				bonus/ft_lstdelone.c \
+				bonus/ft_lstiter.c \
+				bonus/ft_lstlast.c \
+				bonus/ft_lstmap.c \
+				bonus/ft_lstnew.c \
+				bonus/ft_lstsize.c
+
 MY_OBJECTS = $(MY_SOURCES:.c=.o)
+
+BONUS_OBJECTS = $(BONUS_SOURCES:.c=.o)
 
 all: $(NAME)
 
 $(NAME): $(MY_OBJECTS)
 	ar rcs $(NAME) $(MY_OBJECTS)
 
+bonus: $(MY_OBJECTS) $(BONUS_OBJECTS)
+	ar rcs $(NAME) $(MY_OBJECTS) $(BONUS_OBJECTS)
+
 clean:
-	rm -f $(MY_OBJECTS)
+	rm -f $(MY_OBJECTS) $(BONUS_OBJECTS)
 
-fclean: 
-	rm -f $(NAME) $(MY_OBJECTS)
+fclean: clean
+	rm -f $(NAME)
 
-re:	fclean $(NAME)
+re:	fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re bonus

@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 15:03:49 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/04/23 18:06:24 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/07/28 17:43:24 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,14 @@
 # include <stdlib.h>
 # include <unistd.h>
 
+typedef struct s_list
+{
+	void			*content;
+	struct s_list	*next;
+
+}					t_list;
+
 int		ft_atoi(const char *nptr);
-long	ft_atol(const char *nptr);
 void	ft_bzero(void *s, size_t n);
 void	*ft_calloc(size_t nmemb, size_t size);
 int		ft_isalnum(int c);
@@ -42,8 +48,6 @@ int		ft_tolower(int c);
 int		ft_toupper(int c);
 char	*ft_substr(char const *s, unsigned int start, size_t len);
 char	*ft_strjoin(char const *s1, char const *s2);
-char	*ft_strjoin_with_space(char const *s1, char const *s2);
-char	*ft_strcpy(char *str);
 char	*ft_strtrim(char const *s1, char const *set);
 char	*ft_itoa(int n);
 char	*ft_strmapi(char const *s, char (*f)(unsigned int, char));
@@ -53,9 +57,25 @@ void	ft_putstr_fd(char *s, int fd);
 void	ft_putendl_fd(char *s, int fd);
 void	ft_putnbr_fd(int n, int fd);
 char	**ft_split(char const *s, char c);
-void	ft_array_free(char **arr);
+
+//bonus
+t_list  *ft_lstnew(void *content);
+void    ft_lstadd_front(t_list **lst, t_list *new);
+int     ft_lstsize(t_list *lst);
+t_list  *ft_lstlast(t_list *lst);
+void    ft_lstadd_back(t_list **lst, t_list *new);
+void    ft_lstdelone(t_list *lst, void (*del)(void*));
+void    ft_lstclear(t_list **lst, void (*del)(void*));
+void    ft_lstiter(t_list *lst, void (*f)(void *));
+t_list  *ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
+
+//advanced_libft
 char	**ft_array_copy(char **array);
+void	ft_array_free(char **arr);
 size_t	ft_array_size(char **array);
+long	ft_atol(const char *nptr);
 void	ft_free(char **p);
+char	*ft_strcpy(char *str);
+char	*ft_strjoin_with_space(char const *s1, char const *s2);
 
 #endif
