@@ -2,7 +2,7 @@ NAME = minishell
 
 CC = cc
 
-CFLAGS = -Wall -Wextra -Werror -lreadline -MMD -MP -g
+CFLAGS = -Wall -Wextra -Werror -MMD -MP -g
 
 MY_SOURCES = minishell.c
 
@@ -15,7 +15,7 @@ all: $(NAME)
 
 $(NAME): $(MY_OBJECTS)
 		cd libft && $(MAKE) bonus
-		$(CC) $(CFLAGS) $(MY_OBJECTS) libft/libft.a -o $(NAME)
+		$(CC) $(CFLAGS) $(MY_OBJECTS) libft/libft.a -o $(NAME) -lreadline
 
 clean:
 		cd libft && $(MAKE) clean

@@ -113,7 +113,7 @@ char	*msh_pathname(t_msh *msh, int i)
 	return (pathname);
 }
 
-char	*msh_read(ssize_t rr)
+char	*msh_read(ssize_t rr) //useless now?!
 {
 	char	buf[2];
 	char	*tmp;
@@ -166,7 +166,7 @@ void	msh_initialize(t_msh *msh, char **envp)
 	i = 0;
 	msh->status = 1;
 	msh->envp = envp;
-	msh->in_str = msh_read(1);
+	msh->in_str = readline("minishell: "); //msh_read(1);
 	if (!msh->in_str)
 		msh_error(msh, "couldn't read");
 	msh->in_arr = ft_split(msh->in_str, '|');
