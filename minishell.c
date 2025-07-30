@@ -11,9 +11,7 @@
 /* ************************************************************************** */
 
 //valgrind command:
-//valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --suppressions=readline.supp ./minishell
-
-#define _POSIX_C_SOURCE 200809L //for vscode only so signals work!
+//valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --suppressions=minishell.supp ./minishell
 
 #include "minishell.h"
 
@@ -59,29 +57,41 @@ void	msh_free(t_msh *msh)
 	}
 }
 
-void	msh_error(t_msh *msh, char *msg)
+void	msh_error(t_msh *msh, char *msg, int status)
 {
 	ft_putendl_fd(msg, 2);
 	msh_free(msh);
 	rl_clear_history();
-	exit(msh->status);
+	exit(status);
+}
+
+void	return_prompt()
+{
+	rl_replace_line("", 0);
+	ioctl(0, TIOCSTI, "\n");
+	rl_on_new_line();
 }
 
 void	msh_execute(t_msh *msh, int i)
 {
 	if (!msh->pathname[i])
-	{
-		msh->status = 127;
-		msh_error(msh, "command not found");//should not exit but display a new prompt
-	}
+	/*{
+		//ft_putstr_fd(msh->pathname[i], 2);
+		ft_putstr_fd("command not found", 2);
+		return_prompt();
+		return ;
+	}*/
+		msh_error(msh, "command not found", 127);//should not exit but display a new prompt, maybe just use perror to print the errno-msg
 	else if (msh->pathname[i] && access(msh->pathname[i], X_OK) == -1)
-	{
-		msh->status = 126;
-		msh_error(msh, "permission denied");//should also not exit at this point I guess?
-	}
+	/*{
+		perror("Pathname");
+		return_prompt();
+		return ;
+	}*/
+		msh_error(msh, "permission denied", 126);//should also not exit at this point
 	else if (msh->pathname[i] && access(msh->pathname[i], X_OK) == 0)
 		execve(msh->pathname[i], msh->cmd[i], msh->envp);
-	msh_error(msh, "execve failed");//dunno if it should exit here...
+	msh_error(msh, "execve failed", msh->status);//should also not exit at this point
 }
 
 char	*msh_pathname_r(t_msh *msh, char **paths, int i)
@@ -96,11 +106,11 @@ char	*msh_pathname_r(t_msh *msh, char **paths, int i)
 	{
 		tmp = ft_strjoin(paths[j], "/");
 		if (!tmp)
-			msh_error(msh, "pathname tmp ft_strjoin failed");
+			msh_error(msh, "pathname tmp ft_strjoin failed", msh->status);
 		pathname = ft_strjoin(tmp, msh->cmd[i][0]);
 		free(tmp);
 		if (!pathname)
-			msh_error(msh, "pathname ft_strjoin failed");
+			msh_error(msh, "pathname ft_strjoin failed", msh->status);
 		if (access(pathname, F_OK) == 0)
 			return (pathname);
 		free(pathname);
@@ -126,15 +136,15 @@ char	*msh_pathname(t_msh *msh, int i)
 		{
 			paths = ft_split(msh->envp[j] + 5, ':');
 			if (!paths)
-				msh_error(msh, "paths ft_split failed");
+				msh_error(msh, "paths ft_split failed", msh->status);
 			pathname = msh_pathname_r(msh, paths, i);
 			ft_array_free(paths);
 		}
 	}
 	return (pathname);
 }
-
-char	*msh_read(ssize_t rr) //useless now?!
+/* useless because of use of readline atm
+char	*msh_read(ssize_t rr)
 {
 	char	buf[2];
 	char	*tmp;
@@ -160,12 +170,13 @@ char	*msh_read(ssize_t rr) //useless now?!
 	}
 	return (out);
 }
+*/
 
 void	msh_fork(t_msh *msh, int i, int fd_in, int fd_out)
 {
 	msh->pid[i] = fork();
 	if (msh->pid[i] == -1)
-		msh_error(msh, "fork failed");
+		msh_error(msh, "fork failed", msh->status);
 	if (msh->pid[i] == 0)
 	{
 		if (fd_in != -1)
@@ -189,25 +200,25 @@ void	msh_initialize(t_msh *msh, char **envp)
 	msh->envp = envp;
 	msh->in_arr = ft_split(msh->in_str, '|');
 	if (!msh->in_arr)
-		msh_error(msh, "in_arr split failed");
+		msh_error(msh, "in_arr split failed", msh->status);
 	msh->n = (int)ft_array_size(msh->in_arr);
 	msh->cmd = (char ***)ft_calloc(msh->n + 1, sizeof(char **));
 	if (!msh->cmd)
-		msh_error(msh, "cmd malloc failed");
+		msh_error(msh, "cmd malloc failed", msh->status);
 	msh->pathname = (char **)ft_calloc(msh->n + 1, sizeof(char *));
 	if (!msh->pathname)
-		msh_error(msh, "pathname malloc oopsie");
+		msh_error(msh, "pathname malloc oopsie", msh->status);
 	while (msh->in_arr[i])
 	{
 		msh->cmd[i] = ft_split(msh->in_arr[i], ' ');
 		if (!msh->cmd[i])
-			msh_error(msh, "cmd plit failed");
+			msh_error(msh, "cmd plit failed", msh->status);
 		msh->pathname[i] = msh_pathname(msh, i);
 		i++;
 	}
 	msh->pid = (pid_t *)ft_calloc(msh->n + 1, sizeof(pid_t));
 	if (!msh->pid)
-		msh_error(msh, "pid malloc error");
+		msh_error(msh, "pid malloc error", msh->status);
 	i = -1;
 	while (++i < msh->n)
 		msh->pid[i] = -1;
@@ -224,7 +235,7 @@ void	msh_pipeline(t_msh *msh, int i)
 		if (i < msh->n - 1)
 		{
 			if (pipe(msh->fd) == -1)
-				msh_error(msh, "pipe failed");
+				msh_error(msh, "pipe failed", msh->status);
 			msh->fd_out = msh->fd[1];
 		}
 		msh_fork(msh, i, msh->fd_in, msh->fd_out);
@@ -245,55 +256,44 @@ void	msh_pipeline(t_msh *msh, int i)
 	}
 }
 
-void	handle_signal(int signal, siginfo_t *info, void *context)
+void	handle_signal(int signal)
 {
-	(void)*context;
-	(void)*info;
 	if (signal == SIGINT)
 	{
 		signal_flag = signal + 128;
-		write(1, "\n", 1);
-		rl_replace_line("", 0);
-		rl_on_new_line();
-		rl_redisplay();
-	}
-	else if (signal == SIGQUIT)
-		signal_flag = signal + 128;
+		return_prompt();
+	}	
 }
 
 int	main(int argc, char **argv, char **envp)
 {
 	t_msh				msh;
-	struct sigaction	sa;
-
-	if (argc > 2)
-		ft_putendl_fd("Not enough arguments", 2);
+	
+	if (argc > 1)
+		return (ft_putendl_fd("No arguments accepted.", 2), 1);
 	(void)argv;
-	rl_catch_signals = 0;
-	sa.sa_sigaction = handle_signal;
-	sa.sa_flags = SA_SIGINFO;
-	sigemptyset(&sa.sa_mask);
-	sigaction(SIGINT, &sa, NULL);
-	sigaction(SIGQUIT, &sa, NULL);
+	signal(SIGINT, handle_signal);
+	signal(SIGQUIT, SIG_IGN);
+	ft_bzero(&msh, sizeof(t_msh));
 	while (1)
 	{
-		msh.in_str = readline("minishell: "); //msh_read(1);
+		
+		msh.in_str = readline("minishell> ");
 		if (!msh.in_str) //by pressing CTRL+D
 			break ;
+		add_history(msh.in_str);
 		if (signal_flag)
 		{
 			free(msh.in_str);
-			msh.in_str = NULL;//bash prints ^C when ctrl+c is pressed, ignores ctrl+\ .
+			msh.in_str = NULL;
 			msh.status = signal_flag;
 			signal_flag = 0;
+			continue ;
 		}
-		add_history(msh.in_str);
-		msh_initialize(&msh, envp);
+		msh_initialize(&msh, envp); //envp is also accessible with __environ (=global env variable)
 		msh_pipeline(&msh, 0);
 		msh_free(&msh);
 	}
-	ft_putendl_fd("exit", 1);
-	rl_clear_history();//somehow we still have leaks from add_history?
-	msh_free(&msh);
+	msh_error(&msh, "exit", msh.status);
 	return (0);
 }
