@@ -13,7 +13,11 @@
 //valgrind command:
 //valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --suppressions=readline.supp ./minishell
 
+#define _POSIX_C_SOURCE 200809L //for vscode only so signals work!
+
 #include "minishell.h"
+
+volatile sig_atomic_t   signal_flag = 0;
 
 void	msh_cmd_free(char ***cmd)
 {
@@ -54,16 +58,16 @@ void	msh_execute(t_msh *msh, int i)
 	if (!msh->pathname[i])
 	{
 		msh->status = 127;
-		msh_error(msh, "command not found");
+		msh_error(msh, "command not found");//should not exit but display a new prompt
 	}
 	else if (msh->pathname[i] && access(msh->pathname[i], X_OK) == -1)
 	{
 		msh->status = 126;
-		msh_error(msh, "permission denied");
+		msh_error(msh, "permission denied");//should also not exit at this point I guess?
 	}
 	else if (msh->pathname[i] && access(msh->pathname[i], X_OK) == 0)
 		execve(msh->pathname[i], msh->cmd[i], msh->envp);
-	msh_error(msh, "execve failed");
+	msh_error(msh, "execve failed");//dunno if it should exit here...
 }
 
 char	*msh_pathname_r(t_msh *msh, char **paths, int i)
@@ -227,18 +231,49 @@ void	msh_pipeline(t_msh *msh, int i)
 	}
 }
 
+void	handle_signal(int signal, siginfo_t *info, void *context)
+{
+	(void)*context;
+	(void)*info;
+	if (signal == SIGINT)
+	{
+		signal_flag = signal + 128;
+		write(1, "\n", 1);
+		rl_replace_line("", 0);
+		rl_on_new_line();
+		rl_redisplay();
+	}
+	else if (signal == SIGQUIT)
+		signal_flag = signal + 128;
+}
+
 int	main(int argc, char **argv, char **envp)
 {
-	t_msh	msh;
+	t_msh				msh;
+	struct sigaction	sa;
 
 	if (argc > 2)
 		ft_putendl_fd("Not enough arguments", 2);
 	(void)argv;
+	rl_catch_signals = 0;
+	sa.sa_sigaction = handle_signal;
+	sa.sa_flags = SA_SIGINFO;
+	sigemptyset(&sa.sa_mask);
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGQUIT, &sa, NULL);
 	while (1)
 	{
 		msh.in_str = readline("minishell: "); //msh_read(1);
-		if (!msh.in_str)
-			msh_error(&msh, "readline failed or EOF reached");
+		if (!msh.in_str) //by pressing CTRL+D
+			msh_error(&msh, "readline failed or EOF reached"); //oops, this causes leaks?! bash prints "exit" in this case
+		if (signal_flag)
+		{
+			free(msh.in_str);
+			msh.in_str = NULL;
+			msh.status = signal_flag;
+			signal_flag = 0;
+		}
+		//add_history(msh.in_str); //causes leaks when command not found, rework necessary
 		msh_initialize(&msh, envp);
 		msh_pipeline(&msh, 0);
 		msh_free(&msh);
