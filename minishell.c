@@ -30,6 +30,7 @@ void	msh_cmd_free(char ***cmd)
 		cmd[i++] = NULL;
 	}
 	free(cmd);
+	cmd = NULL;
 }
 
 void	msh_free(t_msh *msh)
@@ -37,19 +38,32 @@ void	msh_free(t_msh *msh)
 	if (msh->in_str)
 		ft_free(&msh->in_str);
 	if (msh->in_arr)
+	{
 		ft_array_free(msh->in_arr);
+		msh->in_arr = NULL;
+	}
 	if (msh->cmd)
+	{
 		msh_cmd_free(msh->cmd);
+		msh->cmd = NULL;
+	}
 	if (msh->pathname)
+	{
 		ft_array_free(msh->pathname);
+		msh->pathname = NULL;
+	}
 	if (msh->pid)
+	{
 		free(msh->pid);
+		msh->pid = NULL;
+	}
 }
 
 void	msh_error(t_msh *msh, char *msg)
 {
 	ft_putendl_fd(msg, 2);
 	msh_free(msh);
+	rl_clear_history();
 	exit(msh->status);
 }
 
@@ -265,18 +279,21 @@ int	main(int argc, char **argv, char **envp)
 	{
 		msh.in_str = readline("minishell: "); //msh_read(1);
 		if (!msh.in_str) //by pressing CTRL+D
-			msh_error(&msh, "readline failed or EOF reached"); //oops, this causes leaks?! bash prints "exit" in this case
+			break ;
 		if (signal_flag)
 		{
 			free(msh.in_str);
-			msh.in_str = NULL;
+			msh.in_str = NULL;//bash prints ^C when ctrl+c is pressed, ignores ctrl+\ .
 			msh.status = signal_flag;
 			signal_flag = 0;
 		}
-		//add_history(msh.in_str); //causes leaks when command not found, rework necessary
+		add_history(msh.in_str);
 		msh_initialize(&msh, envp);
 		msh_pipeline(&msh, 0);
 		msh_free(&msh);
 	}
+	ft_putendl_fd("exit", 1);
+	rl_clear_history();//somehow we still have leaks from add_history?
+	msh_free(&msh);
 	return (0);
 }
