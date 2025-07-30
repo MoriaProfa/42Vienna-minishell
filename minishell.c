@@ -162,12 +162,13 @@ void	msh_fork(t_msh *msh, int i, int fd_in, int fd_out)
 	}
 }
 
-void	msh_initialize(t_msh *msh)
+void	msh_initialize(t_msh *msh, char **envp)
 {
 	int	i;
 
 	i = 0;
 	msh->status = 1;
+	msh->envp = envp;
 	msh->in_arr = ft_split(msh->in_str, '|');
 	if (!msh->in_arr)
 		msh_error(msh, "in_arr split failed");
@@ -233,13 +234,12 @@ int	main(int argc, char **argv, char **envp)
 	if (argc > 2)
 		ft_putendl_fd("Not enough arguments", 2);
 	(void)argv;
-	msh.envp = envp;
 	while (1)
 	{
 		msh.in_str = readline("minishell: "); //msh_read(1);
 		if (!msh.in_str)
 			msh_error(&msh, "readline failed or EOF reached");
-		msh_initialize(&msh);
+		msh_initialize(&msh, envp);
 		msh_pipeline(&msh, 0);
 		msh_free(&msh);
 	}
