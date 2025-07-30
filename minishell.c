@@ -10,6 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+//valgrind command:
+//valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --suppressions=readline.supp ./minishell
+
 #include "minishell.h"
 
 void	msh_cmd_free(char ***cmd)
@@ -75,11 +78,11 @@ char	*msh_pathname_r(t_msh *msh, char **paths, int i)
 	{
 		tmp = ft_strjoin(paths[j], "/");
 		if (!tmp)
-			msh_error(msh, "ft_strjoin failed");
+			msh_error(msh, "pathname tmp ft_strjoin failed");
 		pathname = ft_strjoin(tmp, msh->cmd[i][0]);
 		free(tmp);
 		if (!pathname)
-			msh_error(msh, "ft_strjoin failed");
+			msh_error(msh, "pathname ft_strjoin failed");
 		if (access(pathname, F_OK) == 0)
 			return (pathname);
 		free(pathname);
@@ -105,7 +108,7 @@ char	*msh_pathname(t_msh *msh, int i)
 		{
 			paths = ft_split(msh->envp[j] + 5, ':');
 			if (!paths)
-				msh_error(msh, "ft_split failed");
+				msh_error(msh, "paths ft_split failed");
 			pathname = msh_pathname_r(msh, paths, i);
 			ft_array_free(paths);
 		}
@@ -168,31 +171,31 @@ void	msh_initialize(t_msh *msh, char **envp)
 	msh->envp = envp;
 	msh->in_str = readline("minishell: "); //msh_read(1);
 	if (!msh->in_str)
-		msh_error(msh, "couldn't read");
+		msh_error(msh, "readline failed or EOF reached");
 	msh->in_arr = ft_split(msh->in_str, '|');
 	if (!msh->in_arr)
-		msh_error(msh, "split failed");
+		msh_error(msh, "in_arr split failed");
 	msh->n = (int)ft_array_size(msh->in_arr);
 	//msh->cmd = (char ***)malloc(sizeof(char **) * (msh->n + 1));
 	msh->cmd = (char ***)ft_calloc(msh->n + 1, sizeof(char **));
 	if (!msh->cmd)
-		msh_error(msh, "malloc failed");
+		msh_error(msh, "cmd malloc failed");
 	//msh->pathname = (char **)malloc(sizeof(char *) * (msh->n + 1));
 	msh->pathname = (char **)ft_calloc(msh->n + 1, sizeof(char *));
 	if (!msh->pathname)
-		msh_error(msh, "malloc oopsie");
+		msh_error(msh, "pathname malloc oopsie");
 	while (msh->in_arr[i])
 	{
 		msh->cmd[i] = ft_split(msh->in_arr[i], ' ');
 		if (!msh->cmd[i])
-			msh_error(msh, "split failed");
+			msh_error(msh, "cmd plit failed");
 		msh->pathname[i] = msh_pathname(msh, i);
 		i++;
 	}
 	//msh->pid = (pid_t *)malloc(sizeof(pid_t) * (msh->n + 1));
 	msh->pid = (pid_t *)ft_calloc(msh->n + 1, sizeof(pid_t));
 	if (!msh->pid)
-		msh_error(msh, "malloc error");
+		msh_error(msh, "pid malloc error");
 	i = -1;
 	while (++i < msh->n)
 		msh->pid[i] = -1;
