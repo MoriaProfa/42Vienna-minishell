@@ -173,10 +173,12 @@ void	msh_initialize(t_msh *msh, char **envp)
 	if (!msh->in_arr)
 		msh_error(msh, "split failed");
 	msh->n = (int)ft_array_size(msh->in_arr);
-	msh->cmd = (char ***)malloc(sizeof(char **) * (msh->n + 1));
+	//msh->cmd = (char ***)malloc(sizeof(char **) * (msh->n + 1));
+	msh->cmd = (char ***)ft_calloc(msh->n + 1, sizeof(char **));
 	if (!msh->cmd)
 		msh_error(msh, "malloc failed");
-	msh->pathname = (char **)malloc(sizeof(char *) * (msh->n + 1));
+	//msh->pathname = (char **)malloc(sizeof(char *) * (msh->n + 1));
+	msh->pathname = (char **)ft_calloc(msh->n + 1, sizeof(char *));
 	if (!msh->pathname)
 		msh_error(msh, "malloc oopsie");
 	while (msh->in_arr[i])
@@ -187,7 +189,8 @@ void	msh_initialize(t_msh *msh, char **envp)
 		msh->pathname[i] = msh_pathname(msh, i);
 		i++;
 	}
-	msh->pid = (pid_t *)malloc(sizeof(pid_t) * (msh->n + 1));
+	//msh->pid = (pid_t *)malloc(sizeof(pid_t) * (msh->n + 1));
+	msh->pid = (pid_t *)ft_calloc(msh->n + 1, sizeof(pid_t));
 	if (!msh->pid)
 		msh_error(msh, "malloc error");
 	i = -1;
