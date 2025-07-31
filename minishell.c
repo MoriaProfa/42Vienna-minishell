@@ -21,6 +21,8 @@ void	msh_cmd_free(char ***cmd)
 {
 	int	i;
 
+	if (!cmd)
+		return ;
 	i = 0;
 	while (cmd[i])
 	{
@@ -28,7 +30,6 @@ void	msh_cmd_free(char ***cmd)
 		cmd[i++] = NULL;
 	}
 	free(cmd);
-	cmd = NULL;
 }
 
 void	msh_free(t_msh *msh)
@@ -81,17 +82,17 @@ void	msh_execute(t_msh *msh, int i)
 		return_prompt();
 		return ;
 	}*/
-		msh_error(msh, "command not found", 127);//should not exit but display a new prompt, maybe just use perror to print the errno-msg
+		msh_error(msh, "command not found", 127);//should not exit but display a new prompt after the error msg (Bernhard said this is the only error-msg that needs to be hardcoded)
 	else if (msh->pathname[i] && access(msh->pathname[i], X_OK) == -1)
 	/*{
 		perror("Pathname");
 		return_prompt();
 		return ;
 	}*/
-		msh_error(msh, "permission denied", 126);//should also not exit at this point
+		msh_error(msh, "permission denied", 126);//should also not exit at this point but display a new prompt after the error msg, maybe just use perror to print the errno-msg
 	else if (msh->pathname[i] && access(msh->pathname[i], X_OK) == 0)
 		execve(msh->pathname[i], msh->cmd[i], msh->envp);
-	msh_error(msh, "execve failed", msh->status);//should also not exit at this point
+	msh_error(msh, "execve failed", msh->status);//should also not exit at this point but display a new prompt after the error msg, maybe just use perror to print the errno-msg
 }
 
 char	*msh_pathname_r(t_msh *msh, char **paths, int i)
@@ -197,7 +198,7 @@ void	msh_initialize(t_msh *msh, char **envp)
 
 	i = 0;
 	msh->status = 1;
-	msh->envp = envp;
+	msh->envp = envp; //todo: new function to iterate through original envp, count envp variables, ft_calloc msh->envp and copy all variables of original envp to msh->envp
 	msh->in_arr = ft_split(msh->in_str, '|');
 	if (!msh->in_arr)
 		msh_error(msh, "in_arr split failed", msh->status);
