@@ -37,7 +37,6 @@ void	msh_set_null(t_msh *msh)
 	msh->in_arr = NULL;
 	msh->cmd = NULL;
 	msh->pathname = NULL;
-	msh->envp = NULL;
 	msh->pid = NULL;
 }
 
@@ -51,16 +50,30 @@ void	msh_free(t_msh *msh)
 		msh_cmd_free(msh->cmd);
 	if (msh->pathname)
 		ft_array_free(msh->pathname);
-	if (msh->envp)
-		ft_array_free(msh->envp);
 	if (msh->pid)
 		free(msh->pid);
 	msh_set_null(msh);
 }
 
-void	msh_error(t_msh *msh, char *msg)
+void	envp_free(t_msh *msh)
 {
-	ft_putendl_fd(msg, 2);
+	if (msh->envp)
+	{
+		ft_array_free(msh->envp);
+		msh->envp = NULL;
+	}
+}
+
+void	msh_end(t_msh *msh, char *msg)
+{
+	int	fd;
+
+	if (msh->status != 0)
+		fd = 2;
+	else
+		fd = 1;
+	ft_putendl_fd(msg, fd);
+	envp_free(msh);
 	msh_free(msh);
 	rl_clear_history();
 	exit(msh->status);
@@ -78,16 +91,16 @@ void	msh_execute(t_msh *msh, int i)
 	if (!msh->pathname[i])
 	{
 		msh->status = 127;
-		msh_error(msh, "command not found");//should display a new prompt after the error msg (Bernhard said this is the only error-msg that needs to be hardcoded)
+		msh_end(msh, "command not found");//should display a new prompt after the error msg (Bernhard said this is the only error-msg that needs to be hardcoded)
 	}
 	else if (msh->pathname[i] && access(msh->pathname[i], X_OK) == -1)
 	{
 		msh->status = 126;
-		msh_error(msh, "permission denied");//maybe just use perror to print the errno-msg
+		msh_end(msh, "permission denied");//maybe just use perror to print the errno-msg
 	}
 	else if (msh->pathname[i] && access(msh->pathname[i], X_OK) == 0)
 		execve(msh->pathname[i], msh->cmd[i], msh->envp);
-	msh_error(msh, "execve failed");//maybe just use perror to print the errno-msg
+	msh_end(msh, "execve failed");//maybe just use perror to print the errno-msg
 }
 
 char	*msh_pathname_r(t_msh *msh, char **paths, int i)
@@ -102,11 +115,11 @@ char	*msh_pathname_r(t_msh *msh, char **paths, int i)
 	{
 		tmp = ft_strjoin(paths[j], "/");
 		if (!tmp)
-			msh_error(msh, "pathname tmp ft_strjoin failed");
+			msh_end(msh, "pathname tmp ft_strjoin failed");
 		pathname = ft_strjoin(tmp, msh->cmd[i][0]);
 		free(tmp);
 		if (!pathname)
-			msh_error(msh, "pathname ft_strjoin failed");
+			msh_end(msh, "pathname ft_strjoin failed");
 		if (access(pathname, F_OK) == 0)
 			return (pathname);
 		free(pathname);
@@ -132,7 +145,7 @@ char	*msh_pathname(t_msh *msh, int i)
 		{
 			paths = ft_split(msh->envp[j] + 5, ':');
 			if (!paths)
-				msh_error(msh, "paths ft_split failed");
+				msh_end(msh, "paths ft_split failed");
 			pathname = msh_pathname_r(msh, paths, i);
 			ft_array_free(paths);
 		}
@@ -172,7 +185,7 @@ void	msh_fork(t_msh *msh, int i, int fd_in, int fd_out)
 {
 	msh->pid[i] = fork();
 	if (msh->pid[i] == -1)
-		msh_error(msh, "fork failed");
+		msh_end(msh, "fork failed");
 	if (msh->pid[i] == 0)
 	{
 		if (fd_in != -1)
@@ -186,16 +199,16 @@ void	msh_fork(t_msh *msh, int i, int fd_in, int fd_out)
 		msh_execute(msh, i);
 	}
 }
+void	envp_initialize(t_msh *msh, char **envp)
+{
+	msh->envp = ft_array_copy(envp);
+	if (!msh->envp)
+		msh_end(msh, "envp copy malloc failed");
+}
 
-void	msh_initialize(t_msh *msh, char **envp)
+void	msh_initialize(t_msh *msh)
 {
 	msh->status = 1;
-	if (!msh->envp)
-	{
-		msh->envp = ft_array_copy(envp);
-		if (!msh->envp)
-			msh_error(msh, "envp copy malloc failed");
-	}
 	msh->fd[0] = -1;
 	msh->fd[1] = -1;
 	msh->fd_in = -1;
@@ -209,25 +222,25 @@ void	msh_parser(t_msh *msh)
 	i = 0;
 	msh->in_arr = ft_split(msh->in_str, '|');
 	if (!msh->in_arr)
-		msh_error(msh, "in_arr split failed");
+		msh_end(msh, "in_arr split failed");
 	msh->n = (int)ft_array_size(msh->in_arr);
 	msh->cmd = (char ***)ft_calloc(msh->n + 1, sizeof(char **));
 	if (!msh->cmd)
-		msh_error(msh, "cmd malloc failed");
+		msh_end(msh, "cmd malloc failed");
 	msh->pathname = (char **)ft_calloc(msh->n + 1, sizeof(char *));
 	if (!msh->pathname)
-		msh_error(msh, "pathname malloc oopsie");
+		msh_end(msh, "pathname malloc oopsie");
 	while (msh->in_arr[i])
 	{
 		msh->cmd[i] = ft_split(msh->in_arr[i], ' ');
 		if (!msh->cmd[i])
-			msh_error(msh, "cmd plit failed");
+			msh_end(msh, "cmd plit failed");
 		msh->pathname[i] = msh_pathname(msh, i);
 		i++;
 	}
 	msh->pid = (pid_t *)ft_calloc(msh->n + 1, sizeof(pid_t));
 	if (!msh->pid)
-		msh_error(msh, "pid malloc error");
+		msh_end(msh, "pid malloc error");
 	i = -1;
 	while (++i < msh->n)
 		msh->pid[i] = -1;
@@ -240,7 +253,7 @@ void	msh_pipeline(t_msh *msh, int i)
 		if (i < msh->n - 1)
 		{
 			if (pipe(msh->fd) == -1)
-				msh_error(msh, "pipe failed");
+				msh_end(msh, "pipe failed");
 			msh->fd_out = msh->fd[1];
 		}
 		msh_fork(msh, i, msh->fd_in, msh->fd_out);
@@ -280,7 +293,7 @@ int	main(int argc, char **argv, char **envp)
 	signal(SIGINT, handle_signal);
 	signal(SIGQUIT, SIG_IGN);
 	ft_bzero(&msh, sizeof(t_msh));
-	//msh_initialize(&msh, envp); //envp is also accessible with __environ (=global env variable)
+	envp_initialize(&msh, envp); //envp is also accessible with __environ (=global env variable)
 	while (1)
 	{
 		msh.in_str = readline("minishell> ");
@@ -295,11 +308,11 @@ int	main(int argc, char **argv, char **envp)
 			signal_flag = 0;
 			continue ;
 		}
-		msh_initialize(&msh, envp); //envp is also accessible with __environ (=global env variable)
+		msh_initialize(&msh);
 		msh_parser(&msh);
 		msh_pipeline(&msh, 0);
 		msh_free(&msh);
 	}
-	msh_error(&msh, "exit");
+	msh_end(&msh, "exit");
 	return (0);
 }
