@@ -259,7 +259,6 @@ void	msh_pipeline(t_msh *msh, int i)
 		waitpid(msh->pid[i], &msh->status, 0);
 		i++;
 	}
-	printf("%d\n", msh->status);
 }
 
 void	handle_signal(int signal)
