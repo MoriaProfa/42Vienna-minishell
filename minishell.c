@@ -31,6 +31,7 @@ void	msh_cmd_free(char ***cmd)
 	}
 	free(cmd);
 }
+
 void	msh_set_null(t_msh *msh)
 {
 	msh->in_arr = NULL;
@@ -188,13 +189,24 @@ void	msh_fork(t_msh *msh, int i, int fd_in, int fd_out)
 
 void	msh_initialize(t_msh *msh, char **envp)
 {
+	msh->status = 1;
+	if (!msh->envp)
+	{
+		msh->envp = ft_array_copy(envp);
+		if (!msh->envp)
+			msh_error(msh, "envp copy malloc failed");
+	}
+	msh->fd[0] = -1;
+	msh->fd[1] = -1;
+	msh->fd_in = -1;
+	msh->fd_out = -1;
+}
+
+void	msh_parser(t_msh *msh)
+{
 	int	i;
 
 	i = 0;
-	msh->status = 1;
-	msh->envp = ft_array_copy(envp);
-	if (!msh->envp)
-		msh_error(msh, "envp copy malloc failed");
 	msh->in_arr = ft_split(msh->in_str, '|');
 	if (!msh->in_arr)
 		msh_error(msh, "in_arr split failed");
@@ -219,10 +231,6 @@ void	msh_initialize(t_msh *msh, char **envp)
 	i = -1;
 	while (++i < msh->n)
 		msh->pid[i] = -1;
-	msh->fd[0] = -1;
-	msh->fd[1] = -1;
-	msh->fd_in = -1;
-	msh->fd_out = -1;
 }
 
 void	msh_pipeline(t_msh *msh, int i)
@@ -273,6 +281,7 @@ int	main(int argc, char **argv, char **envp)
 	signal(SIGINT, handle_signal);
 	signal(SIGQUIT, SIG_IGN);
 	ft_bzero(&msh, sizeof(t_msh));
+	//msh_initialize(&msh, envp); //envp is also accessible with __environ (=global env variable)
 	while (1)
 	{
 		msh.in_str = readline("minishell> ");
@@ -288,6 +297,7 @@ int	main(int argc, char **argv, char **envp)
 			continue ;
 		}
 		msh_initialize(&msh, envp); //envp is also accessible with __environ (=global env variable)
+		msh_parser(&msh);
 		msh_pipeline(&msh, 0);
 		msh_free(&msh);
 	}
