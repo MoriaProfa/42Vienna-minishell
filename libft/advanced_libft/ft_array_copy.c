@@ -23,10 +23,9 @@ char	**ft_array_copy(char **array)
 	i = 0;
 	while (array[i])
 		i++;
-	copy = (char **)malloc(sizeof(char *) * (i + 1));
+	copy = (char **)ft_calloc(i + 1, sizeof(char *));
 	if (!copy)
 		return (NULL);
-	copy[i] = NULL;
 	while (--i >= 0)
 	{
 		copy[i] = ft_strcpy(array[i]);
