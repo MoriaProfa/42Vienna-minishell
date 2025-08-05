@@ -58,10 +58,28 @@
 # include <termios.h>
 //tcsetattr, tcgetattr
 
+typedef enum	e_token_type
+{
+	T_WORD,
+	T_PIPE,
+	T_IN_REDIRECT,
+	T_OUT_REDIRECT,
+	T_APPEND_REDIRECT,
+	T_HEREDOC_REDIRECT
+}	t_token_type;
+
+typedef struct s_token
+{
+	char			*value;
+	t_token_type	type;
+	struct s_token	*next;
+}	t_token;
+
 typedef struct s_msh
 {
 	char	*in_str;
-	char	**in_arr;
+	t_token	*token_list;
+	char	**in_arr; //token_list instead?
 	char	***cmd;
 	char	**pathname;
 	int		n;
