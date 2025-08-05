@@ -16,27 +16,31 @@ void	msh_end(t_msh *msh, char *msg);
 
 void	check_quotation_marks(t_msh *msh)
 {
-	int	i;
-	int	single_quotation_marks;
-	int	double_quotation_marks;
+	int		i;
+	char	quotation_mark;
+	char	str[2];
 
 	i = 0;
-	single_quotation_marks = 0;
-	double_quotation_marks = 0;
+	quotation_mark = 0;
 	while (msh->in_str[i])
 	{
-		if (msh->in_str[i] == '\'')
-			single_quotation_marks++;
-		else if (msh->in_str[i] == '"')
-			double_quotation_marks++;
+		if (msh->in_str[i] == '\'' || msh->in_str[i] == '"')
+		{
+			if (quotation_mark == 0)
+				quotation_mark = msh->in_str[i]; //quote is opened
+			else if (quotation_mark == msh->in_str[i])
+				quotation_mark = 0; //quote is closed again
+		}
 		i++;
 	}
-    if (single_quotation_marks % 2 != 0 && double_quotation_marks % 2 != 0)
-        msh_end(&msh, "Invalid input: uneven amount of quotation marks");
-	if (single_quotation_marks % 2 != 0)
-		msh_end(&msh, "Invalid input: uneven amount of single quotation marks");
-	if (double_quotation_marks % 2 != 0)
-		msh_end(&msh, "Invalid input: uneven amount of double quotation marks");
+    if (quotation_mark != 0)
+	{
+		str[0] = quotation_mark;
+		str[1] = '\0';
+		ft_putstr_fd("minishell: unexpected EOF while looking for matching `", 2);
+		(ft_putstr_fd(str, 2), ft_putendl_fd("'", 2));
+        msh_end(&msh, "minishell: syntax error: unexpected end of file");
+	}
 }
 
 void    free_token(void *content) //so we can free the token-list with ft_lstclear(&msh->tokens, free_token);
@@ -67,25 +71,25 @@ void    fill_token_list(t_msh *msh, const char *value, t_token_type type)
     ft_lstadd_back(&msh->tokens, node); //token list needs to be freed in the end
 }
 
-void	tokenizer(t_msh *msh, const char *input)
+void	tokenizer(t_msh *msh)
 {
-	while (*input)
+	while (*msh->in_str)
 	{
-		while (*input == ' ' || *input == '\t')
-            input++;
-		if (!*input)
+		while (*msh->in_str == ' ' || *msh->in_str == '\t')
+            msh->in_str++;
+		if (!*msh->in_str)
 			break ;
-		if (*input == '<' && *(input + 1) == '<')
+		if (*msh->in_str == '<' && *(msh->in_str + 1) == '<')
 			fill_token_list(&msh, "<<", T_HEREDOC_REDIRECT);
-		else if (*input == '>' && *(input + 1) == '>')
+		else if (*msh->in_str == '>' && *(msh->in_str + 1) == '>')
 			fill_token_list(&msh, ">>", T_APPEND_REDIRECT);
-		else if (*input == '<')
+		else if (*msh->in_str == '<')
 			fill_token_list(&msh, "<", T_IN_REDIRECT);
-		else if (*input == '>')
+		else if (*msh->in_str == '>')
 			fill_token_list(&msh, ">", T_OUT_REDIRECT);
-		else if (*input == '|')
+		else if (*msh->in_str == '|')
 			fill_token_list(&msh, "|", T_PIPE); //is a pipe sign really a token?
-		/*else if (*input == '"' || *input == '\'')
+		/*else if (*msh->in_str == '"' || *msh->in_str == '\'')
 			// read string in single/double quotation marks, add token string "T_WORD" to list
 		else
 		    // read string, add token string "T_WORD" to list
