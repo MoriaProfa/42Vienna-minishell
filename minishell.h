@@ -58,7 +58,7 @@
 # include <termios.h>
 //tcsetattr, tcgetattr
 
-typedef enum	e_token_type
+typedef enum e_token_type
 {
 	T_WORD,
 	T_PIPE,

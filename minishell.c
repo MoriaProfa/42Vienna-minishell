@@ -15,7 +15,7 @@
 
 #include "minishell.h"
 
-volatile sig_atomic_t   signal_flag = 0;
+volatile sig_atomic_t   g_signal_flag = 0;
 
 void	msh_cmd_free(char ***cmd)
 {
@@ -79,7 +79,7 @@ void	msh_end(t_msh *msh, char *msg)
 	exit(msh->status);
 }
 
-void	return_prompt()
+void	return_prompt(void)
 {
 	rl_replace_line("", 0);
 	ioctl(0, TIOCSTI, "\n");
@@ -278,7 +278,7 @@ void	handle_signal(int signal)
 {
 	if (signal == SIGINT)
 	{
-		signal_flag = signal + 128;
+		g_signal_flag = signal + 128;
 		return_prompt();
 	}	
 }
@@ -300,12 +300,12 @@ int	main(int argc, char **argv, char **envp)
 		if (!msh.in_str) //by pressing CTRL+D
 			break ;
 		add_history(msh.in_str);
-		if (signal_flag)
+		if (g_signal_flag)
 		{
 			free(msh.in_str);
 			msh.in_str = NULL;
-			msh.status = signal_flag;
-			signal_flag = 0;
+			msh.status = g_signal_flag;
+			g_signal_flag = 0;
 			continue ;
 		}
 		msh_initialize(&msh);
