@@ -58,6 +58,9 @@
 # include <termios.h>
 //tcsetattr, tcgetattr
 
+//t_list in libft.h maybe changed to double linked list -> add *previous
+//ft_lstnew + ft_lstadd_back + ft_lstadd_front to be modified then
+
 typedef enum e_token_type
 {
 	T_WORD,
@@ -72,13 +75,12 @@ typedef struct s_token
 {
 	char			*value;
 	t_token_type	type;
-	struct s_token	*next;
-}	t_token;
+}					t_token;
 
 typedef struct s_msh
 {
 	char	*in_str;
-	t_token	*token_list;
+	t_list	*tokens;
 	char	**in_arr; //token_list instead?
 	char	***cmd;
 	char	**pathname;
