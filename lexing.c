@@ -43,7 +43,7 @@ void	check_quotation_marks(t_msh *msh)
 	}
 }
 
-// so we can free the token-list with ft_lstclear(&msh->tokens, free_token);
+//todo: free the token-list in msh_end with ft_lstclear(&msh->tokens, free_token);
 void	free_token(void *content)
 {
 	t_token	*token;
@@ -58,19 +58,55 @@ void	fill_token_list(t_msh *msh, const char *value, t_token_type type)
 	t_token	*token;
 	t_list	*node;
 
-	token = malloc(sizeof(t_token));// needs to be freed in the end
+	token = malloc(sizeof(t_token));
 	if (!token)
 		return ;//maybe msh_end
-	token->value = ft_strdup(value);// needs to be freed in the end
+	token->value = ft_strdup(value);
 	token->type = type;
 	node = ft_lstnew(token);
 	if (!node)
 	{
 		free_token(token);
-		return ;
+		return ;//maybe msh_end
 	}
 	ft_lstadd_back(&msh->tokens, node);
-	// token list needs to be freed in the end
+}
+int	handle_single_metacharacter(t_msh *msh, char c, t_token_type type)
+{
+	char str[2];
+
+	if (*msh->in_str == c)
+	{
+		str[0] = c;
+		str[1] = '\0';
+		fill_token_list(msh, str, type);
+		msh->in_str++;
+		return (1);
+	}
+	return (0);
+}
+
+int	handle_metacharacters(t_msh *msh)
+{
+	if (*msh->in_str == '<' && *(msh->in_str + 1) == '<')
+	{
+		fill_token_list(msh, "<<", T_HEREDOC_REDIRECT);
+		msh->in_str += 2;
+		return (1);
+	}
+	if (*msh->in_str == '>' && *(msh->in_str + 1) == '>')
+	{
+		fill_token_list(msh, ">>", T_APPEND_REDIRECT);
+		msh->in_str += 2;
+		return (1);
+	}
+	if (handle_single_metacharacter(msh, '<', T_IN_REDIRECT))
+		return (1);
+	if (handle_single_metacharacter(msh, '>', T_OUT_REDIRECT))
+		return (1);
+	if (handle_single_metacharacter(msh, '|', T_PIPE))
+		return (1);
+	return (0);
 }
 
 void	tokenizer(t_msh *msh)
@@ -81,17 +117,8 @@ void	tokenizer(t_msh *msh)
 			msh->in_str++;
 		if (!*msh->in_str)
 			break ;
-		if (*msh->in_str == '<' && *(msh->in_str + 1) == '<')
-			fill_token_list(&msh, "<<", T_HEREDOC_REDIRECT);
-		else if (*msh->in_str == '>' && *(msh->in_str + 1) == '>')
-			fill_token_list(&msh, ">>", T_APPEND_REDIRECT);
-		else if (*msh->in_str == '<')
-			fill_token_list(&msh, "<", T_IN_REDIRECT);
-		else if (*msh->in_str == '>')
-			fill_token_list(&msh, ">", T_OUT_REDIRECT);
-		else if (*msh->in_str == '|')
-			fill_token_list(&msh, "|", T_PIPE);
-	// is a pipe sign really a token?
+		if (handle_metacharacters(msh))
+			continue ;
 		/*else if (*msh->in_str == '"' || *msh->in_str == '\'')
 			// read string in single/double quotation marks,
 				add token string "T_WORD" to list
