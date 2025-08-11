@@ -80,6 +80,7 @@ typedef struct s_token
 typedef struct s_msh
 {
 	char	*in_str;
+	char	*cpy_in_str;
 	t_list	*tokens;
 	char	**in_arr; //token_list instead?
 	char	***cmd;

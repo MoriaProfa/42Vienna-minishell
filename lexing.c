@@ -10,9 +10,22 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "minishell.h"
+
 void	msh_end(t_msh *msh, char *msg);
 
-#include "minishell.h"
+//just for testing purposes
+void print_tokens(t_list *tokens)
+{
+    t_list *current = tokens;
+    while (current)
+    {
+        t_token *token = (t_token *)(current->content);
+        if (token)
+            printf("Value: %s, Type: %d\n", token->value, token->type);
+        current = current->next;
+    }
+}
 
 void	check_quotation_marks(t_msh *msh)
 {
@@ -22,13 +35,13 @@ void	check_quotation_marks(t_msh *msh)
 
 	i = -1;
 	quotation_mark = 0;
-	while (msh->in_str[++i])
+	while (msh->cpy_in_str[++i])
 	{
-		if (msh->in_str[i] == '\'' || msh->in_str[i] == '"')
+		if (msh->cpy_in_str[i] == '\'' || msh->cpy_in_str[i] == '"')
 		{
 			if (quotation_mark == 0)
-				quotation_mark = msh->in_str[i]; // quote is opened
-			else if (quotation_mark == msh->in_str[i])
+				quotation_mark = msh->cpy_in_str[i]; // quote is opened
+			else if (quotation_mark == msh->cpy_in_str[i])
 				quotation_mark = 0; // quote is closed again
 		}
 	}
@@ -39,7 +52,7 @@ void	check_quotation_marks(t_msh *msh)
 		ft_putstr_fd("minishell: unexpected EOF while looking for matching `", \
 			2);
 		(ft_putstr_fd(str, 2), ft_putendl_fd("'", 2));
-		msh_end(&msh, "minishell: syntax error: unexpected end of file");
+		msh_end(msh, "minishell: syntax error: unexpected end of file");
 	}
 }
 
@@ -76,12 +89,12 @@ int	handle_single_metacharacter(t_msh *msh, char c, t_token_type type)
 {
 	char str[2];
 
-	if (*msh->in_str == c)
+	if (*msh->cpy_in_str == c)
 	{
 		str[0] = c;
 		str[1] = '\0';
 		fill_token_list(msh, str, type);
-		msh->in_str++;
+		msh->cpy_in_str++;
 		return (1);
 	}
 	return (0);
@@ -89,16 +102,16 @@ int	handle_single_metacharacter(t_msh *msh, char c, t_token_type type)
 
 int	handle_metacharacters(t_msh *msh)
 {
-	if (*msh->in_str == '<' && *(msh->in_str + 1) == '<')
+	if (*msh->cpy_in_str == '<' && *(msh->in_str + 1) == '<')
 	{
 		fill_token_list(msh, "<<", T_HEREDOC_REDIRECT);
-		msh->in_str += 2;
+		msh->cpy_in_str += 2;
 		return (1);
 	}
-	if (*msh->in_str == '>' && *(msh->in_str + 1) == '>')
+	if (*msh->cpy_in_str == '>' && *(msh->in_str + 1) == '>')
 	{
 		fill_token_list(msh, ">>", T_APPEND_REDIRECT);
-		msh->in_str += 2;
+		msh->cpy_in_str += 2;
 		return (1);
 	}
 	if (handle_single_metacharacter(msh, '<', T_IN_REDIRECT))
@@ -112,8 +125,8 @@ int	handle_metacharacters(t_msh *msh)
 
 void	skip_whitespaces(t_msh *msh)
 {
-	while (*msh->in_str == ' ' || *msh->in_str == '\t')
-			msh->in_str++;
+	while (*msh->cpy_in_str == ' ' || *msh->cpy_in_str == '\t')
+			msh->cpy_in_str++;
 }
 
 char	*handle_quoted(t_msh *msh, int *len)
@@ -121,17 +134,17 @@ char	*handle_quoted(t_msh *msh, int *len)
 	char	*start;
 	char	quotationmark;
 
-	quotationmark = *msh->in_str;
-	msh->in_str++;
-	start = msh->in_str;
+	quotationmark = *msh->cpy_in_str;
+	msh->cpy_in_str++;
+	start = msh->cpy_in_str;
 	*len = 0;
-	while (*msh->in_str && *msh->in_str != quotationmark)
+	while (*msh->cpy_in_str && *msh->cpy_in_str != quotationmark)
 		{
-			msh->in_str++;
+			msh->cpy_in_str++;
 			(*len)++;
 		}
-	if (*msh->in_str == quotationmark)
-		msh->in_str++;
+	if (*msh->cpy_in_str == quotationmark)
+		msh->cpy_in_str++;
 	return (start);
 }
 
@@ -139,11 +152,11 @@ char	*handle_unquoted(t_msh *msh, int *len)
 {
 	char	*start;
 
-	start = msh->in_str;
+	start = msh->cpy_in_str;
 	*len = 0;
-	while (*msh->in_str && !ft_strchr(" \t<>|", msh->in_str))
+	while (*msh->cpy_in_str && !ft_strchr(" \t<>|", *msh->cpy_in_str))
 	{
-		msh->in_str++;
+		msh->cpy_in_str++;
 		(*len)++;
 	}
 	return (start);
@@ -158,7 +171,7 @@ char	*create_word(t_msh *msh)
 
 	len = 0;
 	skip_whitespaces(msh);
-	if (*msh->in_str == '"' || *msh->in_str == '\'')
+	if (*msh->cpy_in_str == '"' || *msh->cpy_in_str == '\'')
 		start = handle_quoted(msh, &len);
 	else
 		start = handle_unquoted(msh, &len);
@@ -170,14 +183,14 @@ char	*create_word(t_msh *msh)
 	return (word);
 }
 
-void	tokenizer(t_msh *msh)
+void	msh_tokenizer(t_msh *msh)
 {
 	char	*word;
 
-	while (*msh->in_str)
+	while (*msh->cpy_in_str)
 	{
 		skip_whitespaces(msh);
-		if (!*msh->in_str)
+		if (!*msh->cpy_in_str)
 			break ;
 		if (handle_metacharacters(msh))
 			continue ;

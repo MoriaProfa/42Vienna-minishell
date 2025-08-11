@@ -15,6 +15,10 @@
 
 #include "minishell.h"
 
+void print_tokens(t_list *tokens);
+void	free_token(void *content);
+void	msh_tokenizer(t_msh *msh);
+
 volatile sig_atomic_t   g_signal_flag = 0;
 
 void	msh_cmd_free(char ***cmd)
@@ -52,6 +56,7 @@ void	msh_free(t_msh *msh)
 		ft_array_free(msh->pathname);
 	if (msh->pid)
 		free(msh->pid);
+	ft_lstclear(&msh->tokens, free_token);
 	msh_set_null(msh);
 }
 
@@ -208,6 +213,7 @@ void	envp_initialize(t_msh *msh, char **envp)
 
 void	msh_initialize(t_msh *msh)
 {
+	msh->cpy_in_str = msh->in_str;
 	msh->status = 1;
 	msh->fd[0] = -1;
 	msh->fd[1] = -1;
@@ -309,7 +315,9 @@ int	main(int argc, char **argv, char **envp)
 			continue ;
 		}
 		msh_initialize(&msh);
-		msh_parser(&msh);
+		msh_tokenizer(&msh);
+		print_tokens(msh.tokens); //just for testing
+		msh_parser(&msh); //doesnt do anything with tokens yet
 		msh_pipeline(&msh, 0);
 		msh_free(&msh);
 	}
