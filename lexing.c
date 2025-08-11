@@ -56,7 +56,6 @@ void	check_quotation_marks(t_msh *msh)
 	}
 }
 
-//todo: free the token-list in msh_end with ft_lstclear(&msh->tokens, free_token);
 void	free_token(void *content)
 {
 	t_token	*token;
@@ -102,13 +101,13 @@ int	handle_single_metacharacter(t_msh *msh, char c, t_token_type type)
 
 int	handle_metacharacters(t_msh *msh)
 {
-	if (*msh->cpy_in_str == '<' && *(msh->in_str + 1) == '<')
+	if (*msh->cpy_in_str == '<' && *(msh->cpy_in_str + 1) == '<')
 	{
 		fill_token_list(msh, "<<", T_HEREDOC_REDIRECT);
 		msh->cpy_in_str += 2;
 		return (1);
 	}
-	if (*msh->cpy_in_str == '>' && *(msh->in_str + 1) == '>')
+	if (*msh->cpy_in_str == '>' && *(msh->cpy_in_str + 1) == '>')
 	{
 		fill_token_list(msh, ">>", T_APPEND_REDIRECT);
 		msh->cpy_in_str += 2;
