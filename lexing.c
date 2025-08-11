@@ -71,6 +71,7 @@ void	fill_token_list(t_msh *msh, const char *value, t_token_type type)
 	}
 	ft_lstadd_back(&msh->tokens, node);
 }
+
 int	handle_single_metacharacter(t_msh *msh, char c, t_token_type type)
 {
 	char str[2];
@@ -109,20 +110,84 @@ int	handle_metacharacters(t_msh *msh)
 	return (0);
 }
 
+void	skip_whitespaces(t_msh *msh)
+{
+	while (*msh->in_str == ' ' || *msh->in_str == '\t')
+			msh->in_str++;
+}
+
+char	*handle_quoted(t_msh *msh, int *len)
+{
+	char	*start;
+	char	quotationmark;
+
+	quotationmark = *msh->in_str;
+	msh->in_str++;
+	start = msh->in_str;
+	*len = 0;
+	while (*msh->in_str && *msh->in_str != quotationmark)
+		{
+			msh->in_str++;
+			(*len)++;
+		}
+	if (*msh->in_str == quotationmark)
+		msh->in_str++;
+	return (start);
+}
+
+char	*handle_unquoted(t_msh *msh, int *len)
+{
+	char	*start;
+
+	start = msh->in_str;
+	*len = 0;
+	while (*msh->in_str && !ft_strchr(" \t<>|", msh->in_str))
+	{
+		msh->in_str++;
+		(*len)++;
+	}
+	return (start);
+}
+
+char	*create_word(t_msh *msh)
+{
+
+	char	*word;
+	char	*start;
+	int		len;
+
+	len = 0;
+	skip_whitespaces(msh);
+	if (*msh->in_str == '"' || *msh->in_str == '\'')
+		start = handle_quoted(msh, &len);
+	else
+		start = handle_unquoted(msh, &len);
+	word = ft_calloc(len + 1, sizeof(char));
+	if (!word)
+		return (NULL);
+	ft_memcpy(word, start, len);
+	word[len] = '\0';
+	return (word);
+}
+
 void	tokenizer(t_msh *msh)
 {
+	char	*word;
+
 	while (*msh->in_str)
 	{
-		while (*msh->in_str == ' ' || *msh->in_str == '\t')
-			msh->in_str++;
+		skip_whitespaces(msh);
 		if (!*msh->in_str)
 			break ;
 		if (handle_metacharacters(msh))
 			continue ;
-		/*else if (*msh->in_str == '"' || *msh->in_str == '\'')
-			// read string in single/double quotation marks,
-				add token string "T_WORD" to list
 		else
-			 // read string, add token string "T_WORD" to list*/
+		{
+			word = create_word(msh);
+			if (!word)
+				break ;
+			fill_token_list(msh, word, T_WORD);
+			free(word);
+		}
 	}
 }
