@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/06 18:36:53 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/08/12 17:39:37 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,8 @@ typedef struct s_msh
 	int		fd[2];
 }			t_msh;
 
+void	msh_end(t_msh *msh, char *msg);
 int	msh_pwd(t_msh *msh);
+int	msh_cd(t_msh *msh);
 
 #endif

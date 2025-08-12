@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/06 18:40:35 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/08/12 17:41:39 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -310,10 +310,13 @@ int	main(int argc, char **argv, char **envp)
 		}
 		msh_initialize(&msh);
 		msh_parser(&msh);
-		if (msh.in_str && ft_strncmp(msh.in_str, "pwd", 3) == 0)
+		if (ft_strncmp(msh.in_str, "pwd", 3) == 0)
 		{
-			if (msh_pwd(&msh) != 0);
-				
+			msh_pwd(&msh);
+		}
+		else if (ft_strncmp(msh.in_str, "cd", 2) == 0)
+		{
+			msh_cd(&msh);
 		}
 		else
 			msh_pipeline(&msh, 0);
