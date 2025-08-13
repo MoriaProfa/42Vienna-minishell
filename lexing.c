@@ -35,13 +35,13 @@ void	check_quotationmarks(t_msh *msh)
 
 	i = -1;
 	quotationmark = 0;
-	while (msh->cpy_in_str[++i])
+	while (msh->in_str[++i])
 	{
-		if (msh->cpy_in_str[i] == '\'' || msh->cpy_in_str[i] == '"')
+		if (msh->in_str[i] == '\'' || msh->in_str[i] == '"')
 		{
 			if (quotationmark == 0)
-				quotationmark = msh->cpy_in_str[i]; // quote is opened
-			else if (quotationmark == msh->cpy_in_str[i])
+				quotationmark = msh->in_str[i]; // quote is opened
+			else if (quotationmark == msh->in_str[i])
 				quotationmark = 0; // quote is closed again
 		}
 	}
