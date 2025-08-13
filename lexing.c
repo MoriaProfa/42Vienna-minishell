@@ -27,27 +27,27 @@ void print_tokens(t_list *tokens)
     }
 }
 
-void	check_quotation_marks(t_msh *msh)
+void	check_quotationmarks(t_msh *msh)
 {
 	int		i;
-	char	quotation_mark;
+	char	quotationmark;
 	char	str[2];
 
 	i = -1;
-	quotation_mark = 0;
+	quotationmark = 0;
 	while (msh->cpy_in_str[++i])
 	{
 		if (msh->cpy_in_str[i] == '\'' || msh->cpy_in_str[i] == '"')
 		{
-			if (quotation_mark == 0)
-				quotation_mark = msh->cpy_in_str[i]; // quote is opened
-			else if (quotation_mark == msh->cpy_in_str[i])
-				quotation_mark = 0; // quote is closed again
+			if (quotationmark == 0)
+				quotationmark = msh->cpy_in_str[i]; // quote is opened
+			else if (quotationmark == msh->cpy_in_str[i])
+				quotationmark = 0; // quote is closed again
 		}
 	}
-	if (quotation_mark != 0)
+	if (quotationmark != 0)
 	{
-		str[0] = quotation_mark;
+		str[0] = quotationmark;
 		str[1] = '\0';
 		ft_putstr_fd("minishell: unexpected EOF while looking for matching `", \
 			2);
@@ -67,7 +67,7 @@ void	free_token(void *content)
 
 void	fill_token_list(t_msh *msh, const char *value, t_token_type type)
 {
-	t_token	*token;
+	t_token		*token;
 	t_list	*node;
 
 	token = malloc(sizeof(t_token));

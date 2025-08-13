@@ -16,7 +16,7 @@
 #include "minishell.h"
 
 void print_tokens(t_list *tokens);
-void	check_quotation_marks(t_msh *msh);
+void	check_quotationmarks(t_msh *msh);
 void	free_token(void *content);
 void	msh_tokenizer(t_msh *msh);
 
@@ -316,7 +316,7 @@ int	main(int argc, char **argv, char **envp)
 			continue ;
 		}
 		msh_initialize(&msh);
-		check_quotation_marks(&msh);
+		check_quotationmarks(&msh);
 		msh_tokenizer(&msh);
 		print_tokens(msh.tokens); //just for testing
 		msh_parser(&msh); //doesnt do anything with tokens yet
