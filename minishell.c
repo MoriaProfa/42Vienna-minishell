@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/12 17:41:39 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/08/13 14:40:29 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,12 @@
 
 #include "minishell.h"
 
-volatile sig_atomic_t   signal_flag = 0;
+void print_tokens(t_list *tokens);
+void	check_quotation_marks(t_msh *msh);
+void	free_token(void *content);
+void	msh_tokenizer(t_msh *msh);
+
+volatile sig_atomic_t   g_signal_flag = 0;
 
 void	msh_cmd_free(char ***cmd)
 {
@@ -52,6 +57,7 @@ void	msh_free(t_msh *msh)
 		ft_array_free(msh->pathname);
 	if (msh->pid)
 		free(msh->pid);
+	ft_lstclear(&msh->tokens, free_token);
 	msh_set_null(msh);
 }
 
@@ -79,7 +85,7 @@ void	msh_end(t_msh *msh, char *msg)
 	exit(msh->status);
 }
 
-void	return_prompt()
+void	return_prompt(void)
 {
 	rl_replace_line("", 0);
 	ioctl(0, TIOCSTI, "\n");
@@ -208,6 +214,7 @@ void	envp_initialize(t_msh *msh, char **envp)
 
 void	msh_initialize(t_msh *msh)
 {
+	msh->cpy_in_str = msh->in_str;
 	msh->status = 1;
 	msh->fd[0] = -1;
 	msh->fd[1] = -1;
@@ -278,7 +285,7 @@ void	handle_signal(int signal)
 {
 	if (signal == SIGINT)
 	{
-		signal_flag = signal + 128;
+		g_signal_flag = signal + 128;
 		return_prompt();
 	}	
 }
@@ -300,26 +307,20 @@ int	main(int argc, char **argv, char **envp)
 		if (!msh.in_str) //by pressing CTRL+D
 			break ;
 		add_history(msh.in_str);
-		if (signal_flag)
+		if (g_signal_flag)
 		{
 			free(msh.in_str);
 			msh.in_str = NULL;
-			msh.status = signal_flag;
-			signal_flag = 0;
+			msh.status = g_signal_flag;
+			g_signal_flag = 0;
 			continue ;
 		}
 		msh_initialize(&msh);
-		msh_parser(&msh);
-		if (ft_strncmp(msh.in_str, "pwd", 3) == 0)
-		{
-			msh_pwd(&msh);
-		}
-		else if (ft_strncmp(msh.in_str, "cd", 2) == 0)
-		{
-			msh_cd(&msh);
-		}
-		else
-			msh_pipeline(&msh, 0);
+		check_quotation_marks(&msh);
+		msh_tokenizer(&msh);
+		print_tokens(msh.tokens); //just for testing
+		msh_parser(&msh); //doesnt do anything with tokens yet
+		msh_pipeline(&msh, 0);
 		msh_free(&msh);
 	}
 	msh_end(&msh, "exit");
