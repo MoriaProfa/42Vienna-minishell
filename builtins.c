@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/12 18:53:32 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/08/13 13:48:03 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,10 +48,9 @@ int	msh_cd(t_msh *msh)
 	if (!array)
 		msh_end(msh, "cd array split failed");
 	stat(array[1], &stats);
-	if (stats.st_mode & F_OK)
+	if (stats.st_mode & F_OK & S_IRUSR & S_IWUSR & S_IXUSR)
 		value = chdir(array[1]);
-	else if ((stats.st_mode & F_OK) && (!(stats.st_mode & R_OK)
-			|| !(stats.st_mode & W_OK) || !(stats.st_mode & X_OK)))
+	else if ((stats.st_mode & F_OK) && !(S_IRUSR | S_IWUSR | S_IXUSR))
 	{
 		printf("%s: %s\n", "cd: permission denied", array[1]);
 	}
