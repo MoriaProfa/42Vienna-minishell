@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/13 14:48:44 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/08/14 18:40:36 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -320,16 +320,20 @@ int	main(int argc, char **argv, char **envp)
 		msh_tokenizer(&msh);
 		print_tokens(msh.tokens); //just for testing
 		msh_parser(&msh); //doesnt do anything with tokens yet
-		if (ft_strncmp(msh.in_str, "pwd", 3) == 0)
+		//printf("%d\n", msh.status);
+		if (ft_strncmp(msh.tokens->content, "pwd", 3) == 0)
 		{
-			msh_pwd(&msh);
+			if (msh_pwd(&msh)== 0)
+				msh.status = 0;
 		}
 		else if (ft_strncmp(msh.in_str, "cd", 2) == 0)
 		{
-			msh_cd(&msh);
+			if (msh_cd(&msh) == 0)
+				msh.status = 0;
 		}
 		else
 			msh_pipeline(&msh, 0);
+		//printf("%d\n", msh.status);
 		msh_free(&msh);
 	}
 	msh_end(&msh, "exit");
