@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com>   +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/07/28 17:16:18 by astehl           ###   ########.fr       */
+/*   Updated: 2025/08/22 01:49:04 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,9 +58,6 @@
 # include <termios.h>
 //tcsetattr, tcgetattr
 
-//t_list in libft.h maybe changed to double linked list -> add *previous
-//ft_lstnew + ft_lstadd_back + ft_lstadd_front to be modified then
-
 typedef enum e_token_type
 {
 	T_WORD,
@@ -77,15 +74,28 @@ typedef struct s_token
 	t_token_type	type;
 }					t_token;
 
+typedef struct s_cmd
+{
+    char    **args; //command + args
+    char    *infile; // <
+    char    *outfile; // > or >>
+    int     append; //1 if >>
+    char    *heredoc; // <<
+    int     argc; //amount of args
+    int     args_cap; //args cap
+}   		t_cmd;
+
 typedef struct s_msh
 {
 	char	*in_str;
 	char	*cpy_in_str;
 	t_list	*tokens;
-	char	**in_arr; //token_list instead?
-	char	***cmd;
+	t_cmd	**cmd_table;
+	int		n_cmds;
+	char	**in_arr; //tokens instead?
+	char	***cmd; //cmd_table instead?
 	char	**pathname;
-	int		n;
+	int		n; //n_cmds instead?
 	char	**envp;
 	int		status;
 	pid_t	*pid;
