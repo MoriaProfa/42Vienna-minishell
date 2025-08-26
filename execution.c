@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/26 12:37:18 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/08/26 13:54:41 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,36 +98,24 @@ void	msh_fork(t_msh *msh, int i, int fd_in, int fd_out)
 	}
 }
 
-void	msh_noname(t_msh *msh)
+void	msh_pathname_pid(t_msh *msh)
 {
 	int	i;
 
-	i = 0;
-	/*msh->in_arr = ft_split(msh->in_str, '|');
-	if (!msh->in_arr)
-		msh_end(msh, "in_arr split failed");
-	msh->n = (int)ft_array_size(msh->in_arr);
-	msh->cmd = (char ***)ft_calloc(msh->n + 1, sizeof(char **));
-	if (!msh->cmd)
-		msh_end(msh, "cmd malloc failed");*/
+	i = -1;
 	msh->pathname = (char **)ft_calloc(msh->n_cmds + 1, sizeof(char *));
 	if (!msh->pathname)
 		msh_end(msh, "pathname malloc oopsie");
-	while (i < msh->n_cmds)
-	{
-		/*msh->cmd[i] = ft_split(msh->in_arr[i], ' ');
-		if (!msh->cmd[i])
-			msh_end(msh, "cmd plit failed");*/
-		msh->pathname[i] = msh_pathname(msh, i);
-		i++;
-	}
-	msh->pid = (pid_t *)ft_calloc(msh->n + 1, sizeof(pid_t));
+	msh->pid = (pid_t *)ft_calloc(msh->n_cmds + 1, sizeof(pid_t));
 	if (!msh->pid)
 		msh_end(msh, "pid malloc error");
-	i = -1;
 	while (++i < msh->n_cmds)
+	{
+		msh->pathname[i] = msh_pathname(msh, i);
 		msh->pid[i] = -1;
+	}
 }
+		
 
 void	msh_pipeline(t_msh *msh, int i)
 {
