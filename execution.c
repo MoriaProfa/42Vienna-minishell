@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/26 13:54:41 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/08/26 18:07:37 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,22 +14,22 @@
 
 void	msh_execute(t_msh *msh, int i)
 {
-	if (!msh->pathname[i])
+	if (!((t_cmd *)msh->cmd_table[i])->pathname)
 	{
 		msh->status = 127;
 		msh_end(msh, "command not found");//should display a new prompt after the error msg (Bernhard said this is the only error-msg that needs to be hardcoded)
 	}
-	else if (msh->pathname[i] && access(msh->pathname[i], X_OK) == -1)
+	else if (((t_cmd *)msh->cmd_table[i])->pathname && access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == -1)
 	{
 		msh->status = 126;
 		msh_end(msh, "permission denied");//maybe just use perror to print the errno-msg
 	}
-	else if (msh->pathname[i] && access(msh->pathname[i], X_OK) == 0)
-		execve(msh->pathname[i], ((t_cmd *)msh->cmd_table[i])->args, msh->envp);
+	else if (((t_cmd *)msh->cmd_table[i])->pathname && access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == 0)
+		execve(((t_cmd *)msh->cmd_table[i])->pathname, ((t_cmd *)msh->cmd_table[i])->args, msh->envp);
 	msh_end(msh, "execve failed");//maybe just use perror to print the errno-msg
 }
 
-char	*msh_pathname_r(t_msh *msh, char **paths, int i)
+char	*msh_pathname_r(t_msh *msh, char **paths, char *cmd)
 {
 	char	*pathname;
 	char	*tmp;
@@ -42,7 +42,7 @@ char	*msh_pathname_r(t_msh *msh, char **paths, int i)
 		tmp = ft_strjoin(paths[j], "/");
 		if (!tmp)
 			msh_end(msh, "pathname tmp ft_strjoin failed");
-		pathname = ft_strjoin(tmp, ((t_cmd *)msh->cmd_table[i])->args[0]);
+		pathname = ft_strjoin(tmp, cmd);
 		free(tmp);
 		if (!pathname)
 			msh_end(msh, "pathname ft_strjoin failed");
@@ -53,7 +53,7 @@ char	*msh_pathname_r(t_msh *msh, char **paths, int i)
 	return (NULL);
 }
 
-char	*msh_pathname(t_msh *msh, int i)
+char	*msh_pathname(t_msh *msh, char *cmd)
 {
 	char	**paths;
 	char	*pathname;
@@ -61,8 +61,8 @@ char	*msh_pathname(t_msh *msh, int i)
 
 	j = 0;
 	pathname = NULL;
-	if (access(((t_cmd *)msh->cmd_table[i])->args[0], F_OK) == 0)
-		pathname = ((t_cmd *)msh->cmd_table[i])->args[0];
+	if (access(cmd, F_OK) == 0)
+		pathname = cmd;
 	else
 	{
 		while (msh->envp[j] && ft_strncmp(msh->envp[j], "PATH=", 5) != 0)
@@ -72,7 +72,7 @@ char	*msh_pathname(t_msh *msh, int i)
 			paths = ft_split(msh->envp[j] + 5, ':');
 			if (!paths)
 				msh_end(msh, "paths ft_split failed");
-			pathname = msh_pathname_r(msh, paths, i);
+			pathname = msh_pathname_r(msh, paths, cmd);
 			ft_array_free(paths);
 		}
 	}
@@ -103,15 +103,15 @@ void	msh_pathname_pid(t_msh *msh)
 	int	i;
 
 	i = -1;
-	msh->pathname = (char **)ft_calloc(msh->n_cmds + 1, sizeof(char *));
+	/*msh->pathname = (char **)ft_calloc(msh->n_cmds + 1, sizeof(char *));
 	if (!msh->pathname)
-		msh_end(msh, "pathname malloc oopsie");
+		msh_end(msh, "pathname malloc oopsie");*/
 	msh->pid = (pid_t *)ft_calloc(msh->n_cmds + 1, sizeof(pid_t));
 	if (!msh->pid)
 		msh_end(msh, "pid malloc error");
 	while (++i < msh->n_cmds)
 	{
-		msh->pathname[i] = msh_pathname(msh, i);
+		//msh->pathname[i] = msh_pathname(msh, i);
 		msh->pid[i] = -1;
 	}
 }

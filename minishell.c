@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/26 16:32:06 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/08/26 18:07:59 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,7 +192,7 @@ int	main(int argc, char **argv, char **envp)
 		msh_tokenizer(&msh);
 		//print_tokens(msh.tokens); //just for testing
 		build_cmd_table(&msh);
-		//print_cmd_table(&msh); //just for testing
+		print_cmd_table(&msh); //just for testing
 		msh_pathname_pid(&msh); //allocates for msh.pathname and for msh.pid
 		/*int i = 0;
 		while (i < msh.n_cmds) // for test purposes

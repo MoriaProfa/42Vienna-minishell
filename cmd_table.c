@@ -3,15 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_table.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/08/22 03:08:24 by astehl           ###   ########.fr       */
+/*   Updated: 2025/08/26 18:07:02 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 void	msh_end(t_msh *msh, char *msg);
+char	*msh_pathname(t_msh *msh, char *cmd);
+char	*msh_pathname_r(t_msh *msh, char **paths, char *cmd);
 
 //just for testing purposes
 void print_cmd_table(t_msh *msh)
@@ -35,6 +37,8 @@ void print_cmd_table(t_msh *msh)
             printf("\toutfile: %s (append = %i)\n", cmd->outfile, cmd->append);
         if (cmd->heredoc)
             printf("\theredoc: %s\n", cmd->heredoc);
+        if (cmd->pathname)
+            printf("\tpathname: %s\n", cmd->pathname);
         i++;
     }
 }
@@ -60,6 +64,8 @@ void    free_cmd_table(t_cmd **cmds, int n)
             free(cmds[i]->outfile);
         if (cmds[i]->heredoc)
             free(cmds[i]->heredoc);
+        if (cmds[i]->pathname)
+            free(cmds[i]->pathname);
         free(cmds[i]);
     }
     free(cmds);
@@ -92,6 +98,13 @@ t_cmd   *init_cmd(void)
         return (NULL);
     }
     cmd->argc = 0;
+    cmd->pathname = (char *)ft_calloc(1, sizeof(char *));
+	if (!cmd->pathname)
+	{
+        free(cmd);
+        return (NULL);
+    }
+    cmd->pathname = NULL;
     return (cmd);
 }
 
@@ -166,8 +179,10 @@ void   build_cmd_table(t_msh *msh)
             }
             else if (token->type == T_HEREDOC_REDIRECT)
                 cmds[count]->heredoc = get_next_word_token(&token_list);
+            
             token_list = token_list->next;
         }
+        cmds[count]->pathname = msh_pathname(msh, cmds[count]->args[0]);
         if (token_list && ((t_token *)token_list->content)->type == T_PIPE)
             token_list = token_list->next;
         count++;

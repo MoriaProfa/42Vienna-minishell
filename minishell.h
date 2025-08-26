@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/26 16:19:59 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/08/26 16:47:13 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ typedef struct s_cmd
     char    *heredoc; // <<
     int     argc; //amount of args
     int     args_cap; //args cap
+	char	*pathname; //pathname to an executable
 }   		t_cmd;
 
 typedef struct s_msh
