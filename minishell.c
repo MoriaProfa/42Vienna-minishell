@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/26 13:55:08 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/08/26 16:34:44 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	msh_tokenizer(t_msh *msh);
 void   build_cmd_table(t_msh *msh);
 void    free_cmd_table(t_cmd **cmds, int n);
 void	msh_pipeline(t_msh *msh, int i);
-void	msh_msh_pathname_pid(t_msh *msh);
+void	msh_pathname_pid(t_msh *msh);
 void	msh_fork(t_msh *msh, int i, int fd_in, int fd_out);
 char	*msh_pathname(t_msh *msh, int i);
 char	*msh_pathname_r(t_msh *msh, char **paths, int i);
@@ -193,14 +193,14 @@ int	main(int argc, char **argv, char **envp)
 		//print_tokens(msh.tokens); //just for testing
 		build_cmd_table(&msh);
 		//print_cmd_table(&msh); //just for testing
-		msh_msh_pathname_pid(&msh); //allocates for msh.pathname and for msh.pid
-		int i = 0;
+		msh_pathname_pid(&msh); //allocates for msh.pathname and for msh.pid
+		/*int i = 0;
 		while (i < msh.n_cmds) // for test purposes
 		{
 			printf("msh.table[%d].args[0] = %s\n", i, ((t_cmd *)msh.cmd_table[i])->args[0]);
 			printf("msh.pathname[%d] = %s\n", i, msh.pathname[i]);
 			i++;
-		}
+		}*/
 		msh_pipeline(&msh, 0);
 		msh_free(&msh);
 	}
