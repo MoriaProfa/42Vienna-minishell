@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/08/26 21:32:01 by astehl           ###   ########.fr       */
+/*   Updated: 2025/08/26 21:42:05 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void print_cmd_table(t_msh *msh)
     int i = 0;
     if (!msh->cmd_table)
         return ;
-    printf("=== Command Table (n = %i) ===\n", msh->n_cmds);
+    printf("\n=== Command Table (n = %i) ===\n", msh->n_cmds);
     while (msh->cmd_table[i] && i < msh->n_cmds)
     {
         t_cmd *cmd = msh->cmd_table[i];
@@ -178,7 +178,6 @@ void   build_cmd_table(t_msh *msh)
             }
             else if (token->type == T_HEREDOC_REDIRECT)
                 cmds[count]->heredoc = get_next_word_token(&token_list);
-            
             token_list = token_list->next;
         }
         cmds[count]->pathname = create_cmd_pathname(msh, cmds[count]->args[0]);

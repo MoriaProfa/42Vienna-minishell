@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/08/26 21:31:40 by astehl           ###   ########.fr       */
+/*   Updated: 2025/08/26 21:38:09 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,16 @@
 void print_tokens(t_list *tokens)
 {
     t_list *current = tokens;
+	int i = 1;
+	
+	printf("Token list:\n");
     while (current)
     {
         t_token *token = (t_token *)(current->content);
         if (token)
-            printf("Value: %s, Type: %d\n", token->value, token->type);
+            printf("Token #%i:\n\tValue: %s, Type: %d\n", i, token->value, token->type);
         current = current->next;
+		i++;
     }
 }
 
