@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/26 18:07:59 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/08/26 20:25:05 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,25 +29,9 @@ void	msh_execute(t_msh *msh, int i);
 
 volatile sig_atomic_t   g_signal_flag = 0;
 
-void	msh_cmd_free(char ***cmd)
-{
-	int	i;
-
-	if (!cmd)
-		return ;
-	i = 0;
-	while (cmd[i])
-	{
-		ft_array_free(cmd[i]);
-		cmd[i++] = NULL;
-	}
-	free(cmd);
-}
-
 void	msh_set_null(t_msh *msh)
 {
 	msh->in_arr = NULL;
-	msh->cmd = NULL;
 	msh->pid = NULL;
 	msh->cmd_table = NULL;
 	msh->n_cmds = 0;
@@ -59,8 +43,6 @@ void	msh_free(t_msh *msh)
 		ft_free(&msh->in_str);
 	if (msh->in_arr)
 		ft_array_free(msh->in_arr);
-	if (msh->cmd)
-		msh_cmd_free(msh->cmd);
 	if (msh->pid)
 		free(msh->pid);
 	ft_lstclear(&msh->tokens, free_token);
@@ -188,8 +170,8 @@ int	main(int argc, char **argv, char **envp)
 		//print_tokens(msh.tokens); //just for testing
 		build_cmd_table(&msh);
 		print_cmd_table(&msh); //just for testing
-		//msh_pathname_pid(&msh); //allocates for msh.pid
-		//msh_pipeline(&msh, 0);
+		msh_pathname_pid(&msh); //allocates for msh.pid
+		msh_pipeline(&msh, 0);
 		msh_free(&msh);
 	}
 	msh_end(&msh, "exit");
