@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/26 20:25:05 by astehl           ###   ########.fr       */
+/*   Updated: 2025/08/26 20:29:05 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,12 @@
 
 #include "minishell.h"
 
-void print_tokens(t_list *tokens);
-void print_cmd_table(t_msh *msh);
+void	print_tokens(t_list *tokens);
+void	print_cmd_table(t_msh *msh);
 void	check_quotationmarks(t_msh *msh);
 void	free_token(void *content);
 void	msh_tokenizer(t_msh *msh);
-void   build_cmd_table(t_msh *msh);
+void	build_cmd_table(t_msh *msh);
 void    free_cmd_table(t_cmd **cmds, int n);
 void	msh_pipeline(t_msh *msh, int i);
 void	msh_pathname_pid(t_msh *msh);
@@ -31,7 +31,6 @@ volatile sig_atomic_t   g_signal_flag = 0;
 
 void	msh_set_null(t_msh *msh)
 {
-	msh->in_arr = NULL;
 	msh->pid = NULL;
 	msh->cmd_table = NULL;
 	msh->n_cmds = 0;
@@ -41,8 +40,6 @@ void	msh_free(t_msh *msh)
 {
 	if (msh->in_str)
 		ft_free(&msh->in_str);
-	if (msh->in_arr)
-		ft_array_free(msh->in_arr);
 	if (msh->pid)
 		free(msh->pid);
 	ft_lstclear(&msh->tokens, free_token);
