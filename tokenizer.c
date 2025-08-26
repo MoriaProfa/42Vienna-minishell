@@ -6,13 +6,11 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/08/26 21:26:50 by astehl           ###   ########.fr       */
+/*   Updated: 2025/08/26 21:31:40 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-void	msh_end(t_msh *msh, char *msg);
 
 //just for testing purposes
 void print_tokens(t_list *tokens)

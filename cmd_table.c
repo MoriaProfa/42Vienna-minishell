@@ -6,12 +6,11 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/08/26 20:17:28 by astehl           ###   ########.fr       */
+/*   Updated: 2025/08/26 21:32:01 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-void	msh_end(t_msh *msh, char *msg);
 char	*create_cmd_pathname(t_msh *msh, char *cmd);
 
 //just for testing purposes
