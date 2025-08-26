@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/26 12:41:34 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/08/26 16:19:59 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ typedef struct s_msh
 	char	**in_arr; //tokens instead?
 	char	***cmd; //cmd_table instead?
 	char	**pathname;
-	int		n; //n_cmds instead?
+	int		n; //n_cmds instead? not needed now
 	char	**envp;
 	int		status;
 	pid_t	*pid;
