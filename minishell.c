@@ -25,8 +25,8 @@ void    free_cmd_table(t_cmd **cmds, int n);
 void	msh_pipeline(t_msh *msh, int i);
 void	msh_pathname_pid(t_msh *msh);
 void	msh_fork(t_msh *msh, int i, int fd_in, int fd_out);
-char	*msh_pathname(t_msh *msh, int i);
-char	*msh_pathname_r(t_msh *msh, char **paths, int i);
+char	*msh_pathname(t_msh *msh, char *cmd);
+char	*msh_pathname_r(t_msh *msh, char **paths, char *cmd);
 void	msh_execute(t_msh *msh, int i);
 
 volatile sig_atomic_t   g_signal_flag = 0;
@@ -50,7 +50,6 @@ void	msh_set_null(t_msh *msh)
 {
 	msh->in_arr = NULL;
 	msh->cmd = NULL;
-	msh->pathname = NULL;
 	msh->pid = NULL;
 	msh->cmd_table = NULL;
 	msh->n_cmds = 0;
@@ -64,8 +63,6 @@ void	msh_free(t_msh *msh)
 		ft_array_free(msh->in_arr);
 	if (msh->cmd)
 		msh_cmd_free(msh->cmd);
-	if (msh->pathname)
-		ft_array_free(msh->pathname);
 	if (msh->pid)
 		free(msh->pid);
 	ft_lstclear(&msh->tokens, free_token);
@@ -193,7 +190,7 @@ int	main(int argc, char **argv, char **envp)
 		//print_tokens(msh.tokens); //just for testing
 		build_cmd_table(&msh);
 		print_cmd_table(&msh); //just for testing
-		msh_pathname_pid(&msh); //allocates for msh.pathname and for msh.pid
+		//msh_pathname_pid(&msh); //allocates for msh.pid
 		/*int i = 0;
 		while (i < msh.n_cmds) // for test purposes
 		{
@@ -201,7 +198,7 @@ int	main(int argc, char **argv, char **envp)
 			printf("msh.pathname[%d] = %s\n", i, msh.pathname[i]);
 			i++;
 		}*/
-		msh_pipeline(&msh, 0);
+		//msh_pipeline(&msh, 0);
 		msh_free(&msh);
 	}
 	msh_end(&msh, "exit");

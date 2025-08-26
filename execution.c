@@ -62,7 +62,7 @@ char	*msh_pathname(t_msh *msh, char *cmd)
 	j = 0;
 	pathname = NULL;
 	if (access(cmd, F_OK) == 0)
-		pathname = cmd;
+		pathname = cmd; //should it be the same address or should we copy cmd with ft_strcpy?
 	else
 	{
 		while (msh->envp[j] && ft_strncmp(msh->envp[j], "PATH=", 5) != 0)

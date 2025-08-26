@@ -95,8 +95,6 @@ typedef struct s_msh
 	int		n_cmds;
 	char	**in_arr; //tokens instead?
 	char	***cmd; //cmd_table instead?
-	char	**pathname;
-	int		n; //n_cmds instead? not needed now
 	char	**envp;
 	int		status;
 	pid_t	*pid;

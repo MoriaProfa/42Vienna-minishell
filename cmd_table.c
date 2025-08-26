@@ -98,12 +98,13 @@ t_cmd   *init_cmd(void)
         return (NULL);
     }
     cmd->argc = 0;
-    cmd->pathname = (char *)ft_calloc(1, sizeof(char *));
+    /*cmd->pathname = (char *)ft_calloc(1, sizeof(char *));
 	if (!cmd->pathname)
 	{
         free(cmd);
         return (NULL);
-    }
+    }*/ 
+//why allocate when setting it to NULL afterwards? this creates a leak and it seems to work without it
     cmd->pathname = NULL;
     return (cmd);
 }
@@ -183,6 +184,7 @@ void   build_cmd_table(t_msh *msh)
             token_list = token_list->next;
         }
         cmds[count]->pathname = msh_pathname(msh, cmds[count]->args[0]);
+        //check if pathname was created correctly? if not, msh_end?
         if (token_list && ((t_token *)token_list->content)->type == T_PIPE)
             token_list = token_list->next;
         count++;
