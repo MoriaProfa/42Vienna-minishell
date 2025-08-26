@@ -189,13 +189,6 @@ int	main(int argc, char **argv, char **envp)
 		build_cmd_table(&msh);
 		print_cmd_table(&msh); //just for testing
 		//msh_pathname_pid(&msh); //allocates for msh.pid
-		/*int i = 0;
-		while (i < msh.n_cmds) // for test purposes
-		{
-			printf("msh.table[%d].args[0] = %s\n", i, ((t_cmd *)msh.cmd_table[i])->args[0]);
-			printf("msh.pathname[%d] = %s\n", i, msh.pathname[i]);
-			i++;
-		}*/
 		//msh_pipeline(&msh, 0);
 		msh_free(&msh);
 	}
