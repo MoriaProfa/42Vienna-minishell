@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/08/26 23:47:57 by astehl           ###   ########.fr       */
+/*   Updated: 2025/08/27 01:27:39 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,18 @@ t_cmd   *init_cmd(void)
     return (cmd);
 }
 
+int add_cmd(t_cmd **cmds, int count, t_msh *msh)
+{
+    cmds[count] = init_cmd();
+    if (!cmds[count])
+    {
+        free_cmd_table(msh->cmd_table, count);
+        perror("cmd calloc");
+        return (0);
+    }
+    return (1);
+}
+
 void    add_to_args(t_cmd *cmd, char *word)
 {
     int new_cap;
@@ -130,6 +142,7 @@ char    *get_next_word_token(t_list **tokens)
     }
     return (NULL);
 }
+
 void    parse_single_cmd_tokens(t_cmd *cmd, t_list **token_list)
 {
     t_token *token;
@@ -168,18 +181,6 @@ t_cmd   **ensure_cmd_capacity(t_cmd **cmds, int *cap, int count)
     return (cmds);
 }
 
-int allocate_cmd(t_cmd **cmds, int count, t_msh *msh)
-{
-    cmds[count] = init_cmd();
-    if (!cmds[count])
-    {
-        free_cmd_table(msh->cmd_table, count);
-        perror("calloc");
-        return (0);
-    }
-    return (1);
-}
-
 void   build_cmd_table(t_msh *msh)
 {
     int     cap;
@@ -196,7 +197,7 @@ void   build_cmd_table(t_msh *msh)
     while(token_list)
     {
         cmds = ensure_cmd_capacity(cmds, &cap, count);
-        if (!allocate_cmd(cmds, count, msh))
+        if (!add_cmd(cmds, count, msh))
             return ;
         parse_single_cmd_tokens(cmds[count], &token_list);        
         cmds[count]->pathname = create_cmd_pathname(msh, cmds[count]->args[0]);
