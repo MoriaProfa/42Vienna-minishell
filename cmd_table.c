@@ -12,8 +12,7 @@
 
 #include "minishell.h"
 void	msh_end(t_msh *msh, char *msg);
-char	*msh_pathname(t_msh *msh, char *cmd);
-char	*msh_pathname_r(t_msh *msh, char **paths, char *cmd);
+char	*create_cmd_pathname(t_msh *msh, char *cmd);
 
 //just for testing purposes
 void print_cmd_table(t_msh *msh)
@@ -183,7 +182,7 @@ void   build_cmd_table(t_msh *msh)
             
             token_list = token_list->next;
         }
-        cmds[count]->pathname = msh_pathname(msh, cmds[count]->args[0]);
+        cmds[count]->pathname = create_cmd_pathname(msh, cmds[count]->args[0]);
         //check if pathname was created correctly? if not, msh_end?
         if (token_list && ((t_token *)token_list->content)->type == T_PIPE)
             token_list = token_list->next;

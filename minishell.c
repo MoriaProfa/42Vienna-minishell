@@ -25,8 +25,6 @@ void    free_cmd_table(t_cmd **cmds, int n);
 void	msh_pipeline(t_msh *msh, int i);
 void	msh_pathname_pid(t_msh *msh);
 void	msh_fork(t_msh *msh, int i, int fd_in, int fd_out);
-char	*msh_pathname(t_msh *msh, char *cmd);
-char	*msh_pathname_r(t_msh *msh, char **paths, char *cmd);
 void	msh_execute(t_msh *msh, int i);
 
 volatile sig_atomic_t   g_signal_flag = 0;

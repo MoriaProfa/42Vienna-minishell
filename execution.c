@@ -29,7 +29,7 @@ void	msh_execute(t_msh *msh, int i)
 	msh_end(msh, "execve failed");//maybe just use perror to print the errno-msg
 }
 
-char	*msh_pathname_r(t_msh *msh, char **paths, char *cmd)
+char	*resolve_cmd_pathname(t_msh *msh, char **paths, char *cmd)
 {
 	char	*pathname;
 	char	*tmp;
@@ -53,7 +53,7 @@ char	*msh_pathname_r(t_msh *msh, char **paths, char *cmd)
 	return (NULL);
 }
 
-char	*msh_pathname(t_msh *msh, char *cmd)
+char	*create_cmd_pathname(t_msh *msh, char *cmd)
 {
 	char	**paths;
 	char	*pathname;
@@ -62,7 +62,7 @@ char	*msh_pathname(t_msh *msh, char *cmd)
 	j = 0;
 	pathname = NULL;
 	if (access(cmd, F_OK) == 0)
-		pathname = cmd; //should it be the same address or should we copy cmd with ft_strcpy?
+		pathname = cmd; //should it be the same address or should we copy cmd with ft_strdup? will this later be manipulated or not?
 	else
 	{
 		while (msh->envp[j] && ft_strncmp(msh->envp[j], "PATH=", 5) != 0)
@@ -72,7 +72,7 @@ char	*msh_pathname(t_msh *msh, char *cmd)
 			paths = ft_split(msh->envp[j] + 5, ':');
 			if (!paths)
 				msh_end(msh, "paths ft_split failed");
-			pathname = msh_pathname_r(msh, paths, cmd);
+			pathname = resolve_cmd_pathname(msh, paths, cmd);
 			ft_array_free(paths);
 		}
 	}
