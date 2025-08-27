@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_table.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/08/27 01:27:39 by astehl           ###   ########.fr       */
+/*   Updated: 2025/08/27 14:06:34 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,13 +96,6 @@ t_cmd   *init_cmd(void)
         return (NULL);
     }
     cmd->argc = 0;
-    /*cmd->pathname = (char *)ft_calloc(1, sizeof(char *));
-	if (!cmd->pathname)
-	{
-        free(cmd);
-        return (NULL);
-    }*/ 
-//why allocate when setting it to NULL afterwards? this creates a leak and it seems to work without it
     cmd->pathname = NULL;
     return (cmd);
 }

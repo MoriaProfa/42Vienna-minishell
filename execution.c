@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/26 20:17:06 by astehl           ###   ########.fr       */
+/*   Updated: 2025/08/27 14:01:26 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,19 +62,21 @@ char	*create_cmd_pathname(t_msh *msh, char *cmd)
 	j = 0;
 	pathname = NULL;
 	if (access(cmd, F_OK) == 0)
-		pathname = cmd; //should it be the same address or should we copy cmd with ft_strdup? will this later be manipulated or not?
-	else
 	{
-		while (msh->envp[j] && ft_strncmp(msh->envp[j], "PATH=", 5) != 0)
-			j++;
-		if (msh->envp[j])
-		{
-			paths = ft_split(msh->envp[j] + 5, ':');
-			if (!paths)
-				msh_end(msh, "paths ft_split failed");
-			pathname = resolve_cmd_pathname(msh, paths, cmd);
-			ft_array_free(paths);
-		}
+		pathname = ft_strdup(cmd);
+		if (!pathname)
+			msh_end(msh, "pathname malloc failed");
+		return (pathname);
+	}
+	while (msh->envp[j] && ft_strncmp(msh->envp[j], "PATH=", 5) != 0)
+		j++;
+	if (msh->envp[j])
+	{
+		paths = ft_split(msh->envp[j] + 5, ':');
+		if (!paths)
+			msh_end(msh, "paths ft_split failed");
+		pathname = resolve_cmd_pathname(msh, paths, cmd);
+		ft_array_free(paths);
 	}
 	return (pathname);
 }
