@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/27 16:31:04 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/08/27 17:51:07 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,8 +167,8 @@ int	main(int argc, char **argv, char **envp)
 		print_tokens(msh.tokens); //just for testing
 		build_cmd_table(&msh);
 		print_cmd_table(&msh); //just for testing
-		//msh_pathname_pid(&msh); //allocates for msh.pid
-		//msh_pipeline(&msh, 0);
+		msh_pathname_pid(&msh); //allocates for msh.pid
+		msh_pipeline(&msh, 0);
 		msh_free(&msh);
 	}
 	msh_end(&msh, "exit");

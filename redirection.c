@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 14:37:10 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/27 17:20:48 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/08/27 17:50:18 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,7 +127,7 @@ void	set_fd_in(t_msh *msh, int	i)
 		msh_end(msh, "dup(0) failed");
 	if ((t_cmd *)msh->cmd_table[i]->infile)
 	{
-		msh->fd_in = open((t_cmd *)msh->cmd_table[i]->infile, O_RDONLY);
+		msh->fd_in = open(((t_cmd *)msh->cmd_table[i])->infile, O_RDONLY);
 		if (msh->fd_in == -1)
 			msh_end(msh, "open(infile) failed");
 	}
@@ -148,7 +148,7 @@ void	set_fd_out(t_msh *msh, int i)
 		msh_end(msh, "dup(1) failed");
 	if ((t_cmd *)msh->cmd_table[i]->outfile)
 	{
-		msh->fd_in = open((t_cmd *)msh->cmd_table[i]->outfile, O_RDWR, O_CREAT);
+		msh->fd_in = open(((t_cmd *)msh->cmd_table[i])->outfile, O_RDWR, O_CREAT);
 		if (msh->fd_in == -1)
 			msh_end(msh, "open(outfile) failed");
 	}
