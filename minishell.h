@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/26 12:41:34 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/08/26 20:29:10 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ typedef struct s_cmd
     char    *heredoc; // <<
     int     argc; //amount of args
     int     args_cap; //args cap
+	char	*pathname; //pathname to an executable
 }   		t_cmd;
 
 typedef struct s_msh
@@ -92,10 +93,6 @@ typedef struct s_msh
 	t_list	*tokens;
 	t_cmd	**cmd_table;
 	int		n_cmds;
-	char	**in_arr; //tokens instead?
-	char	***cmd; //cmd_table instead?
-	char	**pathname;
-	int		n; //n_cmds instead?
 	char	**envp;
 	int		status;
 	pid_t	*pid;

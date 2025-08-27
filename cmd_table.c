@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_table.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/08/22 03:08:24 by astehl           ###   ########.fr       */
+/*   Updated: 2025/08/27 14:06:34 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-void	msh_end(t_msh *msh, char *msg);
+char	*create_cmd_pathname(t_msh *msh, char *cmd);
 
 //just for testing purposes
 void print_cmd_table(t_msh *msh)
@@ -19,7 +19,7 @@ void print_cmd_table(t_msh *msh)
     int i = 0;
     if (!msh->cmd_table)
         return ;
-    printf("=== Command Table (n = %i) ===\n", msh->n_cmds);
+    printf("\n=== Command Table (n = %i) ===\n", msh->n_cmds);
     while (msh->cmd_table[i] && i < msh->n_cmds)
     {
         t_cmd *cmd = msh->cmd_table[i];
@@ -35,6 +35,8 @@ void print_cmd_table(t_msh *msh)
             printf("\toutfile: %s (append = %i)\n", cmd->outfile, cmd->append);
         if (cmd->heredoc)
             printf("\theredoc: %s\n", cmd->heredoc);
+        if (cmd->pathname)
+            printf("\tpathname: %s\n", cmd->pathname);
         i++;
     }
 }
@@ -60,6 +62,8 @@ void    free_cmd_table(t_cmd **cmds, int n)
             free(cmds[i]->outfile);
         if (cmds[i]->heredoc)
             free(cmds[i]->heredoc);
+        if (cmds[i]->pathname)
+            free(cmds[i]->pathname);
         free(cmds[i]);
     }
     free(cmds);
@@ -92,7 +96,20 @@ t_cmd   *init_cmd(void)
         return (NULL);
     }
     cmd->argc = 0;
+    cmd->pathname = NULL;
     return (cmd);
+}
+
+int add_cmd(t_cmd **cmds, int count, t_msh *msh)
+{
+    cmds[count] = init_cmd();
+    if (!cmds[count])
+    {
+        free_cmd_table(msh->cmd_table, count);
+        perror("cmd calloc");
+        return (0);
+    }
+    return (1);
 }
 
 void    add_to_args(t_cmd *cmd, char *word)
@@ -119,14 +136,50 @@ char    *get_next_word_token(t_list **tokens)
     return (NULL);
 }
 
+void    parse_single_cmd_tokens(t_cmd *cmd, t_list **token_list)
+{
+    t_token *token;
+
+    while (*token_list && ((t_token *)(*token_list)->content)->type != T_PIPE)
+    {
+        token = (*token_list)->content;
+        if (token->type == T_WORD)
+            add_to_args(cmd, token->value);
+        else if (token->type == T_IN_REDIRECT)
+            cmd->infile = get_next_word_token(token_list);
+        else if (token->type == T_OUT_REDIRECT)
+            cmd->outfile = get_next_word_token(token_list);
+        else if (token->type == T_APPEND_REDIRECT)
+        {
+            cmd->outfile = get_next_word_token(token_list);
+            cmd->append = 1;
+        }
+        else if (token->type == T_HEREDOC_REDIRECT)
+            cmd->heredoc = get_next_word_token(token_list);
+        *token_list = (*token_list)->next;
+    }
+    if ((*token_list) && ((t_token *)(*token_list)->content)->type == T_PIPE)
+        *token_list = (*token_list)->next;
+}
+
+t_cmd   **ensure_cmd_capacity(t_cmd **cmds, int *cap, int count)
+{
+    int new_cap;
+
+    if (count < *cap)
+        return (cmds);
+    new_cap = (*cap) * 2;
+    cmds = grow_array(cmds, *cap, new_cap, sizeof(t_cmd *));
+    *cap = new_cap;
+    return (cmds);
+}
+
 void   build_cmd_table(t_msh *msh)
 {
     int     cap;
-    int     new_cap;
     int     count;
     t_cmd   **cmds;
     t_list  *token_list;
-    t_token *token;
 
     cap = 4;
     count = 0;
@@ -136,44 +189,14 @@ void   build_cmd_table(t_msh *msh)
     token_list = msh->tokens;
     while(token_list)
     {
-        if (count >= cap)
-        {
-            new_cap = cap * 2;
-            cmds = grow_array(cmds, cap, new_cap, sizeof(t_cmd *));
-            cap = new_cap;
-        }
-        cmds[count] = init_cmd();
-        if (!cmds[count])
-        {
-            free_cmd_table(msh->cmd_table, count);
-            perror("calloc");
+        cmds = ensure_cmd_capacity(cmds, &cap, count);
+        if (!add_cmd(cmds, count, msh))
             return ;
-        }
-        while (token_list && ((t_token *)token_list->content)->type != T_PIPE)
-        {
-            token = token_list->content;
-            
-            if (token->type == T_WORD)
-                add_to_args(cmds[count], token->value);
-            else if (token->type == T_IN_REDIRECT)
-                cmds[count]->infile = get_next_word_token(&token_list);
-            else if (token->type == T_OUT_REDIRECT)
-                cmds[count]->outfile = get_next_word_token(&token_list);
-            else if (token->type == T_APPEND_REDIRECT)
-            {
-                cmds[count]->outfile = get_next_word_token(&token_list);
-                cmds[count]->append = 1;
-            }
-            else if (token->type == T_HEREDOC_REDIRECT)
-                cmds[count]->heredoc = get_next_word_token(&token_list);
-            token_list = token_list->next;
-        }
-        if (token_list && ((t_token *)token_list->content)->type == T_PIPE)
-            token_list = token_list->next;
+        parse_single_cmd_tokens(cmds[count], &token_list);        
+        cmds[count]->pathname = create_cmd_pathname(msh, cmds[count]->args[0]);
         count++;
     }
-    if (count >= cap)
-        cmds = grow_array(cmds, cap, count + 1, sizeof(t_cmd *));
+    cmds = ensure_cmd_capacity(cmds, &cap, count);
     cmds[count] = NULL;
     msh->cmd_table = cmds;
     msh->n_cmds = count;
