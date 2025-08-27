@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/27 19:19:08 by astehl           ###   ########.fr       */
+/*   Updated: 2025/08/27 21:18:59 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 void	print_tokens(t_list *tokens);
 void	print_cmd_table(t_msh *msh);
 void	check_quotationmarks(t_msh *msh);
+void	check_tokens(t_msh *msh);
 void	free_token(void *content);
 void	msh_tokenizer(t_msh *msh);
 void	build_cmd_table(t_msh *msh);
@@ -175,6 +176,8 @@ int	main(int argc, char **argv, char **envp)
 		check_quotationmarks(&msh);
 		if (!msh.error_check)
 			(msh_tokenizer(&msh), print_tokens(msh.tokens)); //print just for testing
+		if (!msh.error_check)
+			check_tokens(&msh);
 		if (!msh.error_check)
 			(build_cmd_table(&msh), print_cmd_table(&msh)); //print just for testing
 		//if (!msh.error_check)

@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 20:48:16 by astehl            #+#    #+#             */
-/*   Updated: 2025/08/27 16:55:23 by astehl           ###   ########.fr       */
+/*   Updated: 2025/08/27 21:45:08 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	handle_quotationmark_error(t_msh *msh, char quotationmark)
 	str[1] = '\0';
 	ft_putstr_fd("minishell: unexpected EOF while looking for matching `", 2);
 	(ft_putstr_fd(str, 2), ft_putendl_fd("'", 2));
-	msh_end(msh, "minishell: syntax error: unexpected end of file");//dont end, return to prompt
+	msh_error(msh, "minishell: syntax error: unexpected end of file");
 }
 
 void	check_quotationmarks(t_msh *msh)
@@ -44,4 +44,30 @@ void	check_quotationmarks(t_msh *msh)
 	}
 	if (quotationmark != 0)
 		handle_quotationmark_error(msh, quotationmark);
+}
+
+void	check_tokens(t_msh *msh)
+{
+	t_list	*token_list;
+	t_token *current_token;
+	t_token *next_token;
+	t_token	*first_token;
+	t_token	*last_token;
+
+	token_list = msh->tokens;
+	current_token = token_list->content;
+	first_token = current_token;
+	last_token = ft_lstlast(token_list)->content;
+	if (first_token->type == T_PIPE || last_token->type == T_PIPE)//bash is behaving different if last token is a pipe - not sure how to handle this though
+		msh_error(msh, "minishell: syntax error near unexpected token `|'");
+	/*while (token_list->next && !msh->error_check)
+	{
+		current_token = token_list->content;
+		next_token = token_list->next->content;
+		if (current_token->type != T_WORD && next_token->type != T_WORD)
+		{
+			msh_error(msh, "minishell: syntax error near unexpected token `");
+			(ft_putstr_fd(current_token->value, 2), ft_putendl_fd("'", 2));
+		}
+	}*/
 }
