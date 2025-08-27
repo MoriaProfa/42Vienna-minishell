@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/27 18:59:08 by astehl           ###   ########.fr       */
+/*   Updated: 2025/08/27 19:19:08 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,18 @@ void	msh_fork(t_msh *msh, int i, int fd_in, int fd_out);
 void	msh_execute(t_msh *msh, int i);
 
 volatile sig_atomic_t   g_signal_flag = 0;
+
+void	msh_error(t_msh *msh, char *msg)
+{
+	int	fd;
+
+	if (msh->status != 0)
+		fd = 2;
+	else
+		fd = 1;
+	ft_putendl_fd(msg, fd);
+	msh->error_check = 1;
+}
 
 void	msh_set_null(t_msh *msh)
 {
