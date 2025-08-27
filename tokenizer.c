@@ -6,27 +6,31 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/08/26 21:38:09 by astehl           ###   ########.fr       */
+/*   Updated: 2025/08/27 15:05:23 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-//just for testing purposes
-void print_tokens(t_list *tokens)
+// just for testing purposes
+void	print_tokens(t_list *tokens)
 {
-    t_list *current = tokens;
-	int i = 1;
-	
+	t_list	*current;
+	int		i;
+	t_token	*token;
+
+	current = tokens;
+	i = 1;
 	printf("Token list:\n");
-    while (current)
-    {
-        t_token *token = (t_token *)(current->content);
-        if (token)
-            printf("Token #%i:\n\tValue: %s, Type: %d\n", i, token->value, token->type);
-        current = current->next;
+	while (current)
+	{
+		token = (t_token *)(current->content);
+		if (token)
+			printf("Token #%i:\n\tValue: %s, Type: %d\n", i, token->value,
+				token->type);
+		current = current->next;
 		i++;
-    }
+	}
 }
 
 void	free_token(void *content)
@@ -40,7 +44,7 @@ void	free_token(void *content)
 
 void	fill_token_list(t_msh *msh, const char *value, t_token_type type)
 {
-	t_token		*token;
+	t_token	*token;
 	t_list	*node;
 
 	token = malloc(sizeof(t_token));
@@ -59,7 +63,7 @@ void	fill_token_list(t_msh *msh, const char *value, t_token_type type)
 
 int	handle_single_metacharacter(t_msh *msh, char c, t_token_type type)
 {
-	char str[2];
+	char	str[2];
 
 	if (*msh->cpy_in_str == c)
 	{
@@ -98,7 +102,7 @@ int	handle_metacharacters(t_msh *msh)
 void	skip_whitespaces(t_msh *msh)
 {
 	while (*msh->cpy_in_str == ' ' || *msh->cpy_in_str == '\t')
-			msh->cpy_in_str++;
+		msh->cpy_in_str++;
 }
 
 char	*handle_quoted(t_msh *msh, int *len)
@@ -111,10 +115,10 @@ char	*handle_quoted(t_msh *msh, int *len)
 	start = msh->cpy_in_str;
 	*len = 0;
 	while (*msh->cpy_in_str && *msh->cpy_in_str != quotationmark)
-		{
-			msh->cpy_in_str++;
-			(*len)++;
-		}
+	{
+		msh->cpy_in_str++;
+		(*len)++;
+	}
 	if (*msh->cpy_in_str == quotationmark)
 		msh->cpy_in_str++;
 	return (start);
@@ -136,7 +140,6 @@ char	*handle_unquoted(t_msh *msh, int *len)
 
 char	*create_word(t_msh *msh)
 {
-
 	char	*word;
 	char	*start;
 	int		len;
