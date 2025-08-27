@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 20:48:16 by astehl            #+#    #+#             */
-/*   Updated: 2025/08/27 21:45:08 by astehl           ###   ########.fr       */
+/*   Updated: 2025/08/27 22:58:07 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ void	check_tokens(t_msh *msh)
 {
 	t_list	*token_list;
 	t_token *current_token;
-	t_token *next_token;
+	//t_token *next_token;
 	t_token	*first_token;
 	t_token	*last_token;
 
@@ -58,8 +58,15 @@ void	check_tokens(t_msh *msh)
 	current_token = token_list->content;
 	first_token = current_token;
 	last_token = ft_lstlast(token_list)->content;
-	if (first_token->type == T_PIPE || last_token->type == T_PIPE)//bash is behaving different if last token is a pipe - not sure how to handle this though
+	if (first_token->type == T_PIPE)
 		msh_error(msh, "minishell: syntax error near unexpected token `|'");
+	//if (last_token->type == T_PIPE)
+		//bash opens an input line
+		//if ctrl+c is pressed it gives the prompt back without error msg 
+		//but if ctrl+D is pressed it exits with error message "bash: syntax error: unexpected end of file" and in next line "exit"
+	if ((first_token->type != T_WORD && first_token->type != T_PIPE) || 
+		(last_token->type != T_WORD && last_token->type != T_PIPE))
+		msh_error(msh, "minishell: syntax error near unexpected token `newline'");
 	/*while (token_list->next && !msh->error_check)
 	{
 		current_token = token_list->content;
