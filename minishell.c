@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/26 21:50:45 by astehl           ###   ########.fr       */
+/*   Updated: 2025/08/27 17:45:01 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,7 @@ void	envp_initialize(t_msh *msh, char **envp)
 
 void	msh_initialize(t_msh *msh)
 {
+	msh->error_check = 0;
 	msh->cpy_in_str = msh->in_str;
 	msh->status = 1;
 	msh->fd[0] = -1;
@@ -132,9 +133,6 @@ void	handle_signal(int signal)
 		return_prompt();
 	}	
 }
-
-t_cmd   *init_cmd(void);
-void    add_to_args(t_cmd *cmd, char *word);
 
 int	main(int argc, char **argv, char **envp)
 {

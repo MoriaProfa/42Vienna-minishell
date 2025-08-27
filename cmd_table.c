@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/08/27 14:16:12 by astehl           ###   ########.fr       */
+/*   Updated: 2025/08/27 17:08:56 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ void	*grow_array(void *old, int old_cap, int new_cap, size_t size)
 
 	new = ft_calloc(new_cap, size);
 	if (!new)
-		return (NULL);
+		return (NULL);//maybe msh_end
 	ft_memcpy(new, old, old_cap * size);
 	free(old);
 	return (new);
@@ -92,13 +92,13 @@ t_cmd	*init_cmd(void)
 
 	cmd = ft_calloc(1, sizeof(t_cmd));
 	if (!cmd)
-		return (NULL);
+		return (NULL);//maybe msh_end
 	cmd->args_cap = 4;
 	cmd->args = ft_calloc(cmd->args_cap, sizeof(char *));
 	if (!cmd->args)
 	{
 		free(cmd);
-		return (NULL);
+		return (NULL);//maybe msh_end
 	}
 	cmd->argc = 0;
 	cmd->pathname = NULL;
@@ -112,20 +112,20 @@ int	add_cmd(t_cmd **cmds, int count, t_msh *msh)
 	{
 		free_cmd_table(msh->cmd_table, count);
 		perror("cmd calloc");
-		return (0);
+		return (0);//maybe msh_end
 	}
 	return (1);
 }
 
-void	add_to_args(t_cmd *cmd, char *word)
+void	add_to_cmd_args(t_cmd *cmd, char *word)
 {
 	int	new_cap;
 
 	if (cmd->argc + 1 >= cmd->args_cap)
 	{
 		new_cap = cmd->args_cap * 2;
-		cmd->args = grow_array(cmd->args, cmd->args_cap, new_cap,
-				sizeof(char *));
+		cmd->args = grow_array(cmd->args, cmd->args_cap, new_cap, 
+			sizeof(char *));
 		cmd->args_cap = new_cap;
 	}
 	cmd->args[cmd->argc++] = ft_strdup(word);
@@ -134,11 +134,14 @@ void	add_to_args(t_cmd *cmd, char *word)
 
 char	*get_next_word_token(t_list **tokens)
 {
+	char	*value;
+	
 	if ((*tokens)->next
 		&& ((t_token *)(*tokens)->next->content)->type == T_WORD)
 	{
 		*tokens = (*tokens)->next;
-		return (ft_strdup(((t_token *)(*tokens)->content)->value));
+		value = ft_strdup(((t_token *)(*tokens)->content)->value); //malloc check missing... if !value = msh_end?
+		return (value);
 	}
 	return (NULL);
 }
@@ -151,7 +154,7 @@ void	parse_single_cmd_tokens(t_cmd *cmd, t_list **token_list)
 	{
 		token = (*token_list)->content;
 		if (token->type == T_WORD)
-			add_to_args(cmd, token->value);
+			add_to_cmd_args(cmd, token->value);
 		else if (token->type == T_IN_REDIRECT)
 			cmd->infile = get_next_word_token(token_list);
 		else if (token->type == T_OUT_REDIRECT)
@@ -198,7 +201,7 @@ void	build_cmd_table(t_msh *msh)
 	{
 		cmds = ensure_cmd_capacity(cmds, &cap, count);
 		if (!add_cmd(cmds, count, msh))
-			return ;
+			return ;//maybe msh_end?
 		parse_single_cmd_tokens(cmds[count], &token_list);
 		cmds[count]->pathname = create_cmd_pathname(msh, cmds[count]->args[0]);
 		count++;
