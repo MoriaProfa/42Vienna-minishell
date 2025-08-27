@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 20:48:16 by astehl            #+#    #+#             */
-/*   Updated: 2025/08/26 21:38:40 by astehl           ###   ########.fr       */
+/*   Updated: 2025/08/27 14:14:47 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void	handle_quotationmark_error(t_msh *msh, char quotationmark)
 {
 	char	str[2];
-	
+
 	str[0] = quotationmark;
 	str[1] = '\0';
 	ft_putstr_fd("minishell: unexpected EOF while looking for matching `", 2);
@@ -27,7 +27,7 @@ void	check_quotationmarks(t_msh *msh)
 {
 	int		i;
 	char	quotationmark;
-	
+
 	i = -1;
 	quotationmark = 0;
 	while (msh->in_str[++i])
@@ -37,9 +37,9 @@ void	check_quotationmarks(t_msh *msh)
 			if (i > 0 && msh->in_str[i - 1] == '\\')
 				continue ;
 			if (quotationmark == 0)
-				quotationmark = msh->in_str[i]; // quote is opened
+				quotationmark = msh->in_str[i];
 			else if (quotationmark == msh->in_str[i])
-				quotationmark = 0; // quote is closed again
+				quotationmark = 0;
 		}
 	}
 	if (quotationmark != 0)
