@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/27 15:02:31 by astehl           ###   ########.fr       */
+/*   Updated: 2025/08/27 19:20:22 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,7 @@ typedef struct s_cmd
 
 typedef struct s_msh
 {
+	int		error_check;
 	char	*in_str;
 	char	*cpy_in_str;
 	t_list	*tokens;
@@ -102,5 +103,6 @@ typedef struct s_msh
 }			t_msh;
 
 void	msh_end(t_msh *msh, char *msg);
+void	msh_error(t_msh *msh, char *msg);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/08/27 15:05:23 by astehl           ###   ########.fr       */
+/*   Updated: 2025/08/27 17:00:15 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,7 +152,7 @@ char	*create_word(t_msh *msh)
 		start = handle_unquoted(msh, &len);
 	word = ft_calloc(len + 1, sizeof(char));
 	if (!word)
-		return (NULL);
+		return (NULL);//maybe msh_end
 	ft_memcpy(word, start, len);
 	word[len] = '\0';
 	return (word);
@@ -172,7 +172,7 @@ void	msh_tokenizer(t_msh *msh)
 		else
 		{
 			word = create_word(msh);
-			if (!word)
+			if (!word)//maybe not necessary if create_word uses msh_end
 				break ;
 			fill_token_list(msh, word, T_WORD);
 			free(word);

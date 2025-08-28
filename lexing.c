@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 20:48:16 by astehl            #+#    #+#             */
-/*   Updated: 2025/08/27 14:14:47 by astehl           ###   ########.fr       */
+/*   Updated: 2025/08/27 16:55:23 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	handle_quotationmark_error(t_msh *msh, char quotationmark)
 	str[1] = '\0';
 	ft_putstr_fd("minishell: unexpected EOF while looking for matching `", 2);
 	(ft_putstr_fd(str, 2), ft_putendl_fd("'", 2));
-	msh_end(msh, "minishell: syntax error: unexpected end of file");
+	msh_end(msh, "minishell: syntax error: unexpected end of file");//dont end, return to prompt
 }
 
 void	check_quotationmarks(t_msh *msh)

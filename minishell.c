@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/27 17:51:07 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/08/28 13:35:36 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,18 @@ void	msh_fork(t_msh *msh, int i, int fd_in, int fd_out);
 void	msh_execute(t_msh *msh, int i);
 
 volatile sig_atomic_t   g_signal_flag = 0;
+
+void	msh_error(t_msh *msh, char *msg)
+{
+	int	fd;
+
+	if (msh->status != 0)
+		fd = 2;
+	else
+		fd = 1;
+	ft_putendl_fd(msg, fd);
+	msh->error_check = 1;
+}
 
 void	msh_set_null(t_msh *msh)
 {
@@ -116,6 +128,7 @@ void	envp_initialize(t_msh *msh, char **envp)
 
 void	msh_initialize(t_msh *msh)
 {
+	msh->error_check = 0;
 	msh->cpy_in_str = msh->in_str;
 	msh->status = 1;
 	msh->fd[0] = -1;
@@ -132,9 +145,6 @@ void	handle_signal(int signal)
 		return_prompt();
 	}	
 }
-
-t_cmd   *init_cmd(void);
-void    add_to_args(t_cmd *cmd, char *word);
 
 int	main(int argc, char **argv, char **envp)
 {
@@ -163,12 +173,14 @@ int	main(int argc, char **argv, char **envp)
 		}
 		msh_initialize(&msh);
 		check_quotationmarks(&msh);
-		msh_tokenizer(&msh);
-		print_tokens(msh.tokens); //just for testing
-		build_cmd_table(&msh);
-		print_cmd_table(&msh); //just for testing
-		msh_pathname_pid(&msh); //allocates for msh.pid
-		msh_pipeline(&msh, 0);
+		if (!msh.error_check)
+			(msh_tokenizer(&msh), print_tokens(msh.tokens)); //print just for testing
+		if (!msh.error_check)
+			(build_cmd_table(&msh), print_cmd_table(&msh)); //print just for testing
+		//if (!msh.error_check)
+		//	msh_pathname_pid(&msh); //allocates for msh.pid
+		//if (!msh.error_check)
+		//	msh_pipeline(&msh, 0);
 		msh_free(&msh);
 	}
 	msh_end(&msh, "exit");
