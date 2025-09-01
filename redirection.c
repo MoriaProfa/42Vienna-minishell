@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 14:37:10 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/28 18:27:07 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/01 20:59:54 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,70 @@ char	*create_cmd_pathname(t_msh *msh, char *cmd)
 	return (pathname);
 }
 
+int	check_access(char *file, t_msh *msh)
+{
+	if (access(file, F_OK) == 0 && access(file, R_OK) != 0)
+	{
+		printf("%s: ", file);
+		msh_error(msh, "permission denied");
+		return (0);
+	}
+	else
+		return (1);
+}
+
+void	set_fd_in(t_msh *msh, int	i)
+{
+	if (((t_cmd *)msh->cmd_table[i])->infile)
+	{
+		if (check_access(((t_cmd *)msh->cmd_table[i])->infile, msh) == 1)
+			msh->fd_in = open(((t_cmd *)msh->cmd_table[i])->infile, O_RDONLY);
+		if (msh->fd_in == -1)
+		{
+			printf("%s: ", ((t_cmd *)msh->cmd_table[i])->infile);
+			msh_error(msh, "no such file or directory");
+		}
+	}
+	else
+	{
+		msh->fd_in = dup(STDIN_FILENO);
+		if (msh->fd_in == -1)
+			msh_error(msh, "dup(0) failed");
+	}
+	//printf("fd_in = %d\n", msh->fd_in);
+}
+
+void	set_fd_out(t_msh *msh, int	i)
+{
+	if (((t_cmd *)msh->cmd_table[i])->outfile && ((t_cmd *)msh->cmd_table[i])->append == 0)
+	{
+		if (check_access(((t_cmd *)msh->cmd_table[i])->outfile, msh) == 1)
+			msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfile, O_RDWR, O_CREAT, O_TRUNC);
+		if (msh->fd_out == -1)
+		{
+			printf("%s: ", ((t_cmd *)msh->cmd_table[i])->outfile);
+			msh_error(msh, "no such file or directory");
+		}
+	}
+	else if (((t_cmd *)msh->cmd_table[i])->outfile && ((t_cmd *)msh->cmd_table[i])->append == 1)
+	{
+		if (check_access(((t_cmd *)msh->cmd_table[i])->outfile, msh) == 1)
+			msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfile, O_RDWR, O_CREAT, O_APPEND);
+		if (msh->fd_out == -1)
+		{
+			printf("%s: ", ((t_cmd *)msh->cmd_table[i])->outfile);
+			msh_error(msh, "no such file or directory");
+		}
+	}
+	else
+	{
+		msh->fd_out = dup(STDOUT_FILENO);
+		if (msh->fd_out == -1)
+			msh_error(msh, "dup(1) failed");
+	}
+	//printf("fd_out = %d\n", msh->fd_out);
+}
+
 void	msh_execute(t_msh *msh, int i)
 {
 	printf("in execution");
@@ -103,138 +167,37 @@ void	msh_fork(t_msh *msh, int i)
 		msh_end(msh, "fork failed");;
 	if (msh->pid[i] == 0)
 	{
+		set_fd_in(msh, i);
+		set_fd_out(msh, i);
+		dup2(msh->fd[0], msh->fd_in);
+		close(msh->fd[0]);
+		dup2(msh->fd_in, STDIN_FILENO);
+		close(msh->fd_in);
+		dup2(msh->fd[1], msh->fd_out);
+		close(msh->fd[1]);
+		dup2(msh->fd_out, STDOUT_FILENO);
+		close(msh->fd_out);
 		msh_execute(msh, i);
 	}
 }
 
-void	set_fd_in(t_msh *msh, int	i)
-{
-	if (((t_cmd *)msh->cmd_table[i])->infile)
-	{
-		msh->fd_in = open(((t_cmd *)msh->cmd_table[i])->infile, O_RDONLY);
-		if (msh->fd_in == -1)
-			msh_error(msh, "open(infile) failed");
-	}
-	else
-	{
-		msh->fd_in = dup(0);
-		if (msh->fd_in == -1)
-			msh_error(msh, "dup(0) failed");
-	}
-	printf("fd_in = %d\n", msh->fd_in);
-}
-
-void	set_fd_out(t_msh *msh, int	i)
-{
-	if (((t_cmd *)msh->cmd_table[i])->outfile)
-	{
-		msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfile, O_RDWR, O_CREAT);
-		if (msh->fd_out == -1)
-			msh_error(msh, "open(outfile) failed");
-	}
-	else
-	{
-		msh->fd_out = dup(1);
-		if (msh->fd_out == -1)
-			msh_error(msh, "dup(1) failed");
-	}
-	printf("fd_out = %d\n", msh->fd_out);
-}
-
 void	msh_pipeline(t_msh *msh, int i)
 {
-	// int	tmp_in = dup(0);
-	// int	tmp_out = dup(1);
-	set_fd_in(msh, i);
-	while (i < msh->n_cmds)
+	while (++i < msh->n_cmds)
 	{
-		if (dup2(msh->fd_in, STDIN_FILENO) == -1)
-			msh_error(msh, "dup2 stdin failed");
-		close(msh->fd_in);
-		if (i == msh->n_cmds - 1)
-			set_fd_out(msh, i);
-		else
+		
+		if (i < msh->n_cmds - 1)
 		{
 			if (pipe(msh->fd) == -1)
 				msh_end(msh, "pipe failed");
-			msh->fd_in = msh->fd[0];
-			msh->fd_out = msh->fd[1];
 		}
-		if (dup2(msh->fd_out, STDOUT_FILENO) == -1)
-			msh_error(msh, "dup2 stdin failed");
-		close(msh->fd_out);
-		//msh_fork(msh, i);
-		msh->pid[i] = fork();
-		if (msh->pid[i] == -1)
-			msh_end(msh, "fork failed");;
-		if (msh->pid[i] == 0)
-		{
-			msh_execute(msh, i);
-		}
+		msh_fork(msh, i);
+	}
+	i = 0;
+	while (i < msh->n_cmds)
+	{
 		waitpid(msh->pid[i], &msh->status, 0);
 		i++;
 	}
 }
 
-void	msh_pipeline2(t_msh *msh, int i)
-{
-	// int	tmp_in = dup(0);
-	// int	tmp_out = dup(1);
-	printf("infile = %s\n", ((t_cmd *)msh->cmd_table[i])->infile);
-	if (((t_cmd *)msh->cmd_table[i])->infile)
-	{
-		msh->fd_in = open(((t_cmd *)msh->cmd_table[i])->infile, O_RDONLY);
-		if (msh->fd_in == -1)
-			msh_error(msh, "open(infile) failed");
-	}
-	else
-	{
-		msh->fd_in = dup(STDIN_FILENO);
-		if (msh->fd_in == -1)
-			msh_error(msh, "dup(0) failed");
-	}
-	printf("fd_in = %d\n", msh->fd_in);
-	while (i < msh->n_cmds)
-	{
-		if (dup2(msh->fd_in, STDIN_FILENO) == -1)
-			msh_error(msh, "dup2 stdin failed");
-		close(msh->fd_in);
-		if (i == msh->n_cmds - 1)
-		{
-			if (((t_cmd *)msh->cmd_table[i])->outfile)
-			{
-				msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfile, O_RDWR, O_CREAT);
-				if (msh->fd_out == -1)
-					msh_error(msh, "open(outfile) failed");
-			}
-			else
-			{
-				msh->fd_out = dup(STDOUT_FILENO);
-				if (msh->fd_out == -1)
-					msh_error(msh, "dup(1) failed");
-			}
-			printf("outfile = %s\n", ((t_cmd *)msh->cmd_table[i])->outfile);
-			printf("fd_out = %d\n", msh->fd_out);
-		}
-		else
-		{
-			if (pipe(msh->fd) == -1)
-				msh_end(msh, "pipe failed");
-			msh->fd_in = msh->fd[0];
-			msh->fd_out = msh->fd[1];
-		}
-		if (dup2(msh->fd_out, STDOUT_FILENO) == -1)
-			msh_error(msh, "dup2 stdin failed");
-		close(msh->fd_out);
-		//msh_fork(msh, i);
-		msh->pid[i] = fork();
-		if (msh->pid[i] == -1)
-			msh_end(msh, "fork failed");;
-		if (msh->pid[i] == 0)
-		{
-			msh_execute(msh, i);
-		}
-		waitpid(msh->pid[i], &msh->status, 0);
-		i++;
-	}
-}

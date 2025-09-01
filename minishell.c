@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/28 18:23:54 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/01 20:34:09 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ void	msh_tokenizer(t_msh *msh);
 void	build_cmd_table(t_msh *msh);
 void    free_cmd_table(t_cmd **cmds, int n);
 void	msh_pipeline(t_msh *msh, int i);
-void	msh_pipeline2(t_msh *msh, int i);
 void	msh_pid(t_msh *msh);
 
 volatile sig_atomic_t   g_signal_flag = 0;
@@ -173,13 +172,13 @@ int	main(int argc, char **argv, char **envp)
 		msh_initialize(&msh);
 		check_quotationmarks(&msh);
 		if (!msh.error_check)
-			(msh_tokenizer(&msh), print_tokens(msh.tokens)); //print just for testing
+			(msh_tokenizer(&msh)/*, print_tokens(msh.tokens)*/); //print just for testing
 		if (!msh.error_check)
-			(build_cmd_table(&msh), print_cmd_table(&msh)); //print just for testing
+			(build_cmd_table(&msh)/*, print_cmd_table(&msh)*/); //print just for testing
 		if (!msh.error_check)
 			msh_pid(&msh); //allocates for msh.pid
 		if (!msh.error_check)
-			msh_pipeline2(&msh, 0);
+			msh_pipeline(&msh, -1);
 		msh_free(&msh);
 	}
 	msh_end(&msh, "exit");
