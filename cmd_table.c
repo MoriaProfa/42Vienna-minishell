@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_table.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/08/27 17:08:56 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/02 17:02:42 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ void	print_cmd_table(t_msh *msh)
 			printf("\theredoc: %s\n", cmd->heredoc);
 		if (cmd->pathname)
 			printf("\tpathname: %s\n", cmd->pathname);
+		printf("\tfd[0] = %d\n\tfd[1] = %d\n", cmd->fd[0], cmd->fd[1]);
 		i++;
 	}
 }
@@ -204,6 +205,8 @@ void	build_cmd_table(t_msh *msh)
 			return ;//maybe msh_end?
 		parse_single_cmd_tokens(cmds[count], &token_list);
 		cmds[count]->pathname = create_cmd_pathname(msh, cmds[count]->args[0]);
+		cmds[count]->fd[0] = -1;
+		cmds[count]->fd[1] = -1;
 		count++;
 	}
 	cmds = ensure_cmd_capacity(cmds, &cap, count);

@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 14:37:10 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/01 20:59:54 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/02 17:10:23 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,12 +169,12 @@ void	msh_fork(t_msh *msh, int i)
 	{
 		set_fd_in(msh, i);
 		set_fd_out(msh, i);
-		dup2(msh->fd[0], msh->fd_in);
-		close(msh->fd[0]);
+		dup2(((t_cmd *)msh->cmd_table[i])->fd[0], msh->fd_in);
+		close(((t_cmd *)msh->cmd_table[i])->fd[0]);
 		dup2(msh->fd_in, STDIN_FILENO);
 		close(msh->fd_in);
-		dup2(msh->fd[1], msh->fd_out);
-		close(msh->fd[1]);
+		dup2(((t_cmd *)msh->cmd_table[i])->fd[1], msh->fd_out);
+		close(((t_cmd *)msh->cmd_table[i])->fd[1]);
 		dup2(msh->fd_out, STDOUT_FILENO);
 		close(msh->fd_out);
 		msh_execute(msh, i);
@@ -185,11 +185,11 @@ void	msh_pipeline(t_msh *msh, int i)
 {
 	while (++i < msh->n_cmds)
 	{
-		
 		if (i < msh->n_cmds - 1)
 		{
-			if (pipe(msh->fd) == -1)
+			if (pipe(((t_cmd *)msh->cmd_table[i])->fd) == -1)
 				msh_end(msh, "pipe failed");
+			printf("fd[0] = %d\nfd[1] = %d\n", ((t_cmd *)msh->cmd_table[i])->fd[0], ((t_cmd *)msh->cmd_table[i])->fd[1]);
 		}
 		msh_fork(msh, i);
 	}
@@ -200,4 +200,3 @@ void	msh_pipeline(t_msh *msh, int i)
 		i++;
 	}
 }
-
