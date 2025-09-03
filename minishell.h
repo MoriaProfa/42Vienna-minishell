@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/03 13:31:47 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/03 16:11:48 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,8 @@
 //rl_redisplay, add_history
 # include <signal.h>
 //signal, sigaction, sigemptyset, sigaddset, kill
+#include <stdbool.h>
+//booleans
 # include <stdio.h>
 //printf, perror
 # include <string.h>
@@ -73,18 +75,19 @@ typedef struct s_token
 	char			*value;
 	t_token_type	type;
 	int				quoted;
-	int				is_adjacent;
+	bool			is_adjacent;
 }					t_token;
 
 typedef struct s_cmd
 {
 	char	**args;//command + args
+	bool	builtin;
 	char	*infile;// <
 	char	*outfile;// > or >>
-	int		append;//1 if >>
+	bool	append;// true if >>
 	char	*heredoc;// <<
-	int		argc;//amount of args
-	int		args_cap;//args cap
+	int		argc;// amount of args
+	int		args_capacity;//args cap
 	char	*pathname;//pathname to an executable
 }			t_cmd;
 

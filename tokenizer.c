@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/03 14:21:21 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/03 15:55:32 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,17 +107,17 @@ int	handle_metacharacters(t_msh *msh)
 	return (0);
 }
 
-int	skip_whitespaces(t_msh *msh)
+bool	skip_whitespaces(t_msh *msh)
 {
-	int	skips;
+	bool	skip;
 
-	skips = 0;
+	skip = false;
 	while (*msh->cpy_in_str == ' ' || *msh->cpy_in_str == '\t')
 	{
 		msh->cpy_in_str++;
-		skips++;
+		skip = true;
 	}
-	return (skips);		
+	return (skip);		
 }
 
 char	*handle_quoted(t_msh *msh, int *len)
@@ -197,7 +197,7 @@ void	msh_tokenizer(t_msh *msh)
 		i++;
 		ft_memset(quoted_adjacent, 0, sizeof(quoted_adjacent));
 		if (i != 0 && !skip_whitespaces(msh))
-			quoted_adjacent[1] = 1;
+			quoted_adjacent[1] = true;
 		if (!*msh->cpy_in_str)
 			break ;
 		if (handle_metacharacters(msh))
