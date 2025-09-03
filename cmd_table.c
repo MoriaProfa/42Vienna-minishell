@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/02 17:02:42 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/03 15:18:37 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,10 @@ t_cmd	*init_cmd(void)
 	}
 	cmd->argc = 0;
 	cmd->pathname = NULL;
+	cmd->fd[0] = -1;
+	cmd->fd[1] = -1;
+	cmd->fd_in = -1;
+	cmd->fd_out = -1;
 	return (cmd);
 }
 
@@ -205,8 +209,6 @@ void	build_cmd_table(t_msh *msh)
 			return ;//maybe msh_end?
 		parse_single_cmd_tokens(cmds[count], &token_list);
 		cmds[count]->pathname = create_cmd_pathname(msh, cmds[count]->args[0]);
-		cmds[count]->fd[0] = -1;
-		cmds[count]->fd[1] = -1;
 		count++;
 	}
 	cmds = ensure_cmd_capacity(cmds, &cap, count);

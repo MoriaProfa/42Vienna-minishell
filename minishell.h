@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/02 16:55:10 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/03 14:12:35 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,8 @@ typedef struct s_cmd
 	int		args_cap;//args cap
 	char	*pathname;//pathname to an executable
 	int		fd[2];
+	int		fd_in;
+	int		fd_out;
 }			t_cmd;
 
 typedef struct s_msh
@@ -98,8 +100,8 @@ typedef struct s_msh
 	char	**envp;
 	int		status;
 	pid_t	*pid;
-	int		fd_in;
-	int		fd_out;
+	//int		fd_in;
+	//int		fd_out;
 	//int		**fd;
 }			t_msh;
 

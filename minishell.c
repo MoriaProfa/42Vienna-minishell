@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/02 17:01:14 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/03 16:57:00 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,8 +129,8 @@ void	msh_initialize(t_msh *msh)
 	msh->error_check = 0;
 	msh->cpy_in_str = msh->in_str;
 	msh->status = 1;
-	msh->fd_in = -1;
-	msh->fd_out = -1;
+	//msh->fd_in = -1;
+	//msh->fd_out = -1;
 }
 
 void	handle_signal(int signal)
@@ -172,7 +172,7 @@ int	main(int argc, char **argv, char **envp)
 		if (!msh.error_check)
 			(msh_tokenizer(&msh)/*, print_tokens(msh.tokens)*/); //print just for testing
 		if (!msh.error_check)
-			(build_cmd_table(&msh), print_cmd_table(&msh)); //print just for testing
+			(build_cmd_table(&msh)/*, print_cmd_table(&msh)*/); //print just for testing
 		if (!msh.error_check)
 			msh_pid(&msh); //allocates for msh.pid
 		if (!msh.error_check)
