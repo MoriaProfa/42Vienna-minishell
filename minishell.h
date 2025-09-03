@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/27 19:20:22 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/03 13:31:47 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,8 @@ typedef struct s_token
 {
 	char			*value;
 	t_token_type	type;
+	int				quoted;
+	int				is_adjacent;
 }					t_token;
 
 typedef struct s_cmd
