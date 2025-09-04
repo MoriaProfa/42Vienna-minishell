@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/03 15:18:37 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/04 10:16:11 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void	print_cmd_table(t_msh *msh)
 			printf("\theredoc: %s\n", cmd->heredoc);
 		if (cmd->pathname)
 			printf("\tpathname: %s\n", cmd->pathname);
-		printf("\tfd[0] = %d\n\tfd[1] = %d\n", cmd->fd[0], cmd->fd[1]);
+		//printf("\tfd[0] = %d\n\tfd[1] = %d\n", cmd->fd[0], cmd->fd[1]);
 		i++;
 	}
 }
@@ -103,10 +103,10 @@ t_cmd	*init_cmd(void)
 	}
 	cmd->argc = 0;
 	cmd->pathname = NULL;
-	cmd->fd[0] = -1;
-	cmd->fd[1] = -1;
-	cmd->fd_in = -1;
-	cmd->fd_out = -1;
+	// cmd->fd[0] = -1;
+	// cmd->fd[1] = -1;
+	// cmd->fd_in = -1;
+	// cmd->fd_out = -1;
 	return (cmd);
 }
 

@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 14:37:10 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/03 17:46:42 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/04 12:13:13 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,12 +78,22 @@ char	*create_cmd_pathname(t_msh *msh, char *cmd)
 	return (pathname);
 }
 
-int	check_access(char *file, t_msh *msh)
+int	check_access_read(char *file)
 {
 	if (access(file, F_OK) == 0 && access(file, R_OK) != 0)
 	{
-		printf("%s: ", file);
-		msh_error(msh, "permission denied");
+		printf("%s: %s\n", file, "permission denied");
+		return (0);
+	}
+	else
+		return (1);
+}
+
+int	check_access_write(char *file)
+{
+	if (access(file, F_OK) == 0 && access(file, W_OK) != 0)
+	{
+		printf("%s: %s\n", file, "permission denied");
 		return (0);
 	}
 	else
@@ -92,54 +102,42 @@ int	check_access(char *file, t_msh *msh)
 
 void	set_fd_in(t_msh *msh, int	i)
 {
+	msh->fd_in = msh->fd_in_previous;
 	if (((t_cmd *)msh->cmd_table[i])->infile)
 	{
-		if (check_access(((t_cmd *)msh->cmd_table[i])->infile, msh) == 1)
-			((t_cmd *)msh->cmd_table[i])->fd_in = open(((t_cmd *)msh->cmd_table[i])->infile, O_RDONLY);
-		if (((t_cmd *)msh->cmd_table[i])->fd_in == -1)
-		{
-			printf("%s: ", ((t_cmd *)msh->cmd_table[i])->infile);
-			msh_error(msh, "no such file or directory");
-		}
+		if (check_access_read(((t_cmd *)msh->cmd_table[i])->infile) == 0)
+			return ;
+		msh->fd_in = open(((t_cmd *)msh->cmd_table[i])->infile, O_RDONLY);
+		if (msh->fd_in == -1)
+			printf("%s: %s\n", ((t_cmd *)msh->cmd_table[i])->infile, "no such file or directory");
 	}
-	else
-	{
-		((t_cmd *)msh->cmd_table[i])->fd_in = dup(STDIN_FILENO);
-		if (((t_cmd *)msh->cmd_table[i])->fd_in == -1)
-			msh_error(msh, "dup(0) failed");
-	}
-	printf("i = %d fd_in = %d\n", i, ((t_cmd *)msh->cmd_table[i])->fd_in);
+	printf("i = %d fd_in = %d\n", i, msh->fd_in);
 }
 
 void	set_fd_out(t_msh *msh, int	i)
 {
 	if (((t_cmd *)msh->cmd_table[i])->outfile && ((t_cmd *)msh->cmd_table[i])->append == 0)
 	{
-		if (check_access(((t_cmd *)msh->cmd_table[i])->outfile, msh) == 1)
-			((t_cmd *)msh->cmd_table[i])->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfile, O_RDWR | O_CREAT | O_TRUNC, 0777);
-		if (((t_cmd *)msh->cmd_table[i])->fd_out == -1)
-		{
-			printf("%s: ", ((t_cmd *)msh->cmd_table[i])->outfile);
-			msh_error(msh, "no such file or directory");
-		}
+		if (check_access_write(((t_cmd *)msh->cmd_table[i])->outfile) == 0)
+			return ;
+		msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfile, O_RDWR | O_CREAT | O_TRUNC, 0666);
+		if (msh->fd_out == -1)
+			printf("%s: %s\n", ((t_cmd *)msh->cmd_table[i])->outfile, "no such file or directory");
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->outfile && ((t_cmd *)msh->cmd_table[i])->append == 1)
 	{
-		if (check_access(((t_cmd *)msh->cmd_table[i])->outfile, msh) == 1)
-			((t_cmd *)msh->cmd_table[i])->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfile, O_RDWR | O_CREAT | O_APPEND, 0777);
-		if (((t_cmd *)msh->cmd_table[i])->fd_out == -1)
-		{
-			printf("%s: ", ((t_cmd *)msh->cmd_table[i])->outfile);
-			msh_error(msh, "no such file or directory");
-		}
+		if (check_access_write(((t_cmd *)msh->cmd_table[i])->outfile) == 0)
+			return ;
+		msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfile, O_RDWR | O_CREAT | O_APPEND, 0666);
+			printf("%s: %s\n", ((t_cmd *)msh->cmd_table[i])->outfile, "no such file or directory");
 	}
 	else
 	{
-		((t_cmd *)msh->cmd_table[i])->fd_out = dup(STDOUT_FILENO);
-		if (((t_cmd *)msh->cmd_table[i])->fd_out == -1)
+		msh->fd_out = dup(STDOUT_FILENO);
+		if (msh->fd_out == -1)
 			msh_error(msh, "dup(1) failed");
 	}
-	printf("i = %d fd_out = %d\n", i, ((t_cmd *)msh->cmd_table[i])->fd_out);
+	printf("i = %d fd_out = %d\n", i, msh->fd_out);
 }
 
 void	msh_execute(t_msh *msh, int i)
@@ -157,17 +155,26 @@ void	msh_execute(t_msh *msh, int i)
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->pathname && access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == 0)
 		execve(((t_cmd *)msh->cmd_table[i])->pathname, ((t_cmd *)msh->cmd_table[i])->args, msh->envp);
-	msh_end(msh, "execve failed");//maybe just use perror to print the errno-msg
+	msh_error(msh, "execve failed");//maybe just use perror to print the errno-msg
 }
 
-void	msh_fork(t_msh *msh, int i)
+void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
 {
 	msh->pid[i] = fork();
 	if (msh->pid[i] == -1)
 		msh_end(msh, "fork failed");;
 	if (msh->pid[i] == 0)
 	{
-		
+		if (fd_in != STDIN_FILENO)
+		{
+			dup2(fd_in, STDIN_FILENO);
+			close(fd_in);
+		}
+		if (fd_out != STDOUT_FILENO)
+		{
+			dup2(fd_out, STDOUT_FILENO);
+			close(fd_out);
+		}
 		msh_execute(msh, i);
 	}
 }
@@ -178,19 +185,19 @@ void	msh_pipeline(t_msh *msh, int i)
 	{
 		set_fd_in(msh, i);
 		set_fd_out(msh, i);
-		dup2(((t_cmd *)msh->cmd_table[i])->fd_in, STDIN_FILENO);
-		close(((t_cmd *)msh->cmd_table[i])->fd_in);
-		if (i < msh->n_cmds - 1)
+		if (i < msh->n_cmds - 1 && !((t_cmd *)msh->cmd_table[i])->outfile)
 		{
-			if (pipe(((t_cmd *)msh->cmd_table[i])->fd) == -1)
+			if (pipe(msh->fd) == -1)
 				msh_end(msh, "pipe failed");
-			printf("i = %d fd[0] = %d fd[1] = %d\n", i, ((t_cmd *)msh->cmd_table[i])->fd[0], ((t_cmd *)msh->cmd_table[i])->fd[1]);
-			((t_cmd *)msh->cmd_table[i])->fd_in = ((t_cmd *)msh->cmd_table[i])->fd[0];
-			((t_cmd *)msh->cmd_table[i])->fd_out = ((t_cmd *)msh->cmd_table[i])->fd[1];
+			msh->fd_out = msh->fd[1];
+			msh->fd_in_previous = msh->fd[0];
 		}
-		dup2(((t_cmd *)msh->cmd_table[i])->fd_out, STDOUT_FILENO);
-		close(((t_cmd *)msh->cmd_table[i])->fd_out);
-		msh_fork(msh, i);
+		msh_fork(msh, msh->fd_in, msh->fd_out, i);
+		if (msh->fd_in != STDIN_FILENO)
+			close(msh->fd_in);
+		if (msh->fd_out != STDOUT_FILENO)
+			close(msh->fd_out);
+		
 	}
 	i = -1;
 	while (++i < msh->n_cmds)
