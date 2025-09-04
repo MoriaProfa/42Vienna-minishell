@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 14:37:10 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/04 12:13:13 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/04 13:59:55 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,11 +197,14 @@ void	msh_pipeline(t_msh *msh, int i)
 			close(msh->fd_in);
 		if (msh->fd_out != STDOUT_FILENO)
 			close(msh->fd_out);
-		
 	}
 	i = -1;
 	while (++i < msh->n_cmds)
-	{
 		waitpid(msh->pid[i], &msh->status, 0);
-	}
+	close(msh->fd_in);
+	close(msh->fd_out);
+	if (msh->fd[0] != -1)
+		close(msh->fd[0]);
+	if (msh->fd[1] != -1)
+		close(msh->fd[1]);
 }
