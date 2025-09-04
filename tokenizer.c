@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/03 15:55:32 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/04 13:50:47 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,16 +126,19 @@ char	*handle_quoted(t_msh *msh, int *len)
 	char	quotationmark;
 
 	quotationmark = *msh->cpy_in_str;
-	msh->cpy_in_str++;
 	start = msh->cpy_in_str;
-	*len = 0;
+	msh->cpy_in_str++;
+	*len = 1;
 	while (*msh->cpy_in_str && *msh->cpy_in_str != quotationmark)
 	{
 		msh->cpy_in_str++;
 		(*len)++;
 	}
 	if (*msh->cpy_in_str == quotationmark)
+	{
 		msh->cpy_in_str++;
+		(*len)++;
+	}
 	return (start);
 }
 
@@ -185,6 +188,20 @@ int	set_quoted(char c)
 	return (quoted);
 }
 
+bool	check_adjacency(t_list *tokens)
+{
+	t_list	*last_node;
+	t_token	*last_token;
+	
+	if (!tokens)
+		return (false);
+	last_node = ft_lstlast(tokens);
+	last_token = (t_token *)last_node->content;
+	if (last_token->type == T_WORD)
+		return (true);
+	return (false);
+}
+
 void	msh_tokenizer(t_msh *msh)
 {
 	char	*word;
@@ -197,7 +214,7 @@ void	msh_tokenizer(t_msh *msh)
 		i++;
 		ft_memset(quoted_adjacent, 0, sizeof(quoted_adjacent));
 		if (i != 0 && !skip_whitespaces(msh))
-			quoted_adjacent[1] = true;
+			quoted_adjacent[1] = check_adjacency(msh->tokens);
 		if (!*msh->cpy_in_str)
 			break ;
 		if (handle_metacharacters(msh))

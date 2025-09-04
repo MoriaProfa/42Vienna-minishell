@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/03 17:46:48 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/04 14:17:44 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -233,7 +233,7 @@ void	build_cmd_table(t_msh *msh)
 		if (!add_cmd(cmds, count, msh))
 			return ;//maybe msh_end?
 		parse_single_cmd_tokens(cmds[count], &token_list);
-		cmds[count]->pathname = create_cmd_pathname(msh, cmds[count]->args[0]);
+		cmds[count]->pathname = create_cmd_pathname(msh, cmds[count]->args[0]);//cmds[count]->args[0]->value -->array of struct containing value = string + information about quotationmarks
 		count++;
 	}
 	cmds = ensure_cmd_capacity(cmds, &capacity, count);
