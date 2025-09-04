@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/03 15:31:49 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/04 11:51:30 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void	msh_error(t_msh *msh, char *msg)
 	else
 		fd = 1;
 	ft_putendl_fd(msg, fd);
-	msh->error_check = 1;
+	msh->error_check = true;
 }
 
 void	msh_set_null(t_msh *msh)
@@ -129,7 +129,7 @@ void	envp_initialize(t_msh *msh, char **envp)
 
 void	msh_initialize(t_msh *msh)
 {
-	msh->error_check = 0;
+	msh->error_check = false;
 	msh->cpy_in_str = msh->in_str;
 	msh->status = 1;
 	msh->fd[0] = -1;
