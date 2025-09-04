@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/04 21:04:23 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/04 21:16:12 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void	print_cmd_table(t_msh *msh)
 		printf("\targs: ");
 		j = -1;
 		while (cmd->args[++j].value && j < cmd->argc)
-			printf("[value: %s, quote: %d] ", cmd->args[j].value, cmd->args[j].quote);
+			printf("[Value: %s, Quotes: %d] ", cmd->args[j].value, cmd->args[j].quote);
 		printf("\n\tBuiltin args[0].value: %d\n", cmd->builtin);
 		if (cmd->infile)
 			printf("\tinfile: %s\n", cmd->infile);
@@ -45,23 +45,30 @@ void	print_cmd_table(t_msh *msh)
 		i++;
 	}
 }
+void	free_cmd_table_arrays(t_cmd **cmds, int i)
+{
+	int	j;
+
+	j = -1;
+	while (cmds[i]->args[++j].value && j < cmds[i]->argc)
+		free(cmds[i]->args[j].value);
+	j = -1;
+	while (cmds[i]->arg_array[++j] && j < cmds[i]->argc)
+		free(cmds[i]->arg_array[j]);
+}
 
 void	free_cmd_table(t_cmd **cmds, int n)
 {
 	int	i;
-	int	j;
 
 	i = -1;
 	if (!cmds)
 		return ;
 	while (cmds[++i] && i < n)
 	{
-		j = -1;
-		while (cmds[i]->args[++j].value && j < cmds[i]->argc)
-			free(cmds[i]->args[j].value);
-		j = -1;
-		while (cmds[i]->arg_array[++j] && j < cmds[i]->argc)
-			free(cmds[i]->arg_array[j]);
+		free_cmd_table_arrays(cmds, i);
+		if (cmds[i]->arg_array)
+			free(cmds[i]->arg_array);
 		if (cmds[i]->args)
 			free(cmds[i]->args);
 		if (cmds[i]->infile)
