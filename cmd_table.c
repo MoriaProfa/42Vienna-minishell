@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/04 14:17:44 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/04 21:04:23 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,10 @@ void	print_cmd_table(t_msh *msh)
 		cmd = msh->cmd_table[i];
 		printf("Command %i:\n", i);
 		printf("\targs: ");
-		j = 0;
-		while (cmd->args[j] && j < cmd->argc)
-			printf("[%s] ", cmd->args[j++]);
-		printf("\n\tBuiltin args[0]: %d\n", cmd->builtin);
+		j = -1;
+		while (cmd->args[++j].value && j < cmd->argc)
+			printf("[value: %s, quote: %d] ", cmd->args[j].value, cmd->args[j].quote);
+		printf("\n\tBuiltin args[0].value: %d\n", cmd->builtin);
 		if (cmd->infile)
 			printf("\tinfile: %s\n", cmd->infile);
 		if (cmd->outfile)
@@ -57,8 +57,11 @@ void	free_cmd_table(t_cmd **cmds, int n)
 	while (cmds[++i] && i < n)
 	{
 		j = -1;
-		while (cmds[i]->args[++j] && j < cmds[i]->argc)
-			free(cmds[i]->args[j]);
+		while (cmds[i]->args[++j].value && j < cmds[i]->argc)
+			free(cmds[i]->args[j].value);
+		j = -1;
+		while (cmds[i]->arg_array[++j] && j < cmds[i]->argc)
+			free(cmds[i]->arg_array[j]);
 		if (cmds[i]->args)
 			free(cmds[i]->args);
 		if (cmds[i]->infile)
@@ -117,14 +120,24 @@ bool	builtin_check(char *s)
 t_cmd	*init_cmd(void)
 {
 	t_cmd	*cmd;
+	int		i;
 
 	cmd = ft_calloc(1, sizeof(t_cmd));
 	if (!cmd)
 		return (NULL);//maybe msh_end
 	cmd->args_capacity = 4;
-	cmd->args = ft_calloc(cmd->args_capacity, sizeof(char *));
+	cmd->arg_array = ft_calloc(cmd->args_capacity, sizeof(char *));
+	if (!cmd->arg_array)
+	{
+		free(cmd);
+		return (NULL);//maybe msh_end
+	}
+	cmd->args = ft_calloc(cmd->args_capacity, sizeof(t_cmd_args));
 	if (!cmd->args)
 	{
+		i = -1;
+		while (cmd->arg_array[i])
+			free(cmd->arg_array[i]);
 		free(cmd);
 		return (NULL);//maybe msh_end
 	}
@@ -145,7 +158,7 @@ int	add_cmd(t_cmd **cmds, int count, t_msh *msh)
 	return (1);
 }
 
-void	add_to_cmd_args(t_cmd *cmd, char *word)
+void	add_to_cmd_args(t_cmd *cmd, char *word, t_quote_type quote)
 {
 	int	new_capacity;
 
@@ -153,11 +166,16 @@ void	add_to_cmd_args(t_cmd *cmd, char *word)
 	{
 		new_capacity = cmd->args_capacity * 2;
 		cmd->args = grow_array(cmd->args, cmd->args_capacity, new_capacity, 
+			sizeof(t_cmd_args));
+		cmd->arg_array = grow_array(cmd->args, cmd->args_capacity, new_capacity, 
 			sizeof(char *));
 		cmd->args_capacity = new_capacity;
 	}
-	cmd->args[cmd->argc++] = ft_strdup(word);
-	cmd->args[cmd->argc] = NULL;
+	cmd->args[cmd->argc].value = ft_strdup(word);
+	cmd->arg_array[cmd->argc] = ft_strdup(word);
+	cmd->args[cmd->argc++].quote = quote;
+	cmd->args[cmd->argc].value = NULL;//even if it should already be NULL because of using calloc in grow_array
+	cmd->arg_array[cmd->argc] = NULL;//even if it should already be NULL because of using calloc in grow_array
 }
 
 char	*get_next_word_token(t_list **tokens)
@@ -182,7 +200,7 @@ void	parse_single_cmd_tokens(t_cmd *cmd, t_list **token_list)
 	{
 		token = (*token_list)->content;
 		if (token->type == T_WORD)
-			add_to_cmd_args(cmd, token->value);
+			add_to_cmd_args(cmd, token->value, token->quoted);
 		else if (token->type == T_IN_REDIRECT)
 			cmd->infile = get_next_word_token(token_list);
 		else if (token->type == T_OUT_REDIRECT)
@@ -198,7 +216,7 @@ void	parse_single_cmd_tokens(t_cmd *cmd, t_list **token_list)
 	}
 	if ((*token_list) && ((t_token *)(*token_list)->content)->type == T_PIPE)
 		*token_list = (*token_list)->next;
-	if (builtin_check(cmd->args[0]))
+	if (builtin_check(cmd->args[0].value))
 		cmd->builtin = true;
 }
 
@@ -233,7 +251,7 @@ void	build_cmd_table(t_msh *msh)
 		if (!add_cmd(cmds, count, msh))
 			return ;//maybe msh_end?
 		parse_single_cmd_tokens(cmds[count], &token_list);
-		cmds[count]->pathname = create_cmd_pathname(msh, cmds[count]->args[0]);//cmds[count]->args[0]->value -->array of struct containing value = string + information about quotationmarks
+		cmds[count]->pathname = create_cmd_pathname(msh, cmds[count]->args[0].value);
 		count++;
 	}
 	cmds = ensure_cmd_capacity(cmds, &capacity, count);
