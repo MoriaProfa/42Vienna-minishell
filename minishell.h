@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/04 20:46:24 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/04 11:51:04 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,40 +70,26 @@ typedef enum e_token_type
 	T_HEREDOC_REDIRECT
 }	t_token_type;
 
-typedef enum e_quote_type
-{
-	Q_NONE,
-	Q_SINGLE,
-	Q_DOUBLE
-}	t_quote_type;
-
 typedef struct s_token
 {
 	char			*value;
 	t_token_type	type;
-	t_quote_type	quoted;
+	int				quoted;
 	bool			is_adjacent;
 }					t_token;
 
-typedef struct s_cmd_args
-{
-	char			*value;
-	t_quote_type	quote;
-}					t_cmd_args;
-
 typedef struct s_cmd
 {
-	char			**arg_array;//command + args
-	t_cmd_args		*args;//command + args + quote type
-	bool			builtin;
-	char			*infile;// <
-	char			*outfile;// > or >>
-	bool			append;// true if >>
-	char			*heredoc;// <<
-	int				argc;// amount of args
-	int				args_capacity;//args cap
-	char			*pathname;//pathname to an executable
-}					t_cmd;
+	char	**args;//command + args
+	bool	builtin;
+	char	*infile;// <
+	char	*outfile;// > or >>
+	bool	append;// true if >>
+	char	*heredoc;// <<
+	int		argc;// amount of args
+	int		args_capacity;//args cap
+	char	*pathname;//pathname to an executable
+}			t_cmd;
 
 typedef struct s_msh
 {

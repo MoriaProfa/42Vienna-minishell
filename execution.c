@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/04 20:57:55 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/04 22:09:12 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	msh_execute(t_msh *msh, int i)
 		msh_end(msh, "permission denied");//maybe just use perror to print the errno-msg
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->pathname && access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == 0)
-		execve(((t_cmd *)msh->cmd_table[i])->pathname, /*((t_cmd *)msh->cmd_table[i])->args*/msh->cmd_table[i]->arg_array, msh->envp);
+		execve(((t_cmd *)msh->cmd_table[i])->pathname, ((t_cmd *)msh->cmd_table[i])->args, msh->envp);
 	msh_end(msh, "execve failed");//maybe just use perror to print the errno-msg
 }
 
