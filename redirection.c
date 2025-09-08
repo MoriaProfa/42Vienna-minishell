@@ -6,11 +6,13 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 14:37:10 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/04 13:59:55 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/08 18:30:14 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+extern volatile sig_atomic_t   g_signal_flag;
+void	return_prompt(int signal);
 
 void	msh_pid(t_msh *msh)
 {
@@ -122,14 +124,15 @@ void	set_fd_out(t_msh *msh, int	i)
 			return ;
 		msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfile, O_RDWR | O_CREAT | O_TRUNC, 0666);
 		if (msh->fd_out == -1)
-			printf("%s: %s\n", ((t_cmd *)msh->cmd_table[i])->outfile, "no such file or directory");
+			printf("%s: %s\n", ((t_cmd *)msh->cmd_table[i])->outfile, "no such file or directory1");
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->outfile && ((t_cmd *)msh->cmd_table[i])->append == 1)
 	{
 		if (check_access_write(((t_cmd *)msh->cmd_table[i])->outfile) == 0)
 			return ;
 		msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfile, O_RDWR | O_CREAT | O_APPEND, 0666);
-			printf("%s: %s\n", ((t_cmd *)msh->cmd_table[i])->outfile, "no such file or directory");
+		if (msh->fd_out == -1)
+			printf("%s: %s\n", ((t_cmd *)msh->cmd_table[i])->outfile, "no such file or directory2");
 	}
 	else
 	{
@@ -181,6 +184,8 @@ void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
 
 void	msh_pipeline(t_msh *msh, int i)
 {
+	// signal(SIGINT, SIG_IGN);
+	// signal(SIGQUIT, SIG_IGN);
 	while (++i < msh->n_cmds)
 	{
 		set_fd_in(msh, i);
@@ -201,10 +206,14 @@ void	msh_pipeline(t_msh *msh, int i)
 	i = -1;
 	while (++i < msh->n_cmds)
 		waitpid(msh->pid[i], &msh->status, 0);
-	close(msh->fd_in);
-	close(msh->fd_out);
+	if (msh->fd_in != STDIN_FILENO)
+		close(msh->fd_in);
+	if (msh->fd_out != STDOUT_FILENO)
+		close(msh->fd_out);
 	if (msh->fd[0] != -1)
 		close(msh->fd[0]);
 	if (msh->fd[1] != -1)
 		close(msh->fd[1]);
+	// signal(SIGINT, return_prompt);
+	// signal(SIGQUIT, SIG_IGN);
 }
