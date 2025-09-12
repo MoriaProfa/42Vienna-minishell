@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 14:37:10 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/08 18:30:14 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/11 17:59:10 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,7 @@ void	set_fd_in(t_msh *msh, int	i)
 		if (msh->fd_in == -1)
 			printf("%s: %s\n", ((t_cmd *)msh->cmd_table[i])->infile, "no such file or directory");
 	}
-	printf("i = %d fd_in = %d\n", i, msh->fd_in);
+	//printf("i = %d fd_in = %d\n", i, msh->fd_in);
 }
 
 void	set_fd_out(t_msh *msh, int	i)
@@ -133,19 +133,13 @@ void	set_fd_out(t_msh *msh, int	i)
 		msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfile, O_RDWR | O_CREAT | O_APPEND, 0666);
 		if (msh->fd_out == -1)
 			printf("%s: %s\n", ((t_cmd *)msh->cmd_table[i])->outfile, "no such file or directory2");
-	}
-	else
-	{
-		msh->fd_out = dup(STDOUT_FILENO);
-		if (msh->fd_out == -1)
-			msh_error(msh, "dup(1) failed");
-	}
-	printf("i = %d fd_out = %d\n", i, msh->fd_out);
+	} 
+	//printf("i = %d fd_out = %d\n", i, msh->fd_out);
 }
 
 void	msh_execute(t_msh *msh, int i)
 {
-	printf("in execution");
+	printf("in execution\n");
 	if (!((t_cmd *)msh->cmd_table[i])->pathname)
 	{
 		msh->status = 127;
@@ -168,6 +162,16 @@ void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
 		msh_end(msh, "fork failed");;
 	if (msh->pid[i] == 0)
 	{
+		/*if (msh->fd_in != fd_in)
+			close(msh->fd_in);
+		if (msh->fd_out != fd_out)
+			close(msh->fd_out);
+		if (msh->fd_in != fd_in)
+			close(msh->fd_in);
+		if (msh->fd[0] != fd_in)
+			close(msh->fd[0]);
+		if (msh->fd[1] != fd_out)
+			close(msh->fd[1]);*/
 		if (fd_in != STDIN_FILENO)
 		{
 			dup2(fd_in, STDIN_FILENO);
