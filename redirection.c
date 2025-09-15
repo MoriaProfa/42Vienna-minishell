@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 14:37:10 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/15 21:01:38 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/15 21:13:42 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,14 +105,6 @@ int	check_access_write(char *file)
 void	set_fd_in(t_msh *msh, int	i)
 {
 	msh->fd_in = msh->fd_in_previous;
-	if (((t_cmd *)msh->cmd_table[i])->infile)
-	{
-		if (check_access_read(((t_cmd *)msh->cmd_table[i])->infile) == 0)
-			return ;
-		msh->fd_in = open(((t_cmd *)msh->cmd_table[i])->infile, O_RDONLY);
-		if (msh->fd_in == -1)
-			printf("%s: %s\n", ((t_cmd *)msh->cmd_table[i])->infile, "no such file or directory");
-	}
 	if (((t_cmd *)msh->cmd_table[i])->heredoc)
 	{
 		if (msh->fd_in != STDIN_FILENO)
@@ -123,6 +115,15 @@ void	set_fd_in(t_msh *msh, int	i)
 		close(msh->hd_fd[1]);
 		msh->fd_in = msh->hd_fd[0];
 	}
+	else if (((t_cmd *)msh->cmd_table[i])->infile)
+	{
+		if (check_access_read(((t_cmd *)msh->cmd_table[i])->infile) == 0)
+			return ;
+		msh->fd_in = open(((t_cmd *)msh->cmd_table[i])->infile, O_RDONLY);
+		if (msh->fd_in == -1)
+			printf("%s: %s\n", ((t_cmd *)msh->cmd_table[i])->infile, "no such file or directory");
+	}
+	
 }
 
 void	set_fd_out(t_msh *msh, int	i)
