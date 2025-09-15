@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 14:37:10 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/11 17:59:10 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/15 15:25:08 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,7 +139,7 @@ void	set_fd_out(t_msh *msh, int	i)
 
 void	msh_execute(t_msh *msh, int i)
 {
-	printf("in execution\n");
+	//printf("in execution\n");
 	if (!((t_cmd *)msh->cmd_table[i])->pathname)
 	{
 		msh->status = 127;
@@ -162,16 +162,16 @@ void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
 		msh_end(msh, "fork failed");;
 	if (msh->pid[i] == 0)
 	{
-		/*if (msh->fd_in != fd_in)
+		if (msh->fd_in != fd_in)
 			close(msh->fd_in);
 		if (msh->fd_out != fd_out)
 			close(msh->fd_out);
 		if (msh->fd_in != fd_in)
 			close(msh->fd_in);
-		if (msh->fd[0] != fd_in)
+		if (msh->fd[0] != fd_in && msh->fd[0] != -1)
 			close(msh->fd[0]);
-		if (msh->fd[1] != fd_out)
-			close(msh->fd[1]);*/
+		if (msh->fd[1] != fd_out && msh->fd[1] != -1)
+			close(msh->fd[1]);
 		if (fd_in != STDIN_FILENO)
 		{
 			dup2(fd_in, STDIN_FILENO);
