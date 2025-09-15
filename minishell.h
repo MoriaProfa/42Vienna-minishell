@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/04 11:56:19 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/15 20:51:42 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,7 @@ typedef struct s_msh
 	int		fd_in_previous;
 	int		fd_in;
 	int		fd_out;
+	int		hd_fd[2];
 }			t_msh;
 
 void	msh_end(t_msh *msh, char *msg);

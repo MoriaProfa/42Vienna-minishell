@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 14:37:10 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/15 15:25:08 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/15 21:01:38 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,16 @@ void	set_fd_in(t_msh *msh, int	i)
 		if (msh->fd_in == -1)
 			printf("%s: %s\n", ((t_cmd *)msh->cmd_table[i])->infile, "no such file or directory");
 	}
-	//printf("i = %d fd_in = %d\n", i, msh->fd_in);
+	if (((t_cmd *)msh->cmd_table[i])->heredoc)
+	{
+		if (msh->fd_in != STDIN_FILENO)
+			close(msh->fd_in);
+		if (pipe(msh->hd_fd) == -1)
+			msh_end(msh, "pipe failed");
+		write(msh->hd_fd[1], ((t_cmd *)msh->cmd_table[i])->heredoc, ft_strlen(((t_cmd *)msh->cmd_table[i])->heredoc));
+		close(msh->hd_fd[1]);
+		msh->fd_in = msh->hd_fd[0];
+	}
 }
 
 void	set_fd_out(t_msh *msh, int	i)
@@ -133,13 +142,11 @@ void	set_fd_out(t_msh *msh, int	i)
 		msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfile, O_RDWR | O_CREAT | O_APPEND, 0666);
 		if (msh->fd_out == -1)
 			printf("%s: %s\n", ((t_cmd *)msh->cmd_table[i])->outfile, "no such file or directory2");
-	} 
-	//printf("i = %d fd_out = %d\n", i, msh->fd_out);
+	}
 }
 
 void	msh_execute(t_msh *msh, int i)
 {
-	//printf("in execution\n");
 	if (!((t_cmd *)msh->cmd_table[i])->pathname)
 	{
 		msh->status = 127;
@@ -183,6 +190,14 @@ void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
 			close(fd_out);
 		}
 		msh_execute(msh, i);
+	}
+}
+
+void	msh_heredoc(t_msh *msh, int i)
+{
+	if (((t_cmd *)msh->cmd_table[i])->heredoc)
+	{
+		
 	}
 }
 
