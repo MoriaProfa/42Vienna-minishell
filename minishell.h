@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/17 16:10:47 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/17 19:00:59 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,14 +63,14 @@
 
 typedef enum e_builtin_type
 {
-	T_PWD,
-	T_CD,
-	T_EXIT,
-	T_ENV,
-	T_EXPORT,
-	T_UNSET,
-	T_ECHO,
-	T_NOT_BUILTIN,
+	B_PWD,
+	B_CD,
+	B_EXIT,
+	B_ENV,
+	B_EXPORT,
+	B_UNSET,
+	B_ECHO,
+	B_NOT_BUILTIN,
 }					t_builtin_type;
 
 typedef struct s_builtin
@@ -87,7 +87,7 @@ typedef enum e_token_type
 	T_OUT_REDIRECT,
 	T_APPEND_REDIRECT,
 	T_HEREDOC_REDIRECT
-}					t_token_type;
+}				t_token_type;
 
 typedef struct s_token
 {

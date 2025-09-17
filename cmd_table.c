@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/17 17:04:44 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/17 18:57:12 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ t_builtin	builtin_check(char *s)
 	int			i;
 
 	builtin.builtin = false;
-	builtin.type = T_NOT_BUILTIN;
+	builtin.type = B_NOT_BUILTIN;
 	builtin_list[0] = "pwd";
 	builtin_list[1] = "cd";
 	builtin_list[2] = "exit";
