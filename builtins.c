@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/14 18:34:51 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/17 12:20:59 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,23 +68,8 @@ int	msh_echo(t_msh *msh)
 {
 }
 */
-	/*char	**array;
 
-	array = ft_split(msh->in_str, ' ');
-	if (!array)
-		msh_end(msh, "pwd array split failed");
-	if (array[1] != NULL)
-	{
-		printf("%s\n", "pwd: too many arguments");
-		ft_array_free(array);
-		return (1);
-	}
-	else
-	{
-		ft_array_free(array);
-		pwd = getcwd(NULL, 0);
-		if (!pwd)
-			return (1);
-		printf("%s\n", pwd);
-		free(pwd);
-	}*/
+void	msh_builtins(t_msh *msh)
+{
+	
+}

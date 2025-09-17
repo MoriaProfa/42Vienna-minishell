@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/17 10:09:06 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/17 12:52:59 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,8 +194,6 @@ void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
 
 void	msh_pipeline(t_msh *msh, int i)
 {
-	// signal(SIGINT, SIG_IGN);
-	// signal(SIGQUIT, SIG_IGN);
 	while (++i < msh->n_cmds)
 	{
 		set_fd_in(msh, i);
@@ -207,7 +205,10 @@ void	msh_pipeline(t_msh *msh, int i)
 			msh->fd_out = msh->fd[1];
 			msh->fd_in_previous = msh->fd[0];
 		}
-		msh_fork(msh, msh->fd_in, msh->fd_out, i);
+		if (((t_cmd *)msh->cmd_table[i])->builtin)
+			msh_builtins(&msh);
+		else
+			msh_fork(msh, msh->fd_in, msh->fd_out, i);
 		if (msh->fd_in != STDIN_FILENO)
 			close(msh->fd_in);
 		if (msh->fd_out != STDOUT_FILENO)
@@ -224,6 +225,4 @@ void	msh_pipeline(t_msh *msh, int i)
 		close(msh->fd[0]);
 	if (msh->fd[1] != -1)
 		close(msh->fd[1]);
-	// signal(SIGINT, return_prompt);
-	// signal(SIGQUIT, SIG_IGN);
 }

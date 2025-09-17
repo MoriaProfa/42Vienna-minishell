@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/17 10:22:02 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/17 12:53:23 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ void	msh_pipeline(t_msh *msh, int i);
 void	msh_pathname_pid(t_msh *msh);
 void	msh_fork(t_msh *msh, int i, int fd_in, int fd_out);
 void	msh_execute(t_msh *msh, int i);
+void	msh_builtins(t_msh *msh);
 
 volatile sig_atomic_t   g_signal_flag = 0;
 
