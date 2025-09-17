@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/17 16:34:51 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/17 17:47:20 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,50 +24,50 @@ int	msh_pwd(t_msh *msh)
 	return (0);
 }
 
-int	msh_cd(t_msh *msh)
+int	msh_cd(t_msh *msh, int i)
 {
-	char		**array;
 	struct stat	stats;
 
-	array = ft_split(msh->in_str, ' ');
-	if (!array)
-		msh_end(msh, "cd: array split failed");
-	stat(array[1], &stats);
+	if (((t_cmd *)msh->cmd_table[i])->args[2])
+		return (printf("%s\n", "cd: too many arguments"), 1);
+	stat(((t_cmd *)msh->cmd_table[i])->args[1], &stats);
 	//	msh_end(msh, "cd: stat failed");
 	/*if (!S_ISDIR(stats.st_mode))
 		printf("cd: %s: not a directory\n", array[1]);*/
-	if (array[2])
-		printf("%s\n", "cd: too many arguments");
 	if (stats.st_mode & F_OK)
-		msh->status = chdir(array[1]);
+		msh->status = chdir(((t_cmd *)msh->cmd_table[i])->args[1]);
 	if (!(stats.st_mode & F_OK))
-		printf("cd: no such file or directory: %s\n", array[1]);
-	if (access(array[1], X_OK) == 0)
-		printf("cd: permission denied: %s\n", array[1]);
-	ft_array_free(array);
+		printf("cd: %s: no such file or directory\n", ((t_cmd *)msh->cmd_table[i])->args[1]);
+	if (access(((t_cmd *)msh->cmd_table[i])->args[1], X_OK) == 0)
+		printf("cd: permission denied: %s\n", ((t_cmd *)msh->cmd_table[i])->args[1]);
 	return (msh->status);
 }
 
 int	msh_env(t_msh *msh)
 {
-	printf("env");
+	(void)msh;
+	printf("env\n");
+	return (0);
 }
 
 int	msh_export(t_msh *msh)
 {
-	printf("export");
+	(void)msh;
+	printf("export\n");
 	return (0);
 }
 
 int	msh_unset(t_msh *msh)
 {
-	printf("unset");
+	(void)msh;
+	printf("unset\n");
 	return (0);
 }
 
 int	msh_echo(t_msh *msh)
 {
-	printf("echo");
+	(void)msh;
+	printf("echo\n");
 	return (0);
 }
 
@@ -75,36 +75,28 @@ void	msh_builtins(t_msh *msh, int i)
 {
 	if (((t_cmd *)msh->cmd_table[i])->builtin.type == T_PWD)
 	{
-		if (msh_pwd(msh) != 0)
-			return ;
+		msh_pwd(msh);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == T_CD)
 	{
-		if (msh_cd(msh) != 0)
-			return ;
+		msh_cd(msh, i);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == T_EXIT)
-	{
-		msh_end(&msh, "exit");
-	}
+		msh_end(msh, "exit"); // exit status?
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == T_ENV)
 	{
-		if (msh_env(msh) != 0)
-			return ;
+		msh_env(msh);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == T_EXPORT)
 	{
-		if (msh_export(msh) != 0)
-			return ;
+		msh_export(msh);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == T_UNSET)
 	{
-		if (msh_unset(msh) != 0)
-			return ;
+		msh_unset(msh);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == T_ECHO)
 	{
-		if (msh_echo(msh) != 0)
-			return ;
+		msh_echo(msh);
 	}
 }

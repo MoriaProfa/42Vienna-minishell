@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/17 16:19:38 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/17 18:30:32 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,7 +190,10 @@ void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
 			dup2(fd_out, STDOUT_FILENO);
 			close(fd_out);
 		}
-		msh_execute(msh, i);
+		if (((t_cmd *)msh->cmd_table[i])->builtin.builtin == false)
+			msh_execute(msh, i);
+		else
+			msh_builtins(msh, i);
 	}
 }
 
@@ -207,7 +210,7 @@ void	msh_pipeline(t_msh *msh, int i)
 			msh->fd_out = msh->fd[1];
 			msh->fd_in_previous = msh->fd[0];
 		}
-		if (((t_cmd *)msh->cmd_table[i])->builtin.builtin)
+		if (((t_cmd *)msh->cmd_table[i])->builtin.builtin == true/* && !((t_cmd *)msh->cmd_table[i + 1])*/) // no pipes, only one builtin -> run in parent
 			msh_builtins(msh, i);
 		else
 			msh_fork(msh, msh->fd_in, msh->fd_out, i);

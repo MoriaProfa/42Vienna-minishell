@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/17 15:36:18 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/17 17:19:21 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void	msh_tokenizer(t_msh *msh);
 void	build_cmd_table(t_msh *msh);
 void    free_cmd_table(t_cmd **cmds, int n);
 void	msh_pipeline(t_msh *msh, int i);
-void	msh_pathname_pid(t_msh *msh);
+void	msh_pid(t_msh *msh);
 void	msh_fork(t_msh *msh, int i, int fd_in, int fd_out);
 void	msh_execute(t_msh *msh, int i);
 void	msh_builtins(t_msh *msh, int i);
@@ -179,15 +179,15 @@ int	main(int argc, char **argv, char **envp)
 		msh_initialize(&msh);
 		check_quotationmarks(&msh);
 		if (!msh.error_check)
-			(msh_tokenizer(&msh), print_tokens(msh.tokens)); //print just for testing
+			(msh_tokenizer(&msh)/*, print_tokens(msh.tokens)*/); //print just for testing
 		if (!msh.error_check)
 			check_tokens(&msh);
 		if (!msh.error_check)
-			(build_cmd_table(&msh), print_cmd_table(&msh)); //print just for testing
-		//if (!msh.error_check)
-		//	msh_pathname_pid(&msh); //allocates for msh.pid
-		//if (!msh.error_check)
-		//	msh_pipeline(&msh, 0);
+			(build_cmd_table(&msh)/*, print_cmd_table(&msh)*/); //print just for testing
+		if (!msh.error_check)
+			msh_pid(&msh); //allocates for msh.pid
+		if (!msh.error_check)
+			msh_pipeline(&msh, -1);
 		msh_free(&msh);
 	}
 	msh_end(&msh, "exit");
