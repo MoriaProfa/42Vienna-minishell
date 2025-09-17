@@ -6,11 +6,13 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/17 12:52:59 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/17 16:19:38 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+void	msh_builtins(t_msh *msh, int i);
 
 void	msh_pid(t_msh *msh)
 {
@@ -205,8 +207,8 @@ void	msh_pipeline(t_msh *msh, int i)
 			msh->fd_out = msh->fd[1];
 			msh->fd_in_previous = msh->fd[0];
 		}
-		if (((t_cmd *)msh->cmd_table[i])->builtin)
-			msh_builtins(&msh);
+		if (((t_cmd *)msh->cmd_table[i])->builtin.builtin)
+			msh_builtins(msh, i);
 		else
 			msh_fork(msh, msh->fd_in, msh->fd_out, i);
 		if (msh->fd_in != STDIN_FILENO)

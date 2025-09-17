@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_table.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/04 14:17:44 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/17 16:29:07 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,13 +86,14 @@ void	*grow_array(void *old, int old_capacity, int new_capacity, size_t size)
 	return (new);
 }
 
-bool	builtin_check(char *s)
+t_builtin	builtin_check(char *s)
 {
-	bool	builtin;
+	t_builtin	builtin;
 	char	*builtin_list[8];
 	int		i;
 	
-	builtin = false;
+	builtin.builtin = false;
+	builtin.type = T_NOT_BUILTIN;
 	builtin_list[0] = "pwd";
 	builtin_list[1] = "cd";
 	builtin_list[2] = "exit";
@@ -101,15 +102,17 @@ bool	builtin_check(char *s)
 	builtin_list[5] = "unset";
 	builtin_list[6] = "echo";
 	builtin_list[7] = NULL;
-	i = 0;
-	while (builtin_list[i])
+	i = -1;
+	while (builtin_list[++i])
 	{
 		if (ft_strlen(s) == ft_strlen(builtin_list[i]))
 		{
 			if (!ft_strncmp(s, builtin_list[i], ft_strlen(s)))
-				return (true);
+			{
+				builtin.builtin = true;
+				builtin.type = i;
+			}
 		}
-		i++;
 	}
 	return (builtin);
 }
@@ -198,8 +201,7 @@ void	parse_single_cmd_tokens(t_cmd *cmd, t_list **token_list)
 	}
 	if ((*token_list) && ((t_token *)(*token_list)->content)->type == T_PIPE)
 		*token_list = (*token_list)->next;
-	if (builtin_check(cmd->args[0]))
-		cmd->builtin = true;
+	cmd->builtin = builtin_check(cmd->args[0]);
 }
 
 t_cmd	**ensure_cmd_capacity(t_cmd **cmds, int *capacity, int count)

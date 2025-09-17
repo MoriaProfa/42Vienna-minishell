@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/17 10:22:56 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/17 16:10:47 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,9 @@
 // readline, rl_clear_history, rl_on_new_line, rl_replace_line,
 // rl_redisplay, add_history
 # include <signal.h>
-//signal, sigaction, sigemptyset, sigaddset, kill
-#include <stdbool.h>
-//booleans
+// signal, sigaction, sigemptyset, sigaddset, kill
+# include <stdbool.h>
+// booleans
 # include <stdio.h>
 // printf, perror
 # include <string.h>
@@ -59,7 +59,25 @@
 # include <term.h>
 // tgetent, tgetflag, tgetnum, tgetstr, tgoto, tputs
 # include <termios.h>
-//tcsetattr, tcgetattr
+// tcsetattr, tcgetattr
+
+typedef enum e_builtin_type
+{
+	T_PWD,
+	T_CD,
+	T_EXIT,
+	T_ENV,
+	T_EXPORT,
+	T_UNSET,
+	T_ECHO,
+	T_NOT_BUILTIN,
+}					t_builtin_type;
+
+typedef struct s_builtin
+{
+	bool			builtin;
+	t_builtin_type	type;
+}					t_builtin;
 
 typedef enum e_token_type
 {
@@ -69,7 +87,7 @@ typedef enum e_token_type
 	T_OUT_REDIRECT,
 	T_APPEND_REDIRECT,
 	T_HEREDOC_REDIRECT
-} 			t_token_type;
+}					t_token_type;
 
 typedef struct s_token
 {
@@ -81,36 +99,36 @@ typedef struct s_token
 
 typedef struct s_cmd
 {
-	char	**args;//command + args
-	bool	builtin;
-	char	*infile;// <
-	char	*outfile;// > or >>
-	bool	append;// true if >>
-	char	*heredoc;// <<
-	int		argc;// amount of args
-	int		args_capacity;//args cap
-	char	*pathname;//pathname to an executable
-}			t_cmd;
+	char **args; // command + args
+	t_builtin		builtin;
+	char *infile;      // <
+	char *outfile;     // > or >>
+	bool append;       // true if >>
+	char *heredoc;     // <<
+	int argc;          // amount of args
+	int args_capacity; // args cap
+	char *pathname;    // pathname to an executable
+}					t_cmd;
 
 typedef struct s_msh
 {
-	bool	error_check;
-	char	*in_str;
-	char	*cpy_in_str;
-	t_list	*tokens;
-	t_cmd	**cmd_table;
-	int		n_cmds;
-	char	**envp;
-	int		status;
-	pid_t	*pid;
-	int		fd[2];
-	int		fd_in_previous;
-	int		fd_in;
-	int		fd_out;
-	int		hd_fd[2];
-}			t_msh;
+	bool			error_check;
+	char			*in_str;
+	char			*cpy_in_str;
+	t_list			*tokens;
+	t_cmd			**cmd_table;
+	int				n_cmds;
+	char			**envp;
+	int				status;
+	pid_t			*pid;
+	int				fd[2];
+	int				fd_in_previous;
+	int				fd_in;
+	int				fd_out;
+	int				hd_fd[2];
+}					t_msh;
 
-void	msh_end(t_msh *msh, char *msg);
-void	msh_error(t_msh *msh, char *msg);
+void				msh_end(t_msh *msh, char *msg);
+void				msh_error(t_msh *msh, char *msg);
 
 #endif

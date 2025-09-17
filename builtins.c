@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/17 12:20:59 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/17 16:34:51 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,29 +47,64 @@ int	msh_cd(t_msh *msh)
 	ft_array_free(array);
 	return (msh->status);
 }
-/*
-int	msh_exit(t_msh *msh)
-{
-}
 
 int	msh_env(t_msh *msh)
 {
+	printf("env");
 }
 
 int	msh_export(t_msh *msh)
 {
+	printf("export");
+	return (0);
 }
 
 int	msh_unset(t_msh *msh)
 {
+	printf("unset");
+	return (0);
 }
 
 int	msh_echo(t_msh *msh)
 {
+	printf("echo");
+	return (0);
 }
-*/
 
-void	msh_builtins(t_msh *msh)
+void	msh_builtins(t_msh *msh, int i)
 {
-	
+	if (((t_cmd *)msh->cmd_table[i])->builtin.type == T_PWD)
+	{
+		if (msh_pwd(msh) != 0)
+			return ;
+	}
+	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == T_CD)
+	{
+		if (msh_cd(msh) != 0)
+			return ;
+	}
+	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == T_EXIT)
+	{
+		msh_end(&msh, "exit");
+	}
+	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == T_ENV)
+	{
+		if (msh_env(msh) != 0)
+			return ;
+	}
+	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == T_EXPORT)
+	{
+		if (msh_export(msh) != 0)
+			return ;
+	}
+	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == T_UNSET)
+	{
+		if (msh_unset(msh) != 0)
+			return ;
+	}
+	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == T_ECHO)
+	{
+		if (msh_echo(msh) != 0)
+			return ;
+	}
 }
