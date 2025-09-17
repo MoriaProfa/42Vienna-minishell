@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/08/13 17:22:11 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/17 10:22:56 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,9 @@
 // readline, rl_clear_history, rl_on_new_line, rl_replace_line,
 // rl_redisplay, add_history
 # include <signal.h>
-// signal, sigaction, sigemptyset, sigaddset, kill
+//signal, sigaction, sigemptyset, sigaddset, kill
+#include <stdbool.h>
+//booleans
 # include <stdio.h>
 // printf, perror
 # include <string.h>
@@ -57,10 +59,8 @@
 # include <term.h>
 // tgetent, tgetflag, tgetnum, tgetstr, tgoto, tputs
 # include <termios.h>
-	// tcsetattr, tcgetattr
+//tcsetattr, tcgetattr
 
-	// t_list in libft.h maybe changed to double linked list -> add *previous
-	// ft_lstnew + ft_lstadd_back + ft_lstadd_front to be modified then
 typedef enum e_token_type
 {
 	T_WORD,
@@ -75,27 +75,42 @@ typedef struct s_token
 {
 	char			*value;
 	t_token_type	type;
+	int				quoted;
+	bool			is_adjacent;
 }					t_token;
+
+typedef struct s_cmd
+{
+	char	**args;//command + args
+	bool	builtin;
+	char	*infile;// <
+	char	*outfile;// > or >>
+	bool	append;// true if >>
+	char	*heredoc;// <<
+	int		argc;// amount of args
+	int		args_capacity;//args cap
+	char	*pathname;//pathname to an executable
+}			t_cmd;
 
 typedef struct s_msh
 {
-	char			*in_str;
-	char			*cpy_in_str;
-	t_list			*tokens;
-	char 			**in_arr; // token_list instead?
-	char			***cmd;
-	char			**pathname;
-	int				n;
-	char			**envp;
-	int				status;
-	pid_t			*pid;
-	int				fd_in;
-	int				fd_out;
-	int				fd[2];
-}					t_msh;
+	bool	error_check;
+	char	*in_str;
+	char	*cpy_in_str;
+	t_list	*tokens;
+	t_cmd	**cmd_table;
+	int		n_cmds;
+	char	**envp;
+	int		status;
+	pid_t	*pid;
+	int		fd[2];
+	int		fd_in_previous;
+	int		fd_in;
+	int		fd_out;
+	int		hd_fd[2];
+}			t_msh;
 
-void				msh_end(t_msh *msh, char *msg);
-int					msh_pwd(t_msh *msh);
-int					msh_cd(t_msh *msh);
+void	msh_end(t_msh *msh, char *msg);
+void	msh_error(t_msh *msh, char *msg);
 
 #endif
