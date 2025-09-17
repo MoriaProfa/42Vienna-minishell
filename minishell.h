@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/04 11:51:04 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/17 10:09:45 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,9 +102,11 @@ typedef struct s_msh
 	char	**envp;
 	int		status;
 	pid_t	*pid;
+	int		fd[2];
+	int		fd_in_previous;
 	int		fd_in;
 	int		fd_out;
-	int		fd[2];
+	int		hd_fd[2];
 }			t_msh;
 
 void	msh_end(t_msh *msh, char *msg);

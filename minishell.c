@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/04 11:51:30 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/17 10:10:48 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,10 +132,13 @@ void	msh_initialize(t_msh *msh)
 	msh->error_check = false;
 	msh->cpy_in_str = msh->in_str;
 	msh->status = 1;
+	msh->fd_in_previous = STDIN_FILENO;
+	msh->fd_in = STDIN_FILENO;
+	msh->fd_out = STDOUT_FILENO;
 	msh->fd[0] = -1;
 	msh->fd[1] = -1;
-	msh->fd_in = -1;
-	msh->fd_out = -1;
+	msh->hd_fd[0] = -1;
+	msh->hd_fd[1] = -1;
 }
 
 void	handle_signal(int signal)
