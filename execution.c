@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/17 18:54:20 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/18 17:05:46 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,6 +163,18 @@ void	msh_execute(t_msh *msh, int i)
 	msh_error(msh, "execve failed");//maybe just use perror to print the errno-msg
 }
 
+void	close_fds(t_msh *msh, int fd1, int fd2)
+{
+	if (msh->fd_in != fd1)
+			close(msh->fd_in);
+	if (msh->fd_out != fd2)
+			close(msh->fd_out);
+	if (msh->fd[0] != fd1 && msh->fd[0] != -1)
+			close(msh->fd[0]);
+	if (msh->fd[1] != fd2 && msh->fd[1] != -1)
+			close(msh->fd[1]);
+}
+
 void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
 {
 	msh->pid[i] = fork();
@@ -170,16 +182,7 @@ void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
 		msh_end(msh, "fork failed");;
 	if (msh->pid[i] == 0)
 	{
-		if (msh->fd_in != fd_in)
-			close(msh->fd_in);
-		if (msh->fd_out != fd_out)
-			close(msh->fd_out);
-		if (msh->fd_in != fd_in)
-			close(msh->fd_in);
-		if (msh->fd[0] != fd_in && msh->fd[0] != -1)
-			close(msh->fd[0]);
-		if (msh->fd[1] != fd_out && msh->fd[1] != -1)
-			close(msh->fd[1]);
+		close_fds(msh, fd_in, fd_out);
 		if (fd_in != STDIN_FILENO)
 		{
 			dup2(fd_in, STDIN_FILENO);
@@ -222,12 +225,5 @@ void	msh_pipeline(t_msh *msh, int i)
 	i = -1;
 	while (++i < msh->n_cmds)
 		waitpid(msh->pid[i], &msh->status, 0);
-	if (msh->fd_in != STDIN_FILENO)
-		close(msh->fd_in);
-	if (msh->fd_out != STDOUT_FILENO)
-		close(msh->fd_out);
-	if (msh->fd[0] != -1)
-		close(msh->fd[0]);
-	if (msh->fd[1] != -1)
-		close(msh->fd[1]);
+	close_fds(msh, STDIN_FILENO, STDOUT_FILENO);
 }
