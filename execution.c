@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/18 17:05:46 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/18 17:27:39 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,13 +166,13 @@ void	msh_execute(t_msh *msh, int i)
 void	close_fds(t_msh *msh, int fd1, int fd2)
 {
 	if (msh->fd_in != fd1)
-			close(msh->fd_in);
+		close(msh->fd_in);
 	if (msh->fd_out != fd2)
-			close(msh->fd_out);
+		close(msh->fd_out);
 	if (msh->fd[0] != fd1 && msh->fd[0] != -1)
-			close(msh->fd[0]);
+		close(msh->fd[0]);
 	if (msh->fd[1] != fd2 && msh->fd[1] != -1)
-			close(msh->fd[1]);
+		close(msh->fd[1]);
 }
 
 void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
@@ -196,7 +196,10 @@ void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
 		if (((t_cmd *)msh->cmd_table[i])->builtin.builtin == false)
 			msh_execute(msh, i);
 		else
+		{
 			msh_builtins(msh, i);
+			exit (0);
+		}
 	}
 }
 

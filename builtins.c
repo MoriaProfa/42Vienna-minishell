@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/18 16:50:34 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/18 17:26:54 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,4 +111,5 @@ void	msh_builtins(t_msh *msh, int i)
 	{
 		msh_echo(msh);
 	}
+	return ;
 }
