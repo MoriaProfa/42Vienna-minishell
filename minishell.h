@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/17 19:00:59 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/18 13:21:29 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ typedef enum e_token_type
 	T_OUT_REDIRECT,
 	T_APPEND_REDIRECT,
 	T_HEREDOC_REDIRECT
-}				t_token_type;
+}					t_token_type;
 
 typedef struct s_token
 {

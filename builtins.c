@@ -6,11 +6,14 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/17 19:14:21 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/18 16:50:34 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+void	envp_free(t_msh *msh);
+void	msh_free(t_msh *msh);
 
 int	msh_pwd(t_msh *msh)
 {
@@ -19,7 +22,7 @@ int	msh_pwd(t_msh *msh)
 	pwd = getcwd(NULL, 0);
 	if (!pwd)
 		return (msh->status);
-	printf("%s\n", pwd);
+	ft_putendl_fd(pwd, msh->fd_out);
 	free(pwd);
 	return (0);
 }
@@ -41,6 +44,15 @@ int	msh_cd(t_msh *msh, int i)
 	if (access(((t_cmd *)msh->cmd_table[i])->args[1], X_OK) == 0)
 		printf("cd: permission denied: %s\n", ((t_cmd *)msh->cmd_table[i])->args[1]);
 	return (msh->status);
+}
+
+void	msh_exit(t_msh *msh, char *msg)
+{
+	ft_putendl_fd(msg, STDOUT_FILENO);
+	envp_free(msh);
+	msh_free(msh);
+	rl_clear_history();
+	exit(0);
 }
 
 int	msh_env(t_msh *msh)
@@ -82,7 +94,7 @@ void	msh_builtins(t_msh *msh, int i)
 		msh_cd(msh, i);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_EXIT)
-		msh_end(msh, "exit"); // exit status?
+		msh_exit(msh, "exit"); // exit status?
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_ENV)
 	{
 		msh_env(msh);

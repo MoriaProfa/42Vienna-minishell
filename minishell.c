@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/17 17:19:21 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/18 16:52:34 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,9 +75,9 @@ void	msh_end(t_msh *msh, char *msg)
 	int	fd;
 
 	if (msh->status != 0)
-		fd = 2;
+		fd = STDERR_FILENO;
 	else
-		fd = 1;
+		fd = STDOUT_FILENO;
 	ft_putendl_fd(msg, fd);
 	envp_free(msh);
 	msh_free(msh);
