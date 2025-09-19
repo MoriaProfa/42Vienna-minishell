@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/18 17:27:39 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/19 15:53:33 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,16 +151,16 @@ void	msh_execute(t_msh *msh, int i)
 	if (!((t_cmd *)msh->cmd_table[i])->pathname)
 	{
 		msh->status = 127;
-		msh_error(msh, "command not found");//should display a new prompt after the error msg (Bernhard said this is the only error-msg that needs to be hardcoded)
+		msh_end(msh, "command not found");//should display a new prompt after the error msg (Bernhard said this is the only error-msg that needs to be hardcoded)
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->pathname && access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == -1)
 	{
 		msh->status = 126;
-		msh_error(msh, "permission denied");//maybe just use perror to print the errno-msg
+		msh_end(msh, "permission denied");//maybe just use perror to print the errno-msg
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->pathname && access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == 0)
 		execve(((t_cmd *)msh->cmd_table[i])->pathname, ((t_cmd *)msh->cmd_table[i])->args, msh->envp);
-	msh_error(msh, "execve failed");//maybe just use perror to print the errno-msg
+	msh_end(msh, "execve failed");//maybe just use perror to print the errno-msg
 }
 
 void	close_fds(t_msh *msh, int fd1, int fd2)
