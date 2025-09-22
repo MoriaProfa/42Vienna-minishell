@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/17 10:09:06 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/22 17:28:27 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ char	*create_cmd_pathname(t_msh *msh, char *cmd)
 		if (!paths)
 			msh_end(msh, "paths ft_split failed");
 		pathname = resolve_cmd_pathname(msh, paths, cmd);
-		ft_array_free(paths);
+		ft_array_free(paths, sizeof(paths));
 	}
 	return (pathname);
 }

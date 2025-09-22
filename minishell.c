@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/17 10:10:48 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/22 13:42:39 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ void	envp_free(t_msh *msh)
 {
 	if (msh->envp)
 	{
-		ft_array_free(msh->envp);
+		ft_array_free(msh->envp, sizeof(msh->envp));
 		msh->envp = NULL;
 	}
 }
@@ -113,7 +113,7 @@ char	*msh_read(ssize_t rr)
 		{
 			tmp = out;
 			out = ft_strjoin(tmp, buf);
-			ft_free(&tmp);
+			ft_free(&tmp); 
 		}
 	}
 	return (out);
@@ -133,7 +133,7 @@ void	msh_initialize(t_msh *msh)
 	msh->cpy_in_str = msh->in_str;
 	msh->status = 1;
 	msh->fd_in_previous = STDIN_FILENO;
-	msh->fd_in = STDIN_FILENO;
+	msh->fd_in = STDIN_FILENO; 
 	msh->fd_out = STDOUT_FILENO;
 	msh->fd[0] = -1;
 	msh->fd[1] = -1;
