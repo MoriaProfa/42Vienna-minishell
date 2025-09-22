@@ -24,7 +24,7 @@ void	msh_tokenizer(t_msh *msh);
 void	build_cmd_table(t_msh *msh);
 void    free_cmd_table(t_cmd **cmds, int n);
 void	msh_pipeline(t_msh *msh, int i);
-void	msh_pathname_pid(t_msh *msh);
+void	msh_pid(t_msh *msh);
 void	msh_fork(t_msh *msh, int i, int fd_in, int fd_out);
 void	msh_execute(t_msh *msh, int i);
 
@@ -184,7 +184,7 @@ int	main(int argc, char **argv, char **envp)
 		if (!msh.error_check)
 			(build_cmd_table(&msh), print_cmd_table(&msh)); //print just for testing
 		//if (!msh.error_check)
-		//	msh_pathname_pid(&msh); //allocates for msh.pid
+		//	msh_pid(&msh); //allocates for msh.pid
 		//if (!msh.error_check)
 		//	msh_pipeline(&msh, 0);
 		msh_free(&msh);
