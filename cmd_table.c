@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/17 18:57:12 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/22 19:36:47 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,8 @@ void	print_cmd_table(t_msh *msh)
 			printf("\tinfile: %s\n", cmd->infile);
 		if (cmd->outfile)
 			printf("\toutfile: %s (append = %d)\n", cmd->outfile, cmd->append);
-		if (cmd->heredoc)
-			printf("\theredoc: %s\n", cmd->heredoc);
+		if (cmd->heredoc->delimeter)
+			printf("\theredoc: %s\n", cmd->heredoc->delimeter);
 		if (cmd->pathname)
 			printf("\tpathname: %s\n", cmd->pathname);
 		i++;
@@ -65,8 +65,10 @@ void	free_cmd_table(t_cmd **cmds, int n)
 			free(cmds[i]->infile);
 		if (cmds[i]->outfile)
 			free(cmds[i]->outfile);
-		if (cmds[i]->heredoc)
-			free(cmds[i]->heredoc);
+		/*if (cmds[i]->heredoc->delimeter)
+			free(cmds[i]->heredoc->delimeter);
+		if (cmds[i]->heredoc->buffer)
+			free(cmds[i]->heredoc->buffer);*/
 		if (cmds[i]->pathname)
 			free(cmds[i]->pathname);
 		free(cmds[i]);
@@ -194,7 +196,10 @@ void	parse_single_cmd_tokens(t_cmd *cmd, t_list **token_list)
 			cmd->append = true;
 		}
 		else if (token->type == T_HEREDOC_REDIRECT)
-			cmd->heredoc = get_next_word_token(token_list);
+		{
+			cmd->heredoc->delimeter = get_next_word_token(token_list);
+			cmd->heredoc->buffer = NULL;
+		}
 		*token_list = (*token_list)->next;
 	}
 	if ((*token_list) && ((t_token *)(*token_list)->content)->type == T_PIPE)

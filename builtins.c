@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/18 17:26:54 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/22 20:10:38 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,20 +29,24 @@ int	msh_pwd(t_msh *msh)
 
 int	msh_cd(t_msh *msh, int i)
 {
-	struct stat	stats;
+	//struct stat	stats;
+	size_t	len;
 
 	if (((t_cmd *)msh->cmd_table[i])->args[2])
 		return (printf("%s\n", "cd: too many arguments"), 1);
-	stat(((t_cmd *)msh->cmd_table[i])->args[1], &stats);
+	len = ft_strlen(((t_cmd *)msh->cmd_table[i])->args[1]);
+	if (!((t_cmd *)msh->cmd_table[i])->args[1])
+		msh->status = chdir("/home/edarmaev/");
+	/*stat(((t_cmd *)msh->cmd_table[i])->args[1], &stats);
 	//	msh_end(msh, "cd: stat failed");
-	/*if (!S_ISDIR(stats.st_mode))
-		printf("cd: %s: not a directory\n", array[1]);*/
+	if (!S_ISDIR(stats.st_mode))
+		printf("cd: %s: not a directory\n", array[1]);
 	if (stats.st_mode & F_OK)
 		msh->status = chdir(((t_cmd *)msh->cmd_table[i])->args[1]);
 	if (!(stats.st_mode & F_OK))
 		printf("cd: %s: no such file or directory\n", ((t_cmd *)msh->cmd_table[i])->args[1]);
 	if (access(((t_cmd *)msh->cmd_table[i])->args[1], X_OK) == 0)
-		printf("cd: permission denied: %s\n", ((t_cmd *)msh->cmd_table[i])->args[1]);
+		printf("cd: permission denied: %s\n", ((t_cmd *)msh->cmd_table[i])->args[1]);*/
 	return (msh->status);
 }
 
@@ -94,7 +98,7 @@ void	msh_builtins(t_msh *msh, int i)
 		msh_cd(msh, i);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_EXIT)
-		msh_exit(msh, "exit"); // exit status?
+		msh_exit(msh, "exit");
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_ENV)
 	{
 		msh_env(msh);

@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/22 18:29:49 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/22 19:33:51 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,18 +103,18 @@ int	check_access_write(char *file)
 void	set_fd_in(t_msh *msh, int i)
 {
 	msh->fd_in = msh->fd_in_previous;
-	if (((t_cmd *)msh->cmd_table[i])->heredoc)
+	/*if (((t_cmd *)msh->cmd_table[i])->heredoc->delimeter)
 	{
 		if (msh->fd_in != STDIN_FILENO)
 			close(msh->fd_in);
 		if (pipe(msh->hd_fd) == -1)
 			msh_end(msh, "pipe failed");
-		write(msh->hd_fd[1], ((t_cmd *)msh->cmd_table[i])->heredoc,
-			ft_strlen(((t_cmd *)msh->cmd_table[i])->heredoc));
+		write(msh->hd_fd[1], ((t_cmd *)msh->cmd_table[i])->heredoc->delimeter,
+			ft_strlen(((t_cmd *)msh->cmd_table[i])->heredoc->delimeter));
 		close(msh->hd_fd[1]);
 		msh->fd_in = msh->hd_fd[0];
 	}
-	else if (((t_cmd *)msh->cmd_table[i])->infile)
+	else */if (((t_cmd *)msh->cmd_table[i])->infile)
 	{
 		if (check_access_read(((t_cmd *)msh->cmd_table[i])->infile) == 0)
 			return ;

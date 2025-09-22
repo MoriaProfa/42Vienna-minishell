@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/18 13:21:29 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/22 18:36:35 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,17 +97,30 @@ typedef struct s_token
 	bool			is_adjacent;
 }					t_token;
 
+typedef struct s_heredoc
+{
+	char			*delimeter;
+	char			*buffer;
+	bool			quoted;
+}					t_heredoc;
+
+typedef struct s_outfile
+{
+	char			*filename;
+	bool			append;
+}					t_outfile;
+
 typedef struct s_cmd
 {
-	char **args; // command + args
+	char			**args;
 	t_builtin		builtin;
-	char *infile;      // <
-	char *outfile;     // > or >>
-	bool append;       // true if >>
-	char *heredoc;     // <<
-	int argc;          // amount of args
-	int args_capacity; // args cap
-	char *pathname;    // pathname to an executable
+	char			*infile;
+	char			*outfile;
+	bool			append;
+	t_heredoc		*heredoc;
+	int				argc;
+	int				args_capacity;
+	char			*pathname;
 }					t_cmd;
 
 typedef struct s_msh
