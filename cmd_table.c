@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/23 07:01:56 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/23 08:13:41 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,7 +173,7 @@ int	add_cmd(t_cmd **cmds, int count, t_msh *msh)
 	return (1);
 }
 
-void	add_to_cmd_args(t_cmd *cmd, char *word)
+void	add_to_cmd_args(t_cmd *cmd, char *word) //rewrite to capacity check, delete add to args
 {
 	int	new_capacity;
 
@@ -196,7 +196,7 @@ char	*get_next_word(t_list **tokens)
 		&& ((t_token *)(*tokens)->next->content)->type == T_WORD)
 	{
 		*tokens = (*tokens)->next;
-		value = ft_strdup(((t_token *)(*tokens)->content)->value); //malloc check missing... if !value = msh_end?
+		value = ft_strdup(((t_token *)(*tokens)->content)->value); //malloc check missing... if !value = msh_end? but then msh needs to be a parameter and passed over
 		return (value);
 	}
 	return (NULL);
@@ -208,9 +208,10 @@ void	parse_single_cmd_tokens(t_cmd *cmd, t_list **token_list)
 
 	while (*token_list && ((t_token *)(*token_list)->content)->type != T_PIPE)
 	{
+		//capacity check for arrays: args, infiles, outfiles, heredocs
 		token = (*token_list)->content;
 		if (token->type == T_WORD)
-			add_to_cmd_args(cmd, token->value);
+			add_to_cmd_args(cmd, token->value);//cmd->args[cmd->argc++] = ft_strdup(token->value);
 		else if (token->type == T_IN_REDIRECT)
 			cmd->infiles[cmd->n_inf++] = get_next_word(token_list);
 		else if (token->type == T_OUT_REDIRECT)
@@ -229,6 +230,7 @@ void	parse_single_cmd_tokens(t_cmd *cmd, t_list **token_list)
 	if (cmd->args && cmd->args[0] && builtin_check(cmd->args[0]))
 		cmd->builtin = true;
 }
+//ensure capacity for new arrays infiles, outfiles, heredocs is missing!
 
 t_cmd	**ensure_cmd_capacity(t_cmd **cmds, int *capacity, int count)
 {
@@ -313,7 +315,7 @@ void	build_cmd_table(t_msh *msh)
 		if (!add_cmd(cmds, count, msh))//add_cmd could be reduced to 3 lines - maybe adding it here instead
 			return ;//maybe msh_end?
 		parse_single_cmd_tokens(cmds[count], &token_list);
-		cmds[count]->pathname = create_cmd_pathname(msh, cmds[count]->args[0]);//cmds[count]->args[0]->value -->array of struct containing value = string + information about quotationmarks
+		cmds[count]->pathname = create_cmd_pathname(msh, cmds[count]->args[0]);
 		count++;
 	}
 	cmds = ensure_cmd_capacity(cmds, &capacity, count);
