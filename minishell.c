@@ -6,13 +6,13 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/23 07:03:16 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/23 20:05:56 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 //valgrind command:
 //valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes --trace-children=yes --suppressions=minishell.supp ./minishell
-//pwd test < file1 > file2 >> file3 test2 << file4 << "file5" | cd hello | ls
+//pwd test < file1 > file2 >> file3 test2 << file4 << "file5" | cd hello | ls test3 test4 test5 test6 test7
 
 #include "minishell.h"
 
@@ -87,9 +87,14 @@ void	msh_end(t_msh *msh, char *msg)
 
 void	return_prompt(void)
 {
+	printf("\n");
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
+	/*for heredoc (maybe also child processes?) -> old return_prompt function:
 	rl_replace_line("", 0);
 	ioctl(0, TIOCSTI, "\n");
-	rl_on_new_line();
+	rl_on_new_line();*/
 }
 
 /* useless because of use of readline atm
@@ -147,7 +152,7 @@ void	handle_signal(int signal)
 	if (signal == SIGINT)
 	{
 		g_signal_flag = signal + 128;
-		//return_prompt(); //only for heredoc handling, not main loop -> non-interactive mode vs. interactive mode (=heredoc)
+		return_prompt();
 	}	
 }
 

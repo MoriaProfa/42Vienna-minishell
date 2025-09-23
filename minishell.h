@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/23 04:25:03 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/23 15:31:43 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,8 +95,8 @@ typedef struct s_heredoc
 typedef struct s_cmd
 {
 	char		**args;//command + args
-	int			argc;// amount of args
-	int			args_capacity;// capacity of **args
+	int			n_args;// amount of args
+	int			capacity_args;// capacity of **args
 	bool		builtin;// true if args[0] == builtin
 	char		**infiles;// list of <
 	int			n_inf;// amount of infiles

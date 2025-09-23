@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/23 08:13:41 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/23 22:53:31 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,9 @@ void	print_cmd_table(t_msh *msh)
 	{
 		cmd = msh->cmd_table[i];
 		printf("Command %i:\n", i);
-		printf("\targs (%i): ", cmd->argc);
+		printf("\targs (%i): ", cmd->n_args);
 		j = 0;
-		while (cmd->args[j] && j < cmd->argc)
+		while (cmd->args[j] && j < cmd->n_args)
 			printf("[%s] ", cmd->args[j++]);
 		printf("\n\tBuiltin args[0]: %d\n", cmd->builtin);
 		if (cmd->infiles)
@@ -50,10 +50,10 @@ void	print_cmd_table(t_msh *msh)
 		}
 		if (cmd->heredocs)
 		{
-			j = 0;
+			j = -1;
 			printf("\theredocs (%i): ", cmd->n_hd);
-			while (cmd->heredocs[j].delimiter && j < cmd->n_hd)
-				printf("[delimiter: %s] ", cmd->heredocs[j++].delimiter);
+			while (cmd->heredocs[++j].delimiter && j < cmd->n_hd)
+				printf("[%s (expand = %d)] ", cmd->heredocs[j].delimiter, cmd->heredocs[j].expand);
 			printf("\n");
 		}		
 		if (cmd->pathname)
@@ -62,30 +62,36 @@ void	print_cmd_table(t_msh *msh)
 	}
 }
 
+void	free_single_cmd_structs(t_cmd *cmd)
+{
+	int	j;
+
+	j = -1;
+	while (cmd->outfiles && ++j < cmd->n_outf)
+		free(cmd->outfiles[j].filename);
+	j = -1;
+	while (cmd->heredocs && ++j < cmd->n_hd)
+	{
+		free(cmd->heredocs[j].delimiter);
+		if (cmd->heredocs[j].buffer)
+			free(cmd->heredocs[j].buffer);
+	}
+}
+
 void	free_cmd_table(t_cmd **cmds, int n)
 {
 	int	i;
-	int	j;
-
+	
 	i = -1;
 	if (!cmds)
 		return ;
 	while (cmds[++i] && i < n)
 	{
-		ft_array_free(cmds[i]->args, (size_t)cmds[i]->argc);
+		ft_array_free(cmds[i]->args, (size_t)cmds[i]->n_args);
 		ft_array_free(cmds[i]->infiles, (size_t)cmds[i]->n_inf);
-		j = -1;
-		while (cmds[i]->outfiles && ++j < cmds[i]->n_outf)
-			free(cmds[i]->outfiles[j].filename);
+		free_single_cmd_structs(cmds[i]);
 		if (cmds[i]->outfiles)
 			free(cmds[i]->outfiles);
-		j = -1;
-		while (cmds[i]->heredocs && ++j < cmds[i]->n_hd)
-		{
-			free(cmds[i]->heredocs[j].delimiter);
-			if (cmds[i]->heredocs[j].buffer)
-				free(cmds[i]->heredocs[j].buffer);
-		}
 		if (cmds[i]->heredocs)
 			free(cmds[i]->heredocs);
 		if (cmds[i]->pathname)
@@ -93,18 +99,6 @@ void	free_cmd_table(t_cmd **cmds, int n)
 		free(cmds[i]);
 	}
 	free(cmds);
-}
-
-void	*grow_array(void *old, int old_capacity, int new_capacity, size_t size)
-{
-	void	*new;
-
-	new = ft_calloc(new_capacity, size);
-	if (!new)
-		return (NULL);//maybe msh_end -> not possible, cannot add msh to parameters... norm ftw?
-	ft_memcpy(new, old, old_capacity * size);
-	free(old);
-	return (new);
 }
 
 bool	builtin_check(char *s)
@@ -142,8 +136,8 @@ t_cmd	*init_cmd(t_msh *msh)
 	cmd = ft_calloc(1, sizeof(t_cmd)); //all counts get set to 0 this way, pathname to NULL, builtin to false
 	if (!cmd)
 		msh_end(msh, "malloc for cmd failed");
-	cmd->args_capacity = 4;
-	cmd->args = ft_calloc(cmd->args_capacity, sizeof(char *));
+	cmd->capacity_args = 4;
+	cmd->args = ft_calloc(cmd->capacity_args, sizeof(char *));
 	if (!cmd->args)
 		msh_end(msh, "malloc for cmd->args failed");
 	cmd->capacity_inf = 4;
@@ -161,87 +155,117 @@ t_cmd	*init_cmd(t_msh *msh)
 	return (cmd);
 }
 
-int	add_cmd(t_cmd **cmds, int count, t_msh *msh)
+void	*grow_array(void *old_array, int old_capacity, int new_capacity, 
+	size_t size)
 {
-	cmds[count] = init_cmd(msh);
-	if (!cmds[count])
-	{
-		free_cmd_table(msh->cmd_table, count);
-		perror("single cmd malloc failed");
-		return (0);//maybe msh_end
-	}
-	return (1);
+	void	*new_array;
+
+	new_array = ft_calloc(new_capacity, size);
+	if (!new_array)
+		return (NULL);
+	ft_memcpy(new_array, old_array, old_capacity * size);
+	free(old_array);
+	return (new_array);
 }
 
-void	add_to_cmd_args(t_cmd *cmd, char *word) //rewrite to capacity check, delete add to args
+bool	ensure_capacity(void **array, int *count, int *capacity, size_t size)
 {
-	int	new_capacity;
+	int		new_capacity;
+	void	*new_array;
 
-	if (cmd->argc + 1 >= cmd->args_capacity)
+	if (*count + 1 >= *capacity)
 	{
-		new_capacity = cmd->args_capacity * 2;
-		cmd->args = grow_array(cmd->args, cmd->args_capacity, new_capacity, 
-			sizeof(char *));
-		cmd->args_capacity = new_capacity;
+		new_capacity = (*capacity) * 2;
+		new_array = grow_array(*array, *capacity, new_capacity, size);
+		if (!new_array)
+			return (false);
+		*array = new_array;
+		*capacity = new_capacity;
 	}
-	cmd->args[cmd->argc++] = ft_strdup(word);
-	cmd->args[cmd->argc] = NULL;
+	return (true);
 }
 
-char	*get_next_word(t_list **tokens)
+void	cmd_arrays_capacity_check(t_cmd *cmd, t_msh *msh)
 {
-	char	*value;
+	if (!ensure_capacity((void **)&cmd->args, &cmd->n_args, 
+		&cmd->capacity_args, sizeof(char *)))
+		msh_end(msh, "cmd args array capacity increase malloc failed");
+	if (!ensure_capacity((void **)&cmd->infiles, &cmd->n_inf, 
+		&cmd->capacity_inf, sizeof(char *)))
+		msh_end(msh, "cmd infiles array capacity increase malloc failed");
+	if (!ensure_capacity((void **)&cmd->outfiles, &cmd->n_outf, 
+		&cmd->capacity_outf, sizeof(t_outfile)))
+		msh_end(msh, "cmd outfiles array capacity increase malloc failed");
+	if (!ensure_capacity((void **)&cmd->heredocs, &cmd->n_hd, 
+		&cmd->capacity_hd, sizeof(t_heredoc)))
+		msh_end(msh, "cmd heredocs array capacity increase malloc failed");
+}
+
+t_token	*get_next_token(t_list **tokens)
+{
+	t_token	*token;
 	
 	if ((*tokens)->next
 		&& ((t_token *)(*tokens)->next->content)->type == T_WORD)
 	{
 		*tokens = (*tokens)->next;
-		value = ft_strdup(((t_token *)(*tokens)->content)->value); //malloc check missing... if !value = msh_end? but then msh needs to be a parameter and passed over
-		return (value);
+		token = (t_token *)(*tokens)->content;
+		return (token);
 	}
 	return (NULL);
 }
 
-void	parse_single_cmd_tokens(t_cmd *cmd, t_list **token_list)
+void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens, 
+	t_msh *msh)
+{
+	t_token	*word_token;
+	char	*word;
+
+	word_token = get_next_token(tokens);
+	if (!word_token)
+		return ;
+	word = ft_strdup(word_token->value);
+	if (!word)
+		msh_end(msh, "word_token->value ft_strdup malloc failed");
+	if (token->type == T_IN_REDIRECT)
+		cmd->infiles[cmd->n_inf++] = word;
+	else if (token->type == T_OUT_REDIRECT)
+		cmd->outfiles[cmd->n_outf++].filename = word;
+	else if (token->type == T_APPEND_REDIRECT)
+	{
+		cmd->outfiles[cmd->n_outf].filename = word;
+		cmd->outfiles[cmd->n_outf++].append = true;
+	}
+	else if (token->type == T_HEREDOC_REDIRECT)
+	{
+		if (word_token->quoted == 0)
+			cmd->heredocs[cmd->n_hd].expand = 1;
+		cmd->heredocs[cmd->n_hd++].delimiter = word;
+	}
+}
+
+void	parse_single_cmd_tokens(t_cmd *cmd, t_list **tokens, t_msh *msh)
 {
 	t_token			*token;
 
-	while (*token_list && ((t_token *)(*token_list)->content)->type != T_PIPE)
+	while (*tokens && ((t_token *)(*tokens)->content)->type != T_PIPE)
 	{
-		//capacity check for arrays: args, infiles, outfiles, heredocs
-		token = (*token_list)->content;
+		cmd_arrays_capacity_check(cmd, msh);
+		token = (*tokens)->content;
 		if (token->type == T_WORD)
-			add_to_cmd_args(cmd, token->value);//cmd->args[cmd->argc++] = ft_strdup(token->value);
-		else if (token->type == T_IN_REDIRECT)
-			cmd->infiles[cmd->n_inf++] = get_next_word(token_list);
-		else if (token->type == T_OUT_REDIRECT)
-			cmd->outfiles[cmd->n_outf++].filename = get_next_word(token_list);
-		else if (token->type == T_APPEND_REDIRECT)
 		{
-			cmd->outfiles[cmd->n_outf].filename = get_next_word(token_list);
-			cmd->outfiles[cmd->n_outf++].append = true;
+			cmd->args[cmd->n_args] = ft_strdup(token->value);
+			if (!cmd->args[cmd->n_args++])
+				msh_end(msh, "cmd args ft_strdup malloc failed");
 		}
-		else if (token->type == T_HEREDOC_REDIRECT)
-			cmd->heredocs[cmd->n_hd++].delimiter = get_next_word(token_list);
-		*token_list = (*token_list)->next;
+		else
+			parse_redirection_token(cmd, token, tokens, msh);
+		*tokens = (*tokens)->next;
 	}
-	if ((*token_list) && ((t_token *)(*token_list)->content)->type == T_PIPE)
-		*token_list = (*token_list)->next;
+	if ((*tokens) && ((t_token *)(*tokens)->content)->type == T_PIPE)
+		*tokens = (*tokens)->next;
 	if (cmd->args && cmd->args[0] && builtin_check(cmd->args[0]))
 		cmd->builtin = true;
-}
-//ensure capacity for new arrays infiles, outfiles, heredocs is missing!
-
-t_cmd	**ensure_cmd_capacity(t_cmd **cmds, int *capacity, int count)
-{
-	int	new_capacity;
-
-	if (count < *capacity)
-		return (cmds);
-	new_capacity = (*capacity) * 2;
-	cmds = grow_array(cmds, *capacity, new_capacity, sizeof(t_cmd *));
-	*capacity = new_capacity;
-	return (cmds);
 }
 
 char	*resolve_cmd_pathname(t_msh *msh, char **paths, char *cmd)
@@ -256,11 +280,11 @@ char	*resolve_cmd_pathname(t_msh *msh, char **paths, char *cmd)
 	{
 		tmp = ft_strjoin(paths[j], "/");
 		if (!tmp)
-			msh_end(msh, "pathname tmp ft_strjoin failed");
+			msh_end(msh, "pathname tmp ft_strjoin malloc failed");
 		pathname = ft_strjoin(tmp, cmd);
 		free(tmp);
 		if (!pathname)
-			msh_end(msh, "pathname ft_strjoin failed");
+			msh_end(msh, "pathname ft_strjoin malloc failed");
 		if (access(pathname, F_OK) == 0)
 			return (pathname);
 		free(pathname);
@@ -280,7 +304,7 @@ char	*create_cmd_pathname(t_msh *msh, char *cmd)
 	{
 		pathname = ft_strdup(cmd);
 		if (!pathname)
-			msh_end(msh, "pathname malloc failed");
+			msh_end(msh, "pathname ft_strdup malloc failed");
 		return (pathname);
 	}
 	while (msh->envp[j] && ft_strncmp(msh->envp[j], "PATH=", 5) != 0)
@@ -289,7 +313,7 @@ char	*create_cmd_pathname(t_msh *msh, char *cmd)
 	{
 		paths = ft_split(msh->envp[j] + 5, ':');
 		if (!paths)
-			msh_end(msh, "paths ft_split failed");
+			msh_end(msh, "paths ft_split malloc failed");
 		pathname = resolve_cmd_pathname(msh, paths, cmd);
 		ft_array_free(paths, ft_array_size(paths));
 	}
@@ -299,27 +323,24 @@ char	*create_cmd_pathname(t_msh *msh, char *cmd)
 void	build_cmd_table(t_msh *msh)
 {
 	int		capacity;
-	int		count;
 	t_cmd	**cmds;
-	t_list	*token_list;
+	t_list	*tokens;
 
 	capacity = 4;
-	count = 0; //use msh->n_cmds directly instead?
 	cmds = ft_calloc(capacity, sizeof(t_cmd *));
 	if (!cmds)
 		msh_end(msh, "cmd table malloc failed");
-	token_list = msh->tokens;
-	while (token_list)
+	tokens = msh->tokens;
+	while (tokens)
 	{
-		cmds = ensure_cmd_capacity(cmds, &capacity, count);
-		if (!add_cmd(cmds, count, msh))//add_cmd could be reduced to 3 lines - maybe adding it here instead
-			return ;//maybe msh_end?
-		parse_single_cmd_tokens(cmds[count], &token_list);
-		cmds[count]->pathname = create_cmd_pathname(msh, cmds[count]->args[0]);
-		count++;
+		if (!ensure_capacity((void **)&cmds, &msh->n_cmds, 
+			&capacity, sizeof(t_cmd *)))
+			msh_end(msh, "cmd table array capacity increase malloc failed");
+		cmds[msh->n_cmds] = init_cmd(msh);
+		parse_single_cmd_tokens(cmds[msh->n_cmds], &tokens, msh);
+		cmds[msh->n_cmds]->pathname = create_cmd_pathname(msh, 
+			cmds[msh->n_cmds]->args[0]);
+		msh->n_cmds++;
 	}
-	cmds = ensure_cmd_capacity(cmds, &capacity, count);
-	cmds[count] = NULL;
 	msh->cmd_table = cmds;
-	msh->n_cmds = count;
 }
