@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_array_copy.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 10:29:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/22 17:37:24 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/23 05:23:52 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,25 +15,27 @@
 char	**ft_array_copy(char **array)
 {
 	char	**copy;
-	int		i;
+	size_t	i;
+	size_t	size;
 
-	copy = NULL;
 	if (!array)
 		return (NULL);
 	i = 0;
-	while (array[i])
-		i++;
-	copy = (char **)ft_calloc(i + 1, sizeof(char *));
+	size = 0;
+	while (array[size])
+		size++;
+	copy = (char **)ft_calloc(size + 1, sizeof(char *));
 	if (!copy)
 		return (NULL);
-	while (--i >= 0)
+	while (i < size)
 	{
 		copy[i] = ft_strcpy(array[i]);
 		if (!copy[i])
 		{
-			ft_array_free(copy, sizeof(copy));
+			ft_array_free(copy, i);
 			return (NULL);
 		}
+		i++;
 	}
 	return (copy);
 }

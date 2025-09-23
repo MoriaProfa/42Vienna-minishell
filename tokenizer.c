@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/04 13:50:47 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/23 03:46:44 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void	fill_token_list(t_msh *msh, const char *value, t_token_type type,
 	t_token	*token;
 	t_list	*node;
 
-	token = malloc(sizeof(t_token));
+	token = ft_calloc(1, sizeof(t_token));//malloc(sizeof(t_token));
 	if (!token)
 		return ;//maybe msh_end
 	token->value = ft_strdup(value);

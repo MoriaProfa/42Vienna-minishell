@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/22 13:42:39 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/23 06:09:02 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ void	envp_free(t_msh *msh)
 {
 	if (msh->envp)
 	{
-		ft_array_free(msh->envp, sizeof(msh->envp));
+		ft_array_free(msh->envp, ft_array_size(msh->envp));
 		msh->envp = NULL;
 	}
 }

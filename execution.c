@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/22 17:28:27 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/23 04:44:06 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
+/*
 void	msh_pid(t_msh *msh)
 {
 	int	i;
@@ -24,58 +24,6 @@ void	msh_pid(t_msh *msh)
 	{
 		msh->pid[i] = -1;
 	}
-}
-
-char	*resolve_cmd_pathname(t_msh *msh, char **paths, char *cmd)
-{
-	char	*pathname;
-	char	*tmp;
-	int		j;
-
-	j = -1;
-	pathname = NULL;
-	while (paths[++j])
-	{
-		tmp = ft_strjoin(paths[j], "/");
-		if (!tmp)
-			msh_end(msh, "pathname tmp ft_strjoin failed");
-		pathname = ft_strjoin(tmp, cmd);
-		free(tmp);
-		if (!pathname)
-			msh_end(msh, "pathname ft_strjoin failed");
-		if (access(pathname, F_OK) == 0)
-			return (pathname);
-		free(pathname);
-	}
-	return (NULL);
-}
-
-char	*create_cmd_pathname(t_msh *msh, char *cmd)
-{
-	char	**paths;
-	char	*pathname;
-	int		j;
-
-	j = 0;
-	pathname = NULL;
-	if (access(cmd, F_OK) == 0)
-	{
-		pathname = ft_strdup(cmd);
-		if (!pathname)
-			msh_end(msh, "pathname malloc failed");
-		return (pathname);
-	}
-	while (msh->envp[j] && ft_strncmp(msh->envp[j], "PATH=", 5) != 0)
-		j++;
-	if (msh->envp[j])
-	{
-		paths = ft_split(msh->envp[j] + 5, ':');
-		if (!paths)
-			msh_end(msh, "paths ft_split failed");
-		pathname = resolve_cmd_pathname(msh, paths, cmd);
-		ft_array_free(paths, sizeof(paths));
-	}
-	return (pathname);
 }
 
 int	check_access_read(char *file)
@@ -227,3 +175,4 @@ void	msh_pipeline(t_msh *msh, int i)
 	// signal(SIGINT, return_prompt);
 	// signal(SIGQUIT, SIG_IGN);
 }
+*/
