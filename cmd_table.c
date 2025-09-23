@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/23 06:18:04 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/23 06:55:55 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,14 +205,11 @@ char	*get_next_word(t_list **tokens)
 void	parse_single_cmd_tokens(t_cmd *cmd, t_list **token_list)
 {
 	t_token			*token;
-	t_token_type	prev_token_type;
 
-	prev_token_type = T_NONE;
 	while (*token_list && ((t_token *)(*token_list)->content)->type != T_PIPE)
 	{
 		token = (*token_list)->content;
-		if (token->type == T_WORD && 
-			(prev_token_type == T_NONE || prev_token_type == T_WORD))
+		if (token->type == T_WORD)
 			add_to_cmd_args(cmd, token->value);
 		else if (token->type == T_IN_REDIRECT)
 			cmd->infiles[cmd->n_inf++] = get_next_word(token_list);
@@ -225,7 +222,6 @@ void	parse_single_cmd_tokens(t_cmd *cmd, t_list **token_list)
 		}
 		else if (token->type == T_HEREDOC_REDIRECT)
 			cmd->heredocs[cmd->n_hd++].delimiter = get_next_word(token_list);
-		prev_token_type = token->type;
 		*token_list = (*token_list)->next;
 	}
 	if ((*token_list) && ((t_token *)(*token_list)->content)->type == T_PIPE)
