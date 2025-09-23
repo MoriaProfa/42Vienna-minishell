@@ -6,24 +6,28 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/15 20:53:02 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/23 11:11:50 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 //valgrind command:
 //valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes --trace-children=yes --suppressions=minishell.supp ./minishell
+//pwd test < file1 > file2 >> file3 test2 << file4 << "file5" | cd hello | ls
 
 #include "minishell.h"
 
 void	print_tokens(t_list *tokens);
 void	print_cmd_table(t_msh *msh);
 void	check_quotationmarks(t_msh *msh);
+void	check_tokens(t_msh *msh);
 void	free_token(void *content);
 void	msh_tokenizer(t_msh *msh);
 void	build_cmd_table(t_msh *msh);
 void    free_cmd_table(t_cmd **cmds, int n);
 void	msh_pipeline(t_msh *msh, int i);
 void	msh_pid(t_msh *msh);
+void	msh_fork(t_msh *msh, int i, int fd_in, int fd_out);
+void	msh_execute(t_msh *msh, int i);
 
 volatile sig_atomic_t   g_signal_flag = 0;
 
@@ -36,7 +40,7 @@ void	msh_error(t_msh *msh, char *msg)
 	else
 		fd = 1;
 	ft_putendl_fd(msg, fd);
-	msh->error_check = 1;
+	msh->error_check = true;
 }
 
 void	msh_set_null(t_msh *msh)
@@ -61,7 +65,7 @@ void	envp_free(t_msh *msh)
 {
 	if (msh->envp)
 	{
-		ft_array_free(msh->envp);
+		ft_array_free(msh->envp, ft_array_size(msh->envp));
 		msh->envp = NULL;
 	}
 }
@@ -110,7 +114,7 @@ char	*msh_read(ssize_t rr)
 		{
 			tmp = out;
 			out = ft_strjoin(tmp, buf);
-			ft_free(&tmp);
+			ft_free(&tmp); 
 		}
 	}
 	return (out);
@@ -126,11 +130,11 @@ void	envp_initialize(t_msh *msh, char **envp)
 
 void	msh_initialize(t_msh *msh)
 {
-	msh->error_check = 0;
+	msh->error_check = false;
 	msh->cpy_in_str = msh->in_str;
 	msh->status = 1;
 	msh->fd_in_previous = STDIN_FILENO;
-	msh->fd_in = STDIN_FILENO;
+	msh->fd_in = STDIN_FILENO; 
 	msh->fd_out = STDOUT_FILENO;
 	msh->fd[0] = -1;
 	msh->fd[1] = -1;
@@ -143,7 +147,7 @@ void	handle_signal(int signal)
 	if (signal == SIGINT)
 	{
 		g_signal_flag = signal + 128;
-		return_prompt();
+		//return_prompt(); //only for heredoc handling, not main loop -> non-interactive mode vs. interactive mode (=heredoc)
 	}	
 }
 
@@ -163,7 +167,7 @@ int	main(int argc, char **argv, char **envp)
 		msh.in_str = readline("minishell> ");
 		if (!msh.in_str) //by pressing CTRL+D
 			break ;
-		add_history(msh.in_str);
+		add_history(msh.in_str); //original bash doesnt add it when its starting with a whitespace
 		if (g_signal_flag)
 		{
 			free(msh.in_str);
@@ -175,13 +179,15 @@ int	main(int argc, char **argv, char **envp)
 		msh_initialize(&msh);
 		check_quotationmarks(&msh);
 		if (!msh.error_check)
-			(msh_tokenizer(&msh)/*, print_tokens(msh.tokens)*/); //print just for testing
+			(msh_tokenizer(&msh), print_tokens(msh.tokens)); //print just for testing
 		if (!msh.error_check)
-			(build_cmd_table(&msh)/*, print_cmd_table(&msh)*/); //print just for testing
+			check_tokens(&msh);
 		if (!msh.error_check)
-			msh_pid(&msh); //allocates for msh.pid
-		if (!msh.error_check)
-			msh_pipeline(&msh, -1);
+			(build_cmd_table(&msh), print_cmd_table(&msh)); //print just for testing
+		//if (!msh.error_check)
+		//	msh_pid(&msh); //allocates for msh.pid
+		//if (!msh.error_check)
+		//	msh_pipeline(&msh, 0);
 		msh_free(&msh);
 	}
 	msh_end(&msh, "exit");

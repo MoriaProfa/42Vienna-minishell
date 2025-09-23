@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com>   +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 15:03:49 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/07/28 17:10:24 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/19 23:12:51 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
 
 //advanced_libft
 char	**ft_array_copy(char **array);
-void	ft_array_free(char **arr);
+void	ft_array_free(char **arr, size_t size);
 size_t	ft_array_size(char **array);
 long	ft_atol(const char *nptr);
 void	ft_free(char **p);

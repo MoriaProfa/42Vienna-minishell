@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/15 20:51:42 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/23 11:13:34 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,8 @@
 //rl_redisplay, add_history
 # include <signal.h>
 //signal, sigaction, sigemptyset, sigaddset, kill
+#include <stdbool.h>
+//booleans
 # include <stdio.h>
 //printf, perror
 # include <string.h>
@@ -60,6 +62,7 @@
 
 typedef enum e_token_type
 {
+	T_NONE,
 	T_WORD,
 	T_PIPE,
 	T_IN_REDIRECT,
@@ -72,23 +75,44 @@ typedef struct s_token
 {
 	char			*value;
 	t_token_type	type;
+	int				quoted;
+	bool			is_adjacent;
 }					t_token;
+
+typedef struct s_outfile
+{
+	char	*filename;
+	bool	append;// true if >>
+}			t_outfile;
+
+typedef struct s_heredoc
+{
+	char	*delimiter;
+	char	*buffer;
+	bool	expand;// true if delimiter is unquoted = expansion happens in buffer
+}			t_heredoc;
 
 typedef struct s_cmd
 {
-	char	**args;//command + args
-	char	*infile;// <
-	char	*outfile;// > or >>
-	int		append;//1 if >>
-	char	*heredoc;// <<
-	int		argc;//amount of args
-	int		args_cap;//args cap
-	char	*pathname;//pathname to an executable
-}			t_cmd;
+	char		**args;//command + args
+	int			argc;// amount of args
+	int			args_capacity;// capacity of **args
+	bool		builtin;// true if args[0] == builtin
+	char		**infiles;// list of <
+	int			n_inf;// amount of infiles
+	int			capacity_inf;// capacity of **infiles
+	t_outfile	*outfiles;// list of > or >>
+	int			n_outf;// amount of outfiles
+	int			capacity_outf;// capacity of *outfiles
+	t_heredoc	*heredocs;// list of <<
+	int			n_hd;//amount of heredocs
+	int			capacity_hd;//capacity of *heredocs
+	char		*pathname;//pathname to an executable
+}				t_cmd;
 
 typedef struct s_msh
 {
-	int		error_check;
+	bool	error_check;
 	char	*in_str;
 	char	*cpy_in_str;
 	t_list	*tokens;
