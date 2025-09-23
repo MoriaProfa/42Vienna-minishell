@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/23 06:55:55 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/23 07:01:56 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	print_cmd_table(t_msh *msh)
 	{
 		cmd = msh->cmd_table[i];
 		printf("Command %i:\n", i);
-		printf("\targs: ");
+		printf("\targs (%i): ", cmd->argc);
 		j = 0;
 		while (cmd->args[j] && j < cmd->argc)
 			printf("[%s] ", cmd->args[j++]);
@@ -35,7 +35,7 @@ void	print_cmd_table(t_msh *msh)
 		if (cmd->infiles)
 		{
 			j = 0;
-			printf("\tinfiles: ");
+			printf("\tinfiles (%i): ", cmd->n_inf);
 			while (cmd->infiles[j] && j < cmd->n_inf)
 				printf("[%s] ", cmd->infiles[j++]);
 			printf("\n");
@@ -43,7 +43,7 @@ void	print_cmd_table(t_msh *msh)
 		if (cmd->outfiles)
 		{
 			j = -1;
-			printf("\toutfiles: ");
+			printf("\toutfiles (%i): ", cmd->n_outf);
 			while (cmd->outfiles[++j].filename && j < cmd->n_outf)
 				printf("[%s (append = %d)] ", cmd->outfiles[j].filename, cmd->outfiles[j].append);
 			printf("\n");
@@ -51,7 +51,7 @@ void	print_cmd_table(t_msh *msh)
 		if (cmd->heredocs)
 		{
 			j = 0;
-			printf("\theredocs: ");
+			printf("\theredocs (%i): ", cmd->n_hd);
 			while (cmd->heredocs[j].delimiter && j < cmd->n_hd)
 				printf("[delimiter: %s] ", cmd->heredocs[j++].delimiter);
 			printf("\n");
