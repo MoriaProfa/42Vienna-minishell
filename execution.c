@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/23 14:35:34 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/23 17:16:22 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,7 @@ void	msh_pid(t_msh *msh)
 	if (!msh->pid)
 		msh_end(msh, "pid malloc error");
 	while (++i < msh->n_cmds)
-	{
 		msh->pid[i] = -1;
-	}
 }
 
 int	check_access_read(char *file)
@@ -48,11 +46,8 @@ int	check_access_write(char *file)
 		return (1);
 }
 
-void	set_fd_in(t_msh *msh, int	i)
+void	set_fd_in(t_msh *msh, int i, int j)
 {
-	int	j;
-
-	j = 0;
 	msh->fd_in = msh->fd_in_previous;
 	if (((t_cmd *)msh->cmd_table[i])->heredocs->delimiter)
 	{
@@ -60,7 +55,8 @@ void	set_fd_in(t_msh *msh, int	i)
 			close(msh->fd_in);
 		if (pipe(msh->hd_fd) == -1)
 			msh_end(msh, "pipe failed");
-		write(msh->hd_fd[1], ((t_cmd *)msh->cmd_table[i])->heredocs->buffer, ft_strlen(((t_cmd *)msh->cmd_table[i])->heredocs->buffer));
+		write(msh->hd_fd[1], ((t_cmd *)msh->cmd_table[i])->heredocs->buffer,
+			ft_strlen(((t_cmd *)msh->cmd_table[i])->heredocs->buffer));
 		close(msh->hd_fd[1]);
 		msh->fd_in = msh->hd_fd[0];
 	}
@@ -70,17 +66,18 @@ void	set_fd_in(t_msh *msh, int	i)
 		{
 			if (check_access_read(((t_cmd *)msh->cmd_table[i])->infiles[j]) == 0)
 				return ;
-			msh->fd_in = open(((t_cmd *)msh->cmd_table[i])->infiles[j], O_RDONLY);
+			msh->fd_in = open(((t_cmd *)msh->cmd_table[i])->infiles[j],
+					O_RDONLY);
 			if (msh->fd_in == -1)
-				printf("%s: %s\n", ((t_cmd *)msh->cmd_table[i])->infiles[j], "no such file or directory");
+				perror(((t_cmd *)msh->cmd_table[i])->infiles[j]);
 		}
 	}
-	
 }
 
-void	set_fd_out(t_msh *msh, int	i, int j)
+void	set_fd_out(t_msh *msh, int i, int j)
 {
-	while (++j < ((t_cmd *)msh->cmd_table[i])->n_outf)
+	while (((t_cmd *)msh->cmd_table[i])->n_outf > 0
+		&& ++j < ((t_cmd *)msh->cmd_table[i])->n_outf)
 	{
 		if (((t_cmd *)msh->cmd_table[i])->outfiles[j].filename)
 		{
@@ -89,11 +86,13 @@ void	set_fd_out(t_msh *msh, int	i, int j)
 			if (msh->fd_out != STDOUT_FILENO)
 				close(msh->fd_out);
 			if (((t_cmd *)msh->cmd_table[i])->outfiles[j].append == false)
-				msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename, O_RDWR | O_CREAT | O_TRUNC, 0666);
-			else if (((t_cmd *)msh->cmd_table[i])->outfiles[j].append == true)
-				msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename, O_RDWR | O_CREAT | O_APPEND, 0666);
+				msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename,
+						O_RDWR | O_CREAT | O_TRUNC, 0666);
+			else
+				msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename,
+						O_RDWR | O_CREAT | O_APPEND, 0666);
 			if (msh->fd_out == -1)
-				printf("%s: open failed\n", ((t_cmd *)msh->cmd_table[i])->outfiles[j].filename);
+				perror(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename);
 		}
 	}
 }
@@ -103,16 +102,19 @@ void	msh_execute(t_msh *msh, int i)
 	if (!((t_cmd *)msh->cmd_table[i])->pathname)
 	{
 		msh->status = 127;
-		msh_end(msh, "command not found");//should display a new prompt after the error msg (Bernhard said this is the only error-msg that needs to be hardcoded)
+		msh_end(msh, "command not found");
 	}
-	else if (((t_cmd *)msh->cmd_table[i])->pathname && access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == -1)
+	else if (((t_cmd *)msh->cmd_table[i])->pathname
+		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == -1)
 	{
 		msh->status = 126;
-		msh_end(msh, "permission denied");//maybe just use perror to print the errno-msg
+		msh_end(msh, "permission denied");
 	}
-	else if (((t_cmd *)msh->cmd_table[i])->pathname && access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == 0)
-		execve(((t_cmd *)msh->cmd_table[i])->pathname, ((t_cmd *)msh->cmd_table[i])->args, msh->envp);
-	msh_end(msh, "execve failed");//maybe just use perror to print the errno-msg
+	else if (((t_cmd *)msh->cmd_table[i])->pathname
+		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == 0)
+		execve(((t_cmd *)msh->cmd_table[i])->pathname,
+			((t_cmd *)msh->cmd_table[i])->args, msh->envp);
+	msh_end(msh, "execve failed");
 }
 
 void	close_fds(t_msh *msh, int fd1, int fd2)
@@ -131,7 +133,7 @@ void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
 {
 	msh->pid[i] = fork();
 	if (msh->pid[i] == -1)
-		msh_end(msh, "fork failed");;
+		msh_end(msh, "fork failed");
 	if (msh->pid[i] == 0)
 	{
 		close_fds(msh, fd_in, fd_out);
@@ -151,13 +153,12 @@ void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
 
 void	msh_pipeline(t_msh *msh, int i)
 {
-	// signal(SIGINT, SIG_IGN);
-	// signal(SIGQUIT, SIG_IGN);
+	// need to add signal handling in the child
 	while (++i < msh->n_cmds)
 	{
-		set_fd_in(msh, i);
+		//set_fd_in(msh, i, -1);
 		set_fd_out(msh, i, -1);
-		if (i < msh->n_cmds - 1 && !((t_cmd *)msh->cmd_table[i])->outfiles)
+		if (i < msh->n_cmds - 1 && !((t_cmd *)msh->cmd_table[i])->n_outf)
 		{
 			if (pipe(msh->fd) == -1)
 				msh_end(msh, "pipe failed");
@@ -174,6 +175,4 @@ void	msh_pipeline(t_msh *msh, int i)
 	while (++i < msh->n_cmds)
 		waitpid(msh->pid[i], &msh->status, 0);
 	close_fds(msh, STDIN_FILENO, STDOUT_FILENO);
-	// signal(SIGINT, return_prompt);
-	// signal(SIGQUIT, SIG_IGN);
 }
