@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/24 16:13:49 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/24 16:51:35 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ int	check_access_write(char *file)
 void	set_fd_in(t_msh *msh, int i, int j)
 {
 	msh->fd_in = msh->fd_in_previous;
-	/*if (((t_cmd *)msh->cmd_table[i])->heredocs->delimiter)
+	if (((t_cmd *)msh->cmd_table[i])->heredocs->delimiter)
 	{
 		if (msh->fd_in != STDIN_FILENO)
 			close(msh->fd_in);
@@ -60,7 +60,7 @@ void	set_fd_in(t_msh *msh, int i, int j)
 		close(msh->hd_fd[1]);
 		msh->fd_in = msh->hd_fd[0];
 	}
-	else */if (((t_cmd *)msh->cmd_table[i])->n_inf > 0)
+	else if (((t_cmd *)msh->cmd_table[i])->n_inf > 0)
 	{
 		while (j < ((t_cmd *)msh->cmd_table[i])->n_inf)
 		{
