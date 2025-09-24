@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/24 18:01:20 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/24 18:20:19 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -320,6 +320,27 @@ char	*create_cmd_pathname(t_msh *msh, char *cmd)
 	return (pathname);
 }
 
+void	heredoc_collector(t_msh *msh, t_cmd **cmds)
+{
+	int	i;
+
+	i = 0;
+	while (cmds[msh->n_cmds])
+	{
+		while (i < cmds[msh->n_cmds]->n_hd)
+		{
+			cmds[msh->n_cmds]->heredocs[i].buffer = readline("> ");
+			if (!cmds[msh->n_cmds]->heredocs[i].buffer)
+			{
+				printf("heredoc readline failed");
+				return ;
+			}
+			i++;
+		}
+		msh->n_cmds++;
+	}
+}
+
 void	build_cmd_table(t_msh *msh)
 {
 	int		capacity;
@@ -342,5 +363,6 @@ void	build_cmd_table(t_msh *msh)
 			cmds[msh->n_cmds]->args[0]);
 		msh->n_cmds++;
 	}
+	heredoc_collector(msh, cmds);
 	msh->cmd_table = cmds;
 }
