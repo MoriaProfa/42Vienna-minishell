@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/23 03:46:44 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/25 04:26:52 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,19 +48,18 @@ void	fill_token_list(t_msh *msh, const char *value, t_token_type type,
 	t_token	*token;
 	t_list	*node;
 
-	token = ft_calloc(1, sizeof(t_token));//malloc(sizeof(t_token));
+	token = ft_calloc(1, sizeof(t_token));
 	if (!token)
-		return ;//maybe msh_end
+		msh_end(msh, "tokenizer: token malloc failed");
 	token->value = ft_strdup(value);
+	if (!token->value)
+		msh_end(msh, "tokenizer: value malloc failed");
 	token->type = type;
 	token->quoted = quoted_adjacent[0];
 	token->is_adjacent = quoted_adjacent[1];
 	node = ft_lstnew(token);
 	if (!node)
-	{
-		free_token(token);
-		return ;//maybe msh_end
-	}
+		msh_end(msh, "tokenizer: node malloc failed");
 	ft_lstadd_back(&msh->tokens, node);
 }
 
@@ -148,7 +147,7 @@ char	*handle_unquoted(t_msh *msh, int *len)
 
 	start = msh->cpy_in_str;
 	*len = 0;
-	while (*msh->cpy_in_str && !ft_strchr(" \t<>|", *msh->cpy_in_str))
+	while (*msh->cpy_in_str && !ft_strchr(" \t<>|\"\'", *msh->cpy_in_str))
 	{
 		msh->cpy_in_str++;
 		(*len)++;
@@ -156,21 +155,20 @@ char	*handle_unquoted(t_msh *msh, int *len)
 	return (start);
 }
 
-char	*create_word(t_msh *msh)
+char	*create_word_token(t_msh *msh)
 {
 	char	*word;
 	char	*start;
 	int		len;
 
 	len = 0;
-	//skip_whitespaces(msh);//shouldve been skipped in tokenizer already, if used, catch return-value
 	if (*msh->cpy_in_str == '"' || *msh->cpy_in_str == '\'')
 		start = handle_quoted(msh, &len);
 	else
 		start = handle_unquoted(msh, &len);
 	word = ft_calloc(len + 1, sizeof(char));
 	if (!word)
-		return (NULL);//maybe msh_end
+		msh_end(msh, "tokenizer: word malloc failed");
 	ft_memcpy(word, start, len);
 	word[len] = '\0';
 	return (word);
@@ -222,9 +220,7 @@ void	msh_tokenizer(t_msh *msh)
 		else
 		{
 			quoted_adjacent[0] = set_quoted(*msh->cpy_in_str);
-			word = create_word(msh);
-			if (!word)//maybe not necessary if create_word uses msh_end
-				break ;
+			word = create_word_token(msh);
 			fill_token_list(msh, word, T_WORD, quoted_adjacent);
 			free(word);
 		}

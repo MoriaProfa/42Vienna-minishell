@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/23 15:31:43 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/25 01:35:38 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,21 +94,22 @@ typedef struct s_heredoc
 
 typedef struct s_cmd
 {
-	char		**args;//command + args
-	int			n_args;// amount of args
-	int			capacity_args;// capacity of **args
-	bool		builtin;// true if args[0] == builtin
-	char		**infiles;// list of <
-	int			n_inf;// amount of infiles
-	int			capacity_inf;// capacity of **infiles
-	t_outfile	*outfiles;// list of > or >>
-	int			n_outf;// amount of outfiles
-	int			capacity_outf;// capacity of *outfiles
-	t_heredoc	*heredocs;// list of <<
-	int			n_hd;//amount of heredocs
-	int			capacity_hd;//capacity of *heredocs
-	char		*pathname;//pathname to an executable
-}				t_cmd;
+	char			**args;//command + args
+	int				n_args;// amount of args
+	int				capacity_args;// capacity of **args
+	bool			builtin;// true if args[0] == builtin
+	char			**infiles;// list of <
+	int				n_inf;// amount of infiles
+	int				capacity_inf;// capacity of **infiles
+	t_outfile		*outfiles;// list of > or >>
+	int				n_outf;// amount of outfiles
+	int				capacity_outf;// capacity of *outfiles
+	t_heredoc		*heredocs;// list of <<
+	int				n_hd;//amount of heredocs
+	int				capacity_hd;//capacity of *heredocs
+	t_token_type	last_input;//infile or heredoc
+	char			*pathname;//pathname to an executable
+}					t_cmd;
 
 typedef struct s_msh
 {
