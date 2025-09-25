@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/24 18:20:19 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/25 17:24:01 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,8 @@ void	print_cmd_table(t_msh *msh)
 			while (cmd->heredocs[++j].delimiter && j < cmd->n_hd)
 				printf("[%s (expand = %d)] ", cmd->heredocs[j].delimiter, cmd->heredocs[j].expand);
 			printf("\n");
-		}		
+		}
+		printf("\tlast_input: %i\n", cmd->last_input);//0 if T_NONE, 3 if T_IN_REDIRECT, 6 if T_HEREDOC_REDIRECT
 		if (cmd->pathname)
 			printf("\tpathname: %s\n", cmd->pathname);
 		i++;
@@ -152,6 +153,7 @@ t_cmd	*init_cmd(t_msh *msh)
 	cmd->heredocs = ft_calloc(cmd->capacity_hd, sizeof(t_heredoc));
 	if (!cmd->heredocs)
 		msh_end(msh, "malloc for cmd->heredocs failed");
+	cmd->last_input = T_NONE;
 	return (cmd);
 }
 
@@ -215,6 +217,13 @@ t_token	*get_next_token(t_list **tokens)
 	return (NULL);
 }
 
+void	parse_heredoc_token(t_cmd *cmd, t_token *word_token, char *word)
+{
+	if (word_token->quoted == Q_NONE)
+		cmd->heredocs[cmd->n_hd].expand = 1;
+	cmd->heredocs[cmd->n_hd++].delimiter = word;
+	cmd->last_input = T_HEREDOC_REDIRECT;
+}
 void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens, 
 	t_msh *msh)
 {
@@ -228,7 +237,10 @@ void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens,
 	if (!word)
 		msh_end(msh, "word_token->value ft_strdup malloc failed");
 	if (token->type == T_IN_REDIRECT)
+	{
 		cmd->infiles[cmd->n_inf++] = word;
+		cmd->last_input = T_IN_REDIRECT;
+	}
 	else if (token->type == T_OUT_REDIRECT)
 		cmd->outfiles[cmd->n_outf++].filename = word;
 	else if (token->type == T_APPEND_REDIRECT)
@@ -237,11 +249,13 @@ void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens,
 		cmd->outfiles[cmd->n_outf++].append = true;
 	}
 	else if (token->type == T_HEREDOC_REDIRECT)
-	{
-		if (word_token->quoted == 0)
+		parse_heredoc_token(cmd, word_token, word);
+	/*{
+		if (word_token->quoted == Q_NONE)
 			cmd->heredocs[cmd->n_hd].expand = 1;
 		cmd->heredocs[cmd->n_hd++].delimiter = word;
-	}
+		cmd->last_input = T_HEREDOC_REDIRECT;
+	}*/
 }
 
 void	parse_single_cmd_tokens(t_cmd *cmd, t_list **tokens, t_msh *msh)
