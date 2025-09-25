@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/25 04:26:52 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/25 05:03:34 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,11 +178,11 @@ int	set_quoted(char c)
 {
 	int		quoted;
 
-	quoted = 0;
+	quoted = Q_NONE;
 	if (c == '\'')
-		quoted = 1;
+		quoted = Q_SINGLE;
 	else if (c == '"')
-		quoted = 2;
+		quoted = Q_DOUBLE;
 	return (quoted);
 }
 

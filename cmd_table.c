@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/25 02:04:05 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/25 05:04:20 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -219,7 +219,7 @@ t_token	*get_next_token(t_list **tokens)
 
 void	parse_heredoc_token(t_cmd *cmd, t_token *word_token, char *word)
 {
-	if (word_token->quoted == 0)
+	if (word_token->quoted == Q_NONE)
 		cmd->heredocs[cmd->n_hd].expand = 1;
 	cmd->heredocs[cmd->n_hd++].delimiter = word;
 	cmd->last_input = T_HEREDOC_REDIRECT;
@@ -251,7 +251,7 @@ void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens,
 	else if (token->type == T_HEREDOC_REDIRECT)
 		parse_heredoc_token(cmd, word_token, word);
 	/*{
-		if (word_token->quoted == 0)
+		if (word_token->quoted == Q_NONE)
 			cmd->heredocs[cmd->n_hd].expand = 1;
 		cmd->heredocs[cmd->n_hd++].delimiter = word;
 		cmd->last_input = T_HEREDOC_REDIRECT;

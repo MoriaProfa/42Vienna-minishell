@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/25 01:35:38 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/25 05:01:53 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,13 @@
 # include <termios.h>
 //tcsetattr, tcgetattr
 
+typedef enum e_quote_type
+{
+	Q_NONE,
+	Q_SINGLE,
+	Q_DOUBLE
+}	t_quote_type;
+
 typedef enum e_token_type
 {
 	T_NONE,
@@ -75,7 +82,7 @@ typedef struct s_token
 {
 	char			*value;
 	t_token_type	type;
-	int				quoted;
+	t_quote_type	quoted;
 	bool			is_adjacent;
 }					t_token;
 
