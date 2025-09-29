@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/29 19:42:15 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/29 23:33:02 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,23 +136,23 @@ t_cmd	*init_cmd(t_msh *msh)
 
 	cmd = ft_calloc(1, sizeof(t_cmd)); //all counts get set to 0 this way, pathname to NULL, builtin to false
 	if (!cmd)
-		msh_end(msh, "malloc for cmd failed");
+		msh_end(msh, "malloc for cmd failed", 1);
 	cmd->capacity_args = 4;
 	cmd->args = ft_calloc(cmd->capacity_args, sizeof(char *));
 	if (!cmd->args)
-		msh_end(msh, "malloc for cmd->args failed");
+		msh_end(msh, "malloc for cmd->args failed", 1);
 	cmd->capacity_inf = 4;
 	cmd->infiles = ft_calloc(cmd->capacity_inf, sizeof(char *));
 	if (!cmd->infiles)
-		msh_end(msh, "malloc for cmd->infiles failed");
+		msh_end(msh, "malloc for cmd->infiles failed", 1);
 	cmd->capacity_outf = 4;
 	cmd->outfiles = ft_calloc(cmd->capacity_outf, sizeof(t_outfile));
 	if (!cmd->outfiles)
-		msh_end(msh, "malloc for cmd->outfiles failed");
+		msh_end(msh, "malloc for cmd->outfiles failed", 1);
 	cmd->capacity_hd = 4;
 	cmd->heredocs = ft_calloc(cmd->capacity_hd, sizeof(t_heredoc));
 	if (!cmd->heredocs)
-		msh_end(msh, "malloc for cmd->heredocs failed");
+		msh_end(msh, "malloc for cmd->heredocs failed", 1);
 	cmd->last_input = T_NONE;
 	return (cmd);
 }
@@ -191,16 +191,16 @@ void	cmd_arrays_capacity_check(t_cmd *cmd, t_msh *msh)
 {
 	if (!ensure_capacity((void **)&cmd->args, &cmd->n_args, 
 		&cmd->capacity_args, sizeof(char *)))
-		msh_end(msh, "cmd args array capacity increase malloc failed");
+		msh_end(msh, "cmd args array capacity increase malloc failed", 1);
 	if (!ensure_capacity((void **)&cmd->infiles, &cmd->n_inf, 
 		&cmd->capacity_inf, sizeof(char *)))
-		msh_end(msh, "cmd infiles array capacity increase malloc failed");
+		msh_end(msh, "cmd infiles array capacity increase malloc failed", 1);
 	if (!ensure_capacity((void **)&cmd->outfiles, &cmd->n_outf, 
 		&cmd->capacity_outf, sizeof(t_outfile)))
-		msh_end(msh, "cmd outfiles array capacity increase malloc failed");
+		msh_end(msh, "cmd outfiles array capacity increase malloc failed", 1);
 	if (!ensure_capacity((void **)&cmd->heredocs, &cmd->n_hd, 
 		&cmd->capacity_hd, sizeof(t_heredoc)))
-		msh_end(msh, "cmd heredocs array capacity increase malloc failed");
+		msh_end(msh, "cmd heredocs array capacity increase malloc failed", 1);
 }
 
 t_token	*get_next_token(t_list **tokens)
@@ -236,7 +236,7 @@ void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens,
 		return ;
 	word = ft_strdup(word_token->value);
 	if (!word)
-		msh_end(msh, "word_token->value ft_strdup malloc failed");
+		msh_end(msh, "word_token->value ft_strdup malloc failed", 1);
 	if (token->type == T_IN_REDIRECT)
 	{
 		cmd->infiles[cmd->n_inf++] = word;
@@ -265,7 +265,7 @@ void	parse_single_cmd_tokens(t_cmd *cmd, t_list **tokens, t_msh *msh)
 		{
 			cmd->args[cmd->n_args] = ft_strdup(token->value);
 			if (!cmd->args[cmd->n_args++])
-				msh_end(msh, "cmd args ft_strdup malloc failed");
+				msh_end(msh, "cmd args ft_strdup malloc failed", 1);
 		}
 		else
 			parse_redirection_token(cmd, token, tokens, msh);
@@ -289,11 +289,11 @@ char	*resolve_cmd_pathname(t_msh *msh, char **paths, char *cmd)
 	{
 		tmp = ft_strjoin(paths[j], "/");
 		if (!tmp)
-			msh_end(msh, "pathname tmp ft_strjoin malloc failed");
+			msh_end(msh, "pathname tmp ft_strjoin malloc failed", 1);
 		pathname = ft_strjoin(tmp, cmd);
 		free(tmp);
 		if (!pathname)
-			msh_end(msh, "pathname ft_strjoin malloc failed");
+			msh_end(msh, "pathname ft_strjoin malloc failed", 1);
 		if (access(pathname, F_OK) == 0)
 			return (pathname);
 		free(pathname);
@@ -313,7 +313,7 @@ char	*create_cmd_pathname(t_msh *msh, char *cmd)
 	{
 		pathname = ft_strdup(cmd);
 		if (!pathname)
-			msh_end(msh, "pathname ft_strdup malloc failed");
+			msh_end(msh, "pathname ft_strdup malloc failed", 1);
 		return (pathname);
 	}
 	while (msh->envp[j] && ft_strncmp(msh->envp[j], "PATH=", 5) != 0)
@@ -322,7 +322,7 @@ char	*create_cmd_pathname(t_msh *msh, char *cmd)
 	{
 		paths = ft_split(msh->envp[j] + 5, ':');
 		if (!paths)
-			msh_end(msh, "paths ft_split malloc failed");
+			msh_end(msh, "paths ft_split malloc failed", 1);
 		pathname = resolve_cmd_pathname(msh, paths, cmd);
 		ft_array_free(paths, ft_array_size(paths));
 	}
@@ -338,13 +338,13 @@ void	build_cmd_table(t_msh *msh)
 	capacity = 4;
 	cmds = ft_calloc(capacity, sizeof(t_cmd *));
 	if (!cmds)
-		msh_end(msh, "cmd table malloc failed");
+		msh_end(msh, "cmd table malloc failed", 1);
 	tokens = msh->tokens;
 	while (tokens)
 	{
 		if (!ensure_capacity((void **)&cmds, &msh->n_cmds, 
 			&capacity, sizeof(t_cmd *)))
-			msh_end(msh, "cmd table array capacity increase malloc failed");
+			msh_end(msh, "cmd table array capacity increase malloc failed", 1);
 		cmds[msh->n_cmds] = init_cmd(msh);
 		parse_single_cmd_tokens(cmds[msh->n_cmds], &tokens, msh);
 		if (cmds[msh->n_cmds]->args[0])

@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/29 18:40:28 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/29 23:38:31 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,16 +53,16 @@ void	fill_token_list(t_msh *msh, const char *value, t_token_type type,
 
 	token = ft_calloc(1, sizeof(t_token));
 	if (!token)
-		msh_end(msh, "tokenizer: token malloc failed");
+		msh_end(msh, "tokenizer: token malloc failed", 1);
 	token->value = ft_strdup(value);
 	if (!token->value)
-		msh_end(msh, "tokenizer: value malloc failed");
+		msh_end(msh, "tokenizer: value malloc failed", 1);
 	token->type = type;
 	token->quoted = quoted_adjacent[0];
 	token->is_adjacent = quoted_adjacent[1];
 	node = ft_lstnew(token);
 	if (!node)
-		msh_end(msh, "tokenizer: node malloc failed");
+		msh_end(msh, "tokenizer: node malloc failed", 1);
 	ft_lstadd_back(&msh->tokens, node);
 }
 
@@ -171,7 +171,7 @@ char	*create_word_token(t_msh *msh)
 		start = handle_unquoted(msh, &len);
 	word = ft_calloc(len + 1, sizeof(char));
 	if (!word)
-		msh_end(msh, "tokenizer: word malloc failed");
+		msh_end(msh, "tokenizer: word malloc failed", 1);
 	ft_memcpy(word, start, len);
 	word[len] = '\0';
 	return (word);
@@ -243,12 +243,12 @@ void	msh_tokenizer(t_msh *msh)
 			free(word);
 		}
 	}
-	printf("\nraw tokens:");
-	print_tokens(msh->tokens);
+	//printf("\nraw tokens:");
+	//print_tokens(msh->tokens);
 	//expansion
 	remove_quotationmarks_in_tokens(msh->tokens);
-	printf("\nafter quote removal:");
-	print_tokens(msh->tokens);
+	//printf("\nafter quote removal:");
+	//print_tokens(msh->tokens);
 	merge_adjacent_tokens(&msh->tokens, msh);
-	printf("\nafter adjacency handling:");
+	//printf("\nafter adjacency handling:");
 }
