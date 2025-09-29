@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/29 20:51:56 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/29 23:51:43 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,11 @@ void	msh_execute(t_msh *msh, int i);
 
 volatile sig_atomic_t   g_signal_flag = 0;
 
-void	msh_error(t_msh *msh, char *msg)
+void	msh_error(t_msh *msh, char *msg, int status)
 {
 	int	fd;
 
+	msh->status = status;
 	if (msh->status != 0)
 		fd = 2;
 	else
@@ -69,10 +70,11 @@ void	envp_free(t_msh *msh)
 	}
 }
 
-void	msh_end(t_msh *msh, char *msg)
+void	msh_end(t_msh *msh, char *msg, int status)
 {
 	int	fd;
 
+	msh->status = status;
 	if (msh->status != 0)
 		fd = 2;
 	else
@@ -129,7 +131,7 @@ void	envp_initialize(t_msh *msh, char **envp)
 {
 	msh->envp = ft_array_copy(envp);
 	if (!msh->envp)
-		msh_end(msh, "envp copy malloc failed");
+		msh_end(msh, "envp copy malloc failed", 1);
 }
 
 void	msh_initialize(t_msh *msh)
@@ -193,6 +195,6 @@ int	main(int argc, char **argv, char **envp)
 			msh_pipeline(&msh, -1);
 		msh_free(&msh);
 	}
-	msh_end(&msh, "exit");
+	msh_end(&msh, "exit", 0);
 	return (0);
 }

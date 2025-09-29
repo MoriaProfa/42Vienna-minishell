@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 16:29:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/29 19:36:54 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/29 23:33:04 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ void    join_token_content(t_token *previous, t_token *current, t_msh *msh)
 
     joined = ft_strjoin(previous->value, current->value);
     if (!joined)
-        msh_end(msh, "token value merging ft_strjoin malloc failed");
+        msh_end(msh, "token value merging ft_strjoin malloc failed", 1);
     free(previous->value);
     previous->value = joined;
     previous->quoted = merge_quote_types(previous->quoted, current->quoted);
