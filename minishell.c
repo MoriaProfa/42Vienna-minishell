@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/23 20:05:56 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/29 12:45:09 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,7 +137,6 @@ void	msh_initialize(t_msh *msh)
 {
 	msh->error_check = false;
 	msh->cpy_in_str = msh->in_str;
-	msh->status = 1;
 	msh->fd_in_previous = STDIN_FILENO;
 	msh->fd_in = STDIN_FILENO; 
 	msh->fd_out = STDOUT_FILENO;
