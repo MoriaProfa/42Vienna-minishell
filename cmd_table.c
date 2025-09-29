@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/26 18:33:08 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/29 13:13:09 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void	print_cmd_table(t_msh *msh)
 	}
 }
 
-void	free_single_cmd_structs(t_cmd *cmd)
+void	free_single_cmd_structs_data(t_cmd *cmd)
 {
 	int	j;
 
@@ -92,7 +92,7 @@ void	free_cmd_table(t_cmd **cmds, int n)
 	{
 		ft_array_free(cmds[i]->args, (size_t)cmds[i]->n_args);
 		ft_array_free(cmds[i]->infiles, (size_t)cmds[i]->n_inf);
-		free_single_cmd_structs(cmds[i]);
+		free_single_cmd_structs_data(cmds[i]);
 		if (cmds[i]->outfiles)
 			free(cmds[i]->outfiles);
 		if (cmds[i]->heredocs)
@@ -252,12 +252,6 @@ void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens,
 	}
 	else if (token->type == T_HEREDOC_REDIRECT)
 		parse_heredoc_token(cmd, word_token, word);
-	/*{
-		if (word_token->quoted == Q_NONE)
-			cmd->heredocs[cmd->n_hd].expand = 1;
-		cmd->heredocs[cmd->n_hd++].delimiter = word;
-		cmd->last_input = T_HEREDOC_REDIRECT;
-	}*/
 }
 
 void	parse_single_cmd_tokens(t_cmd *cmd, t_list **tokens, t_msh *msh)
@@ -354,8 +348,9 @@ void	build_cmd_table(t_msh *msh)
 			msh_end(msh, "cmd table array capacity increase malloc failed");
 		cmds[msh->n_cmds] = init_cmd(msh);
 		parse_single_cmd_tokens(cmds[msh->n_cmds], &tokens, msh);
-		cmds[msh->n_cmds]->pathname = create_cmd_pathname(msh, 
-			cmds[msh->n_cmds]->args[0]);
+		if (cmds[msh->n_cmds]->args[0])
+			cmds[msh->n_cmds]->pathname = create_cmd_pathname(msh, 
+				cmds[msh->n_cmds]->args[0]);
 		msh->n_cmds++;
 	}
 	//heredoc_collector(msh, cmds);

@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/25 17:23:54 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/29 13:14:32 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,8 @@ typedef enum e_quote_type
 {
 	Q_NONE,
 	Q_SINGLE,
-	Q_DOUBLE
+	Q_DOUBLE,
+	Q_MIXED
 }	t_quote_type;
 
 typedef enum e_token_type
