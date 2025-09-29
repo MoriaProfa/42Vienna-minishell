@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/30 01:15:19 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/30 01:30:25 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,8 @@ void	msh_end(t_msh *msh, char *msg, int status)
 		fd = 2;
 	else
 		fd = 1;
-	ft_putendl_fd(msg, fd);
+	if (msg)
+		ft_putendl_fd(msg, fd);
 	envp_free(msh);
 	msh_free(msh);
 	rl_clear_history();
@@ -195,6 +196,6 @@ int	main(int argc, char **argv, char **envp)
 		//	msh_pipeline(&msh, 0);
 		msh_free(&msh);
 	}
-	msh_end(&msh, "exit", msh.status);
+	msh_end(&msh, NULL, msh.status);
 	return (0);
 }
