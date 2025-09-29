@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/26 18:31:54 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/29 19:39:31 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,24 +102,24 @@ void	set_fd_in(t_msh *msh, int i, int j)
 
 void	set_fd_out(t_msh *msh, int i, int j)
 {
-	while (((t_cmd *)msh->cmd_table[i])->n_outf > 0
-		&& ++j < ((t_cmd *)msh->cmd_table[i])->n_outf)
+	if (msh->fd_out != STDOUT_FILENO)
+		close(msh->fd_out);
+	msh->fd_out = STDOUT_FILENO;
+	while (((t_cmd *)msh->cmd_table[i])->outfiles[++j].filename)
 	{
-		if (((t_cmd *)msh->cmd_table[i])->outfiles[j].filename)
-		{
-			if (check_access_write(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename) == 0)
-				return ;
-			if (msh->fd_out != STDOUT_FILENO)
-				close(msh->fd_out);
-			if (((t_cmd *)msh->cmd_table[i])->outfiles[j].append == false)
-				msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename,
-						O_RDWR | O_CREAT | O_TRUNC, 0666);
-			else
-				msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename,
-						O_RDWR | O_CREAT | O_APPEND, 0666);
-			if (msh->fd_out == -1)
-				perror(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename);
-		}
+		if (check_access_write(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename) == 0)
+			break ;
+		if (msh->fd_out != STDOUT_FILENO)
+			close(msh->fd_out);
+		if (((t_cmd *)msh->cmd_table[i])->outfiles[j].append == false)
+			msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename,
+					O_RDWR | O_CREAT | O_TRUNC, 0666);
+		else
+			msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename,
+					O_RDWR | O_CREAT | O_APPEND, 0666);
+		if (msh->fd_out == -1)
+			perror(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename);
+		printf("filename = %s, fd_out = %d\n", ((t_cmd *)msh->cmd_table[i])->outfiles[j].filename, msh->fd_out);
 	}
 }
 
@@ -182,7 +182,7 @@ void	msh_pipeline(t_msh *msh, int i)
 	// need to add signal handling in the child
 	while (++i < msh->n_cmds)
 	{
-		set_fd_in(msh, i, -1);
+		set_fd_in(msh, i, 0);
 		set_fd_out(msh, i, -1);
 		if (i < msh->n_cmds - 1 && ((t_cmd *)msh->cmd_table[i])->n_outf == 0)
 		{
@@ -190,6 +190,7 @@ void	msh_pipeline(t_msh *msh, int i)
 				msh_end(msh, "pipe failed");
 			msh->fd_out = msh->fd[1];
 			msh->fd_in_previous = msh->fd[0];
+			printf("pipe: fd_out = %d, fd[0] = %d\n", msh->fd_out, msh->fd[0]);
 		}
 		msh_fork(msh, msh->fd_in, msh->fd_out, i);
 		if (msh->fd_in != STDIN_FILENO)
