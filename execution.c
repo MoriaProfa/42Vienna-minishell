@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/29 19:39:31 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/29 21:38:49 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ void	set_fd_in(t_msh *msh, int i, int j)
 	}
 	else */if (((t_cmd *)msh->cmd_table[i])->n_inf > 0)
 	{
-		while (j < ((t_cmd *)msh->cmd_table[i])->n_inf)
+		while (++j < ((t_cmd *)msh->cmd_table[i])->n_inf)
 		{
 			if (check_access_read(((t_cmd *)msh->cmd_table[i])->infiles[j]) == 0)
 				return ;
@@ -102,9 +102,9 @@ void	set_fd_in(t_msh *msh, int i, int j)
 
 void	set_fd_out(t_msh *msh, int i, int j)
 {
-	if (msh->fd_out != STDOUT_FILENO)
-		close(msh->fd_out);
-	msh->fd_out = STDOUT_FILENO;
+	// if (msh->fd_out != STDOUT_FILENO)
+	// 	close(msh->fd_out);
+	// msh->fd_out = STDOUT_FILENO;
 	while (((t_cmd *)msh->cmd_table[i])->outfiles[++j].filename)
 	{
 		if (check_access_write(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename) == 0)
@@ -119,7 +119,7 @@ void	set_fd_out(t_msh *msh, int i, int j)
 					O_RDWR | O_CREAT | O_APPEND, 0666);
 		if (msh->fd_out == -1)
 			perror(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename);
-		printf("filename = %s, fd_out = %d\n", ((t_cmd *)msh->cmd_table[i])->outfiles[j].filename, msh->fd_out);
+		// printf("cmd[%d] file[%d] filename = %s, fd_out = %d\n", i, j, ((t_cmd *)msh->cmd_table[i])->outfiles[j].filename, msh->fd_out);
 	}
 }
 
@@ -157,11 +157,13 @@ void	close_fds(t_msh *msh, int fd1, int fd2)
 
 void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
 {
+	// printf("fd_in = %d fd_out = %d \n", fd_in, fd_out);
 	msh->pid[i] = fork();
 	if (msh->pid[i] == -1)
 		msh_end(msh, "fork failed");
 	if (msh->pid[i] == 0)
 	{
+		printf("child[%d]: msh->in = %d msh->out = %d \n", i + 1, msh->fd_in, msh->fd_out);
 		close_fds(msh, fd_in, fd_out);
 		if (fd_in != STDIN_FILENO)
 		{
