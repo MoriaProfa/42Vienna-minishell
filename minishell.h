@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/25 16:24:28 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/29 15:25:20 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,6 +137,7 @@ typedef struct s_msh
 	int		hd_fd[2];
 }			t_msh;
 
+void	free_token(void *content);
 void	msh_end(t_msh *msh, char *msg);
 void	msh_error(t_msh *msh, char *msg);
 

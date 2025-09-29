@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/29 12:08:33 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/29 19:42:15 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -224,6 +224,7 @@ void	parse_heredoc_token(t_cmd *cmd, t_token *word_token, char *word)
 	cmd->heredocs[cmd->n_hd++].delimiter = word;
 	cmd->last_input = T_HEREDOC_REDIRECT;
 }
+
 void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens, 
 	t_msh *msh)
 {
