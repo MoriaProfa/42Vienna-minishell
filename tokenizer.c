@@ -6,11 +6,14 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/25 16:18:39 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/29 18:40:28 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+void	merge_adjacent_tokens(t_list **tokens, t_msh *msh);
+void    remove_quotationmarks(char *str);
 
 // just for testing purposes
 void	print_tokens(t_list *tokens)
@@ -21,7 +24,7 @@ void	print_tokens(t_list *tokens)
 
 	current = tokens;
 	i = 1;
-	printf("Token list:\n");
+	printf("\nToken list:\n");
 	while (current)
 	{
 		token = (t_token *)(current->content);
@@ -200,6 +203,21 @@ bool	check_adjacency(t_list *tokens)
 	return (false);
 }
 
+void	remove_quotationmarks_in_tokens(t_list *tokens)
+{
+	t_list	*current;
+	t_token	*token;
+
+	current = tokens;
+	while (current)
+	{
+		token = (t_token *)(current->content);
+		if (token->type == T_WORD)
+			remove_quotationmarks(token->value);
+		current = current->next;
+	}
+}
+
 void	msh_tokenizer(t_msh *msh)
 {
 	char	*word;
@@ -225,4 +243,12 @@ void	msh_tokenizer(t_msh *msh)
 			free(word);
 		}
 	}
+	printf("\nraw tokens:");
+	print_tokens(msh->tokens);
+	//expansion
+	remove_quotationmarks_in_tokens(msh->tokens);
+	printf("\nafter quote removal:");
+	print_tokens(msh->tokens);
+	merge_adjacent_tokens(&msh->tokens, msh);
+	printf("\nafter adjacency handling:");
 }
