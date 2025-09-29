@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/29 23:37:41 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/29 23:41:43 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,6 +195,6 @@ int	main(int argc, char **argv, char **envp)
 		//	msh_pipeline(&msh, 0);
 		msh_free(&msh);
 	}
-	msh_end(&msh, "exit", 1);
+	msh_end(&msh, "exit", 0);
 	return (0);
 }
