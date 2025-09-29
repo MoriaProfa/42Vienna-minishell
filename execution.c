@@ -6,12 +6,38 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/24 18:21:57 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/26 18:31:54 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+/*
+void	heredoc_collector(t_msh *msh, t_cmd **cmds)
+{
+	int	i;
 
+	i = 0;
+	while (cmds[msh->n_cmds])
+	{
+		while (i < cmds[msh->n_cmds]->n_hd)
+		{
+			while (1)
+			{
+				cmds[msh->n_cmds]->heredocs[i].buffer = readline("> ");
+				if (!cmds[msh->n_cmds]->heredocs[i].buffer)
+				{
+					printf("heredoc readline failed");
+					break ;
+				}
+				if (ft_strncmp(cmds[msh->n_cmds]->heredocs[i].buffer, cmds[msh->n_cmds]->heredocs[i].delimiter, ft_strlen(cmds[msh->n_cmds]->heredocs[i].buffer) == 0))
+					break ;
+				i++;
+			}
+		}
+		msh->n_cmds++;
+	}
+}
+*/
 void	msh_pid(t_msh *msh)
 {
 	int	i;
@@ -49,7 +75,7 @@ int	check_access_write(char *file)
 void	set_fd_in(t_msh *msh, int i, int j)
 {
 	msh->fd_in = msh->fd_in_previous;
-	if (((t_cmd *)msh->cmd_table[i])->n_hd > 0)
+	/*if (((t_cmd *)msh->cmd_table[i])->n_hd > 0)
 	{
 		if (msh->fd_in != STDIN_FILENO)
 			close(msh->fd_in);
@@ -60,7 +86,7 @@ void	set_fd_in(t_msh *msh, int i, int j)
 		close(msh->hd_fd[1]);
 		msh->fd_in = msh->hd_fd[0];
 	}
-	else if (((t_cmd *)msh->cmd_table[i])->n_inf > 0)
+	else */if (((t_cmd *)msh->cmd_table[i])->n_inf > 0)
 	{
 		while (j < ((t_cmd *)msh->cmd_table[i])->n_inf)
 		{

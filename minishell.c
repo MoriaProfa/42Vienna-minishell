@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/24 16:34:18 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/26 19:44:59 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,7 +137,7 @@ void	msh_initialize(t_msh *msh)
 {
 	msh->error_check = false;
 	msh->cpy_in_str = msh->in_str;
-	msh->status = 1;
+	msh->status = 0;
 	msh->fd_in_previous = STDIN_FILENO;
 	msh->fd_in = STDIN_FILENO; 
 	msh->fd_out = STDOUT_FILENO;
@@ -191,8 +191,8 @@ int	main(int argc, char **argv, char **envp)
 			(build_cmd_table(&msh)/*, print_cmd_table(&msh)*/); //print just for testing
 		if (!msh.error_check)
 			msh_pid(&msh); //allocates for msh.pid
-		if (!msh.error_check)
-			msh_pipeline(&msh, -1);
+		// if (!msh.error_check)
+		// 	msh_pipeline(&msh, -1);
 		msh_free(&msh);
 	}
 	msh_end(&msh, "exit");
