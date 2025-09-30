@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 16:29:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/30 17:51:30 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/30 21:15:02 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,21 +18,56 @@ void    expand_word_tokens(t_list *tokens, t_msh *msh)
     t_list  *cur_node;
     t_token *cur_token;
     char    *str;
+    char    *value_cpy;
+    char    *env_var;
+    char    *env_var_tmp;
+    char    *str_tmp;
     int     i;
+    int     len;
+    int     j;
 
     cur_node = tokens;
     while (cur_node)
     {
-        i = -1;
         cur_token = (t_token *)cur_node->content;
+        value_cpy = cur_token->value;
         if (cur_token->type == T_WORD && cur_token->quoted != Q_SINGLE && 
-            ft_strchr(cur_token->value, '$'))
-        {//this needs to have some recursive logic to be able to handle more than one expansion in one string
-            while(cur_token->value[++i])
+            ft_strchr(value_cpy, '$'))
+        {
+            i = -1;
+            while(value_cpy[++i])
             {
-                if (cur_token->value[i] == '$' && (ft_isalpha(cur_token->value[i + 1]) || ft_strchr("_?", cur_token->value[i])))
+                if (value_cpy[i] == '$' && (ft_isalpha(value_cpy[i + 1]) || ft_strchr("_?", value_cpy[i + 1])))
                 {
-                    str = ft_substr(cur_token->value, 0, i);
+                    if (i > 1 && !str)
+                    {
+                        str = ft_substr(value_cpy, 0, i - 1);
+                        if (!str)
+                            msh_end(msh, "expand str substr malloc failed", 1);
+                    }
+                    len = i + 1;
+                    while (value_cpy[len] != ' ' && value_cpy[len] != '$')
+                        len++;
+                    len -= i;
+                    env_var_tmp = ft_substr(value_cpy, 0, len);
+                    if (!env_var_tmp)
+                        msh_end(msh, "expand env_var_tmp substr malloc failed", 1);
+                    env_var = ft_strjoin(env_var_tmp, "=");
+                    if (!env_var)
+                        msh_end(msh, "expand env_var strjoin malloc failed", 1);
+                    while (msh->envp[j] && ft_strncmp(msh->envp[j], env_var, ft_strlen(env_var)) != 0)
+                        j++;
+                    if (!str)
+                        str = msh->envp[j];
+                    else
+                    {
+                        str_tmp = ft_strjoin(str, msh->envp[j]);
+                        if (!str_tmp)
+                            msh_end(msh, "expand tmp strjoin malloc failed", 1);
+                        free(str);
+                        free(env_var);
+                        str = str_tmp;
+                    }
                 }
             }
         }
