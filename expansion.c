@@ -6,32 +6,40 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 16:29:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/29 23:33:04 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/30 17:51:30 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-/*
-void    expand_word_tokens(t_list *tokens)
-{
-    t_token *token;
-    int     i;
-    char    *str;
 
-    while (tokens->next)
+void    expand_word_tokens(t_list *tokens, t_msh *msh)
+{
+    t_list  *cur_node;
+    t_token *cur_token;
+    char    *str;
+    int     i;
+
+    cur_node = tokens;
+    while (cur_node)
     {
-        token = (t_token *)tokens->content;
-        i = 0;
-        if (token->type == T_WORD && token->quoted != Q_SINGLE)
-        {
-            str = ft_strchr(token->value, '$');
-            
+        i = -1;
+        cur_token = (t_token *)cur_node->content;
+        if (cur_token->type == T_WORD && cur_token->quoted != Q_SINGLE && 
+            ft_strchr(cur_token->value, '$'))
+        {//this needs to have some recursive logic to be able to handle more than one expansion in one string
+            while(cur_token->value[++i])
+            {
+                if (cur_token->value[i] == '$' && (ft_isalpha(cur_token->value[i + 1]) || ft_strchr("_?", cur_token->value[i])))
+                {
+                    str = ft_substr(cur_token->value, 0, i);
+                }
+            }
         }
-        tokens = tokens->next;
+        cur_node = cur_node->next;
     }
 }
-*/
+//letters _ ? <- allowed chars after $ to expand it
 
 void    remove_quotationmarks(char *str)
 {

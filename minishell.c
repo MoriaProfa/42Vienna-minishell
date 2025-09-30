@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/30 01:30:25 by astehl           ###   ########.fr       */
+/*   Updated: 2025/09/30 15:17:36 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,11 +185,11 @@ int	main(int argc, char **argv, char **envp)
 		msh_initialize(&msh);
 		check_quotationmarks(&msh);
 		if (!msh.error_check)
-			(msh_tokenizer(&msh)/*, print_tokens(msh.tokens)*/); //print function just for testing
+			(msh_tokenizer(&msh), print_tokens(msh.tokens)); //print function just for testing
 		if (!msh.error_check)
 			check_tokens(&msh);
 		if (!msh.error_check)
-			(build_cmd_table(&msh)/*, print_cmd_table(&msh)*/); //print function just for testing
+			(build_cmd_table(&msh), print_cmd_table(&msh)); //print function just for testing
 		//if (!msh.error_check)
 		//	msh_pid(&msh); //allocates for msh.pid
 		//if (!msh.error_check)
