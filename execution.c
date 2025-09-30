@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/29 21:38:49 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/30 11:35:18 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void	msh_pid(t_msh *msh)
 	i = -1;
 	msh->pid = (pid_t *)ft_calloc(msh->n_cmds + 1, sizeof(pid_t));
 	if (!msh->pid)
-		msh_end(msh, "pid malloc error");
+		msh_end(msh, "pid malloc error", 1);
 	while (++i < msh->n_cmds)
 		msh->pid[i] = -1;
 }
@@ -128,19 +128,19 @@ void	msh_execute(t_msh *msh, int i)
 	if (!((t_cmd *)msh->cmd_table[i])->pathname)
 	{
 		msh->status = 127;
-		msh_end(msh, "command not found");
+		msh_end(msh, "command not found", 1);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->pathname
 		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == -1)
 	{
 		msh->status = 126;
-		msh_end(msh, "permission denied");
+		msh_end(msh, "permission denied", 1);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->pathname
 		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == 0)
 		execve(((t_cmd *)msh->cmd_table[i])->pathname,
 			((t_cmd *)msh->cmd_table[i])->args, msh->envp);
-	msh_end(msh, "execve failed");
+	msh_end(msh, "execve failed", 1);
 }
 
 void	close_fds(t_msh *msh, int fd1, int fd2)
@@ -160,7 +160,7 @@ void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
 	// printf("fd_in = %d fd_out = %d \n", fd_in, fd_out);
 	msh->pid[i] = fork();
 	if (msh->pid[i] == -1)
-		msh_end(msh, "fork failed");
+		msh_end(msh, "fork failed", 1);
 	if (msh->pid[i] == 0)
 	{
 		printf("child[%d]: msh->in = %d msh->out = %d \n", i + 1, msh->fd_in, msh->fd_out);
@@ -189,7 +189,7 @@ void	msh_pipeline(t_msh *msh, int i)
 		if (i < msh->n_cmds - 1 && ((t_cmd *)msh->cmd_table[i])->n_outf == 0)
 		{
 			if (pipe(msh->fd) == -1)
-				msh_end(msh, "pipe failed");
+				msh_end(msh, "pipe failed", 1);
 			msh->fd_out = msh->fd[1];
 			msh->fd_in_previous = msh->fd[0];
 			printf("pipe: fd_out = %d, fd[0] = %d\n", msh->fd_out, msh->fd[0]);
