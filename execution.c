@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/01 19:31:16 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/01 21:24:14 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,7 @@ void	set_fd_out(t_msh *msh, int i, int j)
 	while (((t_cmd *)msh->cmd_table[i])->outfiles[++j].filename)
 	{
 		if (check_access_write(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename) == 0)
-			break ;
+			return ;
 		if (msh->fd_out != STDOUT_FILENO || msh->fd_out != fd)
 			close(msh->fd_out);
 		if (((t_cmd *)msh->cmd_table[i])->outfiles[j].append == false)
@@ -193,7 +193,12 @@ void	msh_pipeline(t_msh *msh, int i)
 				msh_end(msh, "pipe failed", 1);
 			msh->fd_out = msh->fd[1];
 			msh->fd_in_previous = msh->fd[0];
-			// printf("pipe: fd_out = %d, fd[0] = %d\n", msh->fd_out, msh->fd[0]);
+		}
+		else
+		{
+			if (msh->fd_in_previous != STDIN_FILENO)
+				close(msh->fd_in_previous);
+			msh->fd_in_previous = STDIN_FILENO;
 		}
 		msh_fork(msh, msh->fd_in, msh->fd_out, i);
 		if (msh->fd_in != STDIN_FILENO)
