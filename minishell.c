@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/01 20:24:57 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/01 20:45:01 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,8 @@ void	msh_error(t_msh *msh, char *msg, int status)
 		fd = 2;
 	else
 		fd = 1;
-	ft_putendl_fd(msg, fd);
+	if (msg)
+		ft_putendl_fd(msg, fd);
 	msh->error_check = true;
 }
 
