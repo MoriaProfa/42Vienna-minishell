@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/29 23:33:02 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/01 21:40:32 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,8 @@ void	print_cmd_table(t_msh *msh)
 			j = -1;
 			printf("\toutfiles (%i): ", cmd->n_outf);
 			while (cmd->outfiles[++j].filename && j < cmd->n_outf)
-				printf("[%s (append = %d)] ", cmd->outfiles[j].filename, cmd->outfiles[j].append);
+				printf("[%s (append = %d)] ", cmd->outfiles[j].filename,
+					cmd->outfiles[j].append);
 			printf("\n");
 		}
 		if (cmd->heredocs)
@@ -53,10 +54,12 @@ void	print_cmd_table(t_msh *msh)
 			j = -1;
 			printf("\theredocs (%i): ", cmd->n_hd);
 			while (cmd->heredocs[++j].delimiter && j < cmd->n_hd)
-				printf("[%s (expand = %d)] ", cmd->heredocs[j].delimiter, cmd->heredocs[j].expand);
+				printf("[%s (expand = %d)] ", cmd->heredocs[j].delimiter,
+					cmd->heredocs[j].expand);
 			printf("\n");
 		}
-		printf("\tlast_input: %i\n", cmd->last_input);//0 if T_NONE, 3 if T_IN_REDIRECT, 6 if T_HEREDOC_REDIRECT
+		printf("\tlast_input: %i\n", cmd->last_input);
+		// 0 if T_NONE, 3 if T_IN_REDIRECT, 6 if T_HEREDOC_REDIRECT
 		if (cmd->pathname)
 			printf("\tpathname: %s\n", cmd->pathname);
 		i++;
@@ -82,7 +85,7 @@ void	free_single_cmd_structs_data(t_cmd *cmd)
 void	free_cmd_table(t_cmd **cmds, int n)
 {
 	int	i;
-	
+
 	i = -1;
 	if (!cmds)
 		return ;
@@ -107,7 +110,7 @@ bool	builtin_check(char *s)
 	bool	builtin;
 	char	*builtin_list[8];
 	int		i;
-	
+
 	builtin = false;
 	builtin_list[0] = "pwd";
 	builtin_list[1] = "cd";
@@ -134,7 +137,7 @@ t_cmd	*init_cmd(t_msh *msh)
 {
 	t_cmd	*cmd;
 
-	cmd = ft_calloc(1, sizeof(t_cmd)); //all counts get set to 0 this way, pathname to NULL, builtin to false
+	cmd = ft_calloc(1, sizeof(t_cmd));
 	if (!cmd)
 		msh_end(msh, "malloc for cmd failed", 1);
 	cmd->capacity_args = 4;
@@ -157,8 +160,8 @@ t_cmd	*init_cmd(t_msh *msh)
 	return (cmd);
 }
 
-void	*grow_array(void *old_array, int old_capacity, int new_capacity, 
-	size_t size)
+void	*grow_array(void *old_array, int old_capacity, int new_capacity,
+		size_t size)
 {
 	void	*new_array;
 
@@ -189,24 +192,24 @@ bool	ensure_capacity(void **array, int *count, int *capacity, size_t size)
 
 void	cmd_arrays_capacity_check(t_cmd *cmd, t_msh *msh)
 {
-	if (!ensure_capacity((void **)&cmd->args, &cmd->n_args, 
-		&cmd->capacity_args, sizeof(char *)))
+	if (!ensure_capacity((void **)&cmd->args, &cmd->n_args, &cmd->capacity_args,
+			sizeof(char *)))
 		msh_end(msh, "cmd args array capacity increase malloc failed", 1);
-	if (!ensure_capacity((void **)&cmd->infiles, &cmd->n_inf, 
-		&cmd->capacity_inf, sizeof(char *)))
+	if (!ensure_capacity((void **)&cmd->infiles, &cmd->n_inf,
+			&cmd->capacity_inf, sizeof(char *)))
 		msh_end(msh, "cmd infiles array capacity increase malloc failed", 1);
-	if (!ensure_capacity((void **)&cmd->outfiles, &cmd->n_outf, 
-		&cmd->capacity_outf, sizeof(t_outfile)))
+	if (!ensure_capacity((void **)&cmd->outfiles, &cmd->n_outf,
+			&cmd->capacity_outf, sizeof(t_outfile)))
 		msh_end(msh, "cmd outfiles array capacity increase malloc failed", 1);
-	if (!ensure_capacity((void **)&cmd->heredocs, &cmd->n_hd, 
-		&cmd->capacity_hd, sizeof(t_heredoc)))
+	if (!ensure_capacity((void **)&cmd->heredocs, &cmd->n_hd, &cmd->capacity_hd,
+			sizeof(t_heredoc)))
 		msh_end(msh, "cmd heredocs array capacity increase malloc failed", 1);
 }
 
 t_token	*get_next_token(t_list **tokens)
 {
 	t_token	*token;
-	
+
 	if ((*tokens)->next
 		&& ((t_token *)(*tokens)->next->content)->type == T_WORD)
 	{
@@ -225,8 +228,8 @@ void	parse_heredoc_token(t_cmd *cmd, t_token *word_token, char *word)
 	cmd->last_input = T_HEREDOC_REDIRECT;
 }
 
-void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens, 
-	t_msh *msh)
+void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens,
+		t_msh *msh)
 {
 	t_token	*word_token;
 	char	*word;
@@ -255,7 +258,7 @@ void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens,
 
 void	parse_single_cmd_tokens(t_cmd *cmd, t_list **tokens, t_msh *msh)
 {
-	t_token			*token;
+	t_token	*token;
 
 	while (*tokens && ((t_token *)(*tokens)->content)->type != T_PIPE)
 	{
@@ -342,14 +345,14 @@ void	build_cmd_table(t_msh *msh)
 	tokens = msh->tokens;
 	while (tokens)
 	{
-		if (!ensure_capacity((void **)&cmds, &msh->n_cmds, 
-			&capacity, sizeof(t_cmd *)))
+		if (!ensure_capacity((void **)&cmds, &msh->n_cmds, &capacity,
+				sizeof(t_cmd *)))
 			msh_end(msh, "cmd table array capacity increase malloc failed", 1);
 		cmds[msh->n_cmds] = init_cmd(msh);
 		parse_single_cmd_tokens(cmds[msh->n_cmds], &tokens, msh);
 		if (cmds[msh->n_cmds]->args[0])
-			cmds[msh->n_cmds]->pathname = create_cmd_pathname(msh, 
-				cmds[msh->n_cmds]->args[0]);
+			cmds[msh->n_cmds]->pathname = create_cmd_pathname(msh,
+					cmds[msh->n_cmds]->args[0]);
 		msh->n_cmds++;
 	}
 	msh->cmd_table = cmds;

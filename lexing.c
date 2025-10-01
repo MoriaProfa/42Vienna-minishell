@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 20:48:16 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/01 21:02:54 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/01 21:42:28 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,16 +49,16 @@ void	check_quotationmarks(t_msh *msh)
 void	check_middle_tokens(t_msh *msh)
 {
 	t_list	*cur_node;
-	t_token *cur_token;
-	t_token *next_token;
+	t_token	*cur_token;
+	t_token	*next_token;
 
 	cur_node = msh->tokens;
 	while (!msh->error_check && cur_node && cur_node->next)
 	{
 		cur_token = cur_node->content;
 		next_token = cur_node->next->content;
-		if (cur_token->type != T_WORD && cur_token->type != T_PIPE && 
-			next_token->type != T_WORD)
+		if (cur_token->type != T_WORD && cur_token->type != T_PIPE
+			&& next_token->type != T_WORD)
 		{
 			ft_putstr_fd("syntax error near unexpected token `", 2);
 			(ft_putstr_fd(next_token->value, 2), ft_putendl_fd("'", 2));
@@ -82,6 +82,7 @@ void	check_tokens(t_msh *msh)
 	check_middle_tokens(msh);
 	if (!msh->error_check && last_token->type == T_PIPE)
 		msh_error(msh, "syntax error: unexpected end of file", 2);
-	if (!msh->error_check && last_token->type != T_WORD && last_token->type != T_PIPE)
+	if (!msh->error_check && last_token->type != T_WORD
+		&& last_token->type != T_PIPE)
 		msh_error(msh, "syntax error near unexpected token `newline'", 2);
 }
