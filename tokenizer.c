@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/01 21:43:51 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/01 21:54:05 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -303,9 +303,8 @@ void	msh_tokenizer(t_msh *msh)
 	i = -1;
 	while (*msh->cpy_in_str)
 	{
-		i++;
 		ft_memset(quoted_adjacent, 0, sizeof(quoted_adjacent));
-		if (i != 0 && !skip_whitespaces(msh))
+		if (++i != 0 && !skip_whitespaces(msh))
 			quoted_adjacent[1] = check_adjacency(msh->tokens);
 		if (!*msh->cpy_in_str)
 			break ;
@@ -319,14 +318,14 @@ void	msh_tokenizer(t_msh *msh)
 			free(word);
 		}
 	}
-	//	printf("\nraw tokens:");
-	//	print_tokens(msh->tokens);
+//	printf("\nraw tokens:");
+//	print_tokens(msh->tokens);
 	remove_quotationmarks_in_tokens(msh->tokens);
-	//	printf("\nafter quote removal:");
-	//	print_tokens(msh->tokens);
+//	printf("\nafter quote removal:");
+//	print_tokens(msh->tokens);
 	expand_word_tokens(msh->tokens, msh);
-	//	printf("\nafter expansion:");
-	//	print_tokens(msh->tokens);
+//	printf("\nafter expansion:");
+//	print_tokens(msh->tokens);
 	merge_adjacent_tokens(&msh->tokens, msh);
-	//	printf("\nafter adjacency handling:");
+//	printf("\nafter adjacency handling:");
 }
