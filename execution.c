@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/01 21:24:14 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/01 23:16:01 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,25 +102,23 @@ void	set_fd_in(t_msh *msh, int i, int j)
 
 void	set_fd_out(t_msh *msh, int i, int j)
 {
-	int	fd;
-
-	fd = STDOUT_FILENO;
 	while (((t_cmd *)msh->cmd_table[i])->outfiles[++j].filename)
 	{
 		if (check_access_write(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename) == 0)
 			return ;
-		if (msh->fd_out != STDOUT_FILENO || msh->fd_out != fd)
-			close(msh->fd_out);
 		if (((t_cmd *)msh->cmd_table[i])->outfiles[j].append == false)
-			fd = open(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename,
+			msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename,
 					O_RDWR | O_CREAT | O_TRUNC, 0666);
 		else
-			fd = open(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename,
+			msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename,
 					O_RDWR | O_CREAT | O_APPEND, 0666);
-		if (fd == -1)
+		if (msh->fd_out == -1)
 			perror(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename);
-		msh->fd_out = fd;
-		// printf("cmd[%d] file[%d] filename = %s, fd_out = %d\n", i, j, ((t_cmd *)msh->cmd_table[i])->outfiles[j].filename, msh->fd_out);
+		if (msh->fd_out != STDOUT_FILENO && msh->fd_out != -1)
+		{
+			dup2(msh->fd_out, STDOUT_FILENO);
+			close(msh->fd_out);
+		}
 	}
 }
 
