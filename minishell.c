@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/01 21:38:15 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/01 23:24:45 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,6 +174,12 @@ int	main(int argc, char **argv, char **envp)
 		msh.in_str = readline("minishell> ");
 		if (!msh.in_str) //by pressing CTRL+D
 			break ;
+		if (ft_strlen(msh.in_str) == 0)
+		{
+			free(msh.in_str);
+			msh.in_str = NULL;
+			continue ;
+		}
 		add_history(msh.in_str); //original bash doesnt add it when its starting with a whitespace
 		if (g_signal_flag)
 		{

@@ -6,13 +6,13 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/01 20:49:28 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/01 23:23:30 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void    expand_word_tokens(t_list *tokens, t_msh *msh);
+void			expand_word_tokens(t_list *tokens, t_msh *msh);
 
 // just for testing purposes
 void	print_tokens(t_list *tokens)
@@ -28,8 +28,8 @@ void	print_tokens(t_list *tokens)
 	{
 		cur_token = (t_token *)(cur_node->content);
 		if (cur_token)
-			printf("Token #%i:\n\tValue: %s, Type: %d, Quotes: %d, is adjacent: %d\n", i, cur_token->value,
-				cur_token->type, cur_token->quoted, cur_token->is_adjacent);
+			printf("Token #%i:\n\tValue: %s, Type: %d, Quotes: %d, is adjacent: %d\n", i, cur_token->value, cur_token->type, cur_token->quoted,
+				cur_token->is_adjacent);
 		cur_node = cur_node->next;
 		i++;
 	}
@@ -44,12 +44,12 @@ void	free_token(void *content)
 	free(cur_token);
 }
 
-void	fill_token_list(t_msh *msh, const char *value, t_token_type type, 
-	int *quoted_adjacent)
+void	fill_token_list(t_msh *msh, const char *value, t_token_type type,
+		int *quoted_adjacent)
 {
 	t_list	*cur_node;
 	t_token	*cur_token;
-	
+
 	cur_token = ft_calloc(1, sizeof(t_token));
 	if (!cur_token)
 		msh_end(msh, "tokenizer: token malloc failed", 1);
@@ -118,7 +118,7 @@ bool	skip_whitespaces(t_msh *msh)
 		msh->cpy_in_str++;
 		skip = true;
 	}
-	return (skip);		
+	return (skip);
 }
 
 char	*handle_quoted(t_msh *msh, int *len)
@@ -178,7 +178,7 @@ char	*create_word_token(t_msh *msh)
 
 int	set_quoted(char c)
 {
-	int		quoted;
+	int	quoted;
 
 	quoted = Q_NONE;
 	if (c == '\'')
@@ -192,7 +192,7 @@ bool	check_adjacency(t_list *tokens)
 {
 	t_list	*last_node;
 	t_token	*last_token;
-	
+
 	if (!tokens)
 		return (false);
 	last_node = ft_lstlast(tokens);
@@ -202,81 +202,81 @@ bool	check_adjacency(t_list *tokens)
 	return (false);
 }
 
-void    remove_quotationmarks(char *str)
+void	remove_quotationmarks(char *str)
 {
-    size_t  i;
-    char    quotationmark;
-    char    *start;
-    char    *end;
+	size_t	i;
+	char	quotationmark;
+	char	*start;
+	char	*end;
 
-    i = 0;
-    if (!str)
-        return ;
-    while (str[i] && str[i] != '\'' && str[i] != '"')
-        i++;
-    if (i >= ft_strlen(str))
-        return ;
-    quotationmark = str[i];
-    start = ft_strchr(str, quotationmark);
-    if (!start)
-        return ;
-    end = ft_strchr(start + 1, quotationmark);
-    if (!end)
-        return ;
-    ft_memmove(start, start + 1, end - start - 1);
-    ft_memmove(start + (end - start - 1), end + 1, ft_strlen(end + 1) + 1);
+	i = 0;
+	if (!str)
+		return ;
+	while (str[i] && str[i] != '\'' && str[i] != '"')
+		i++;
+	if (i >= ft_strlen(str))
+		return ;
+	quotationmark = str[i];
+	start = ft_strchr(str, quotationmark);
+	if (!start)
+		return ;
+	end = ft_strchr(start + 1, quotationmark);
+	if (!end)
+		return ;
+	ft_memmove(start, start + 1, end - start - 1);
+	ft_memmove(start + (end - start - 1), end + 1, ft_strlen(end + 1) + 1);
 }
 
-t_quote_type    merge_quote_types(t_quote_type q1, t_quote_type q2)
+t_quote_type	merge_quote_types(t_quote_type q1, t_quote_type q2)
 {
-    if (q1 == q2)
-        return (q1);
-    if ((q1 == Q_NONE && q2 == Q_SINGLE) || (q1 == Q_SINGLE && q2 == Q_NONE))
-        return (Q_SINGLE);
-    if ((q1 == Q_NONE && q2 == Q_DOUBLE) || (q1 == Q_DOUBLE && q2 == Q_NONE))
-        return (Q_DOUBLE);
-    return (Q_MIXED);
+	if (q1 == q2)
+		return (q1);
+	if ((q1 == Q_NONE && q2 == Q_SINGLE) || (q1 == Q_SINGLE && q2 == Q_NONE))
+		return (Q_SINGLE);
+	if ((q1 == Q_NONE && q2 == Q_DOUBLE) || (q1 == Q_DOUBLE && q2 == Q_NONE))
+		return (Q_DOUBLE);
+	return (Q_MIXED);
 }
 
-void    join_token_content(t_token *previous, t_token *current, t_msh *msh)
+void	join_token_content(t_token *previous, t_token *current, t_msh *msh)
 {
-    char    *joined;
+	char	*joined;
 
-    joined = ft_strjoin(previous->value, current->value);
-    if (!joined)
-        msh_end(msh, "token value merging ft_strjoin malloc failed", 1);
-    free(previous->value);
-    previous->value = joined;
-    previous->quoted = merge_quote_types(previous->quoted, current->quoted);
+	joined = ft_strjoin(previous->value, current->value);
+	if (!joined)
+		msh_end(msh, "token value merging ft_strjoin malloc failed", 1);
+	free(previous->value);
+	previous->value = joined;
+	previous->quoted = merge_quote_types(previous->quoted, current->quoted);
 }
 
-void    merge_adjacent_tokens(t_list **tokens, t_msh *msh)
+void	merge_adjacent_tokens(t_list **tokens, t_msh *msh)
 {
-    t_list  *cur_node;
-    t_token *cur_token;
-    t_token *prev_token;
-    t_list  *prev_node;
+	t_list	*cur_node;
+	t_token	*cur_token;
+	t_token	*prev_token;
+	t_list	*prev_node;
 
-    cur_node = *tokens;
-    while (cur_node)
-    {
-        cur_token = (t_token *)cur_node->content;
-        if (cur_token->type == T_WORD 
-            && cur_token->is_adjacent && cur_node->prev 
-            && ((t_token *)cur_node->prev->content)->type == T_WORD)
-        {
-            prev_node = cur_node->prev;
-            prev_token = (t_token *)prev_node->content;
-            join_token_content(prev_token, cur_token, msh);
-            prev_node->next = cur_node->next;
-            if (cur_node->next)
-                cur_node->next->prev = prev_node;
-            ft_lstdelone(cur_node, free_token);
-            cur_node = prev_node->next;       
-        }
-        else
-            cur_node = cur_node->next;
-    }
+	cur_node = *tokens;
+	while (cur_node)
+	{
+		cur_token = (t_token *)cur_node->content;
+		if (cur_token->type == T_WORD && cur_token->is_adjacent
+			&& cur_node->prev
+			&& ((t_token *)cur_node->prev->content)->type == T_WORD)
+		{
+			prev_node = cur_node->prev;
+			prev_token = (t_token *)prev_node->content;
+			join_token_content(prev_token, cur_token, msh);
+			prev_node->next = cur_node->next;
+			if (cur_node->next)
+				cur_node->next->prev = prev_node;
+			ft_lstdelone(cur_node, free_token);
+			cur_node = prev_node->next;
+		}
+		else
+			cur_node = cur_node->next;
+	}
 }
 
 void	remove_quotationmarks_in_tokens(t_list *tokens)
@@ -303,9 +303,8 @@ void	msh_tokenizer(t_msh *msh)
 	i = -1;
 	while (*msh->cpy_in_str)
 	{
-		i++;
 		ft_memset(quoted_adjacent, 0, sizeof(quoted_adjacent));
-		if (i != 0 && !skip_whitespaces(msh))
+		if (++i != 0 && !skip_whitespaces(msh))
 			quoted_adjacent[1] = check_adjacency(msh->tokens);
 		if (!*msh->cpy_in_str)
 			break ;
