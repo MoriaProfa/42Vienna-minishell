@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/01 19:21:43 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/01 19:28:16 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -319,14 +319,14 @@ void	msh_tokenizer(t_msh *msh)
 			free(word);
 		}
 	}
-	printf("\nraw tokens:");
-	print_tokens(msh->tokens);
+	// printf("\nraw tokens:");
+	// print_tokens(msh->tokens);
 	remove_quotationmarks_in_tokens(msh->tokens);
-	printf("\nafter quote removal:");
-	print_tokens(msh->tokens);
+	// printf("\nafter quote removal:");
+	// print_tokens(msh->tokens);
 	expand_word_tokens(msh->tokens, msh);
-	printf("\nafter expansion:");
-	print_tokens(msh->tokens);
+	// printf("\nafter expansion:");
+	// print_tokens(msh->tokens);
 	merge_adjacent_tokens(&msh->tokens, msh);
-	printf("\nafter adjacency handling:");
+	// printf("\nafter adjacency handling:");
 }
