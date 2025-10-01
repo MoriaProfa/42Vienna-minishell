@@ -6,64 +6,63 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/29 23:52:21 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/01 19:21:43 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	merge_adjacent_tokens(t_list **tokens, t_msh *msh);
-void    remove_quotationmarks(char *str);
+void    expand_word_tokens(t_list *tokens, t_msh *msh);
 
 // just for testing purposes
 void	print_tokens(t_list *tokens)
 {
-	t_list	*current;
+	t_list	*cur_node;
+	t_token	*cur_token;
 	int		i;
-	t_token	*token;
 
-	current = tokens;
+	cur_node = tokens;
 	i = 1;
 	printf("\nToken list:\n");
-	while (current)
+	while (cur_node)
 	{
-		token = (t_token *)(current->content);
-		if (token)
-			printf("Token #%i:\n\tValue: %s, Type: %d, Quotes: %d, is adjacent: %d\n", i, token->value,
-				token->type, token->quoted, token->is_adjacent);
-		current = current->next;
+		cur_token = (t_token *)(cur_node->content);
+		if (cur_token)
+			printf("Token #%i:\n\tValue: %s, Type: %d, Quotes: %d, is adjacent: %d\n", i, cur_token->value,
+				cur_token->type, cur_token->quoted, cur_token->is_adjacent);
+		cur_node = cur_node->next;
 		i++;
 	}
 }
 
 void	free_token(void *content)
 {
-	t_token	*token;
+	t_token	*cur_token;
 
-	token = (t_token *)content;
-	free(token->value);
-	free(token);
+	cur_token = (t_token *)content;
+	free(cur_token->value);
+	free(cur_token);
 }
 
 void	fill_token_list(t_msh *msh, const char *value, t_token_type type, 
 	int *quoted_adjacent)
 {
-	t_token	*token;
-	t_list	*node;
-
-	token = ft_calloc(1, sizeof(t_token));
-	if (!token)
+	t_list	*cur_node;
+	t_token	*cur_token;
+	
+	cur_token = ft_calloc(1, sizeof(t_token));
+	if (!cur_token)
 		msh_end(msh, "tokenizer: token malloc failed", 1);
-	token->value = ft_strdup(value);
-	if (!token->value)
+	cur_token->value = ft_strdup(value);
+	if (!cur_token->value)
 		msh_end(msh, "tokenizer: value malloc failed", 1);
-	token->type = type;
-	token->quoted = quoted_adjacent[0];
-	token->is_adjacent = quoted_adjacent[1];
-	node = ft_lstnew(token);
-	if (!node)
+	cur_token->type = type;
+	cur_token->quoted = quoted_adjacent[0];
+	cur_token->is_adjacent = quoted_adjacent[1];
+	cur_node = ft_lstnew(cur_token);
+	if (!cur_node)
 		msh_end(msh, "tokenizer: node malloc failed", 1);
-	ft_lstadd_back(&msh->tokens, node);
+	ft_lstadd_back(&msh->tokens, cur_node);
 }
 
 int	handle_single_metacharacter(t_msh *msh, char c, t_token_type type)
@@ -203,18 +202,95 @@ bool	check_adjacency(t_list *tokens)
 	return (false);
 }
 
+void    remove_quotationmarks(char *str)
+{
+    size_t  i;
+    char    quotationmark;
+    char    *start;
+    char    *end;
+
+    i = 0;
+    if (!str)
+        return ;
+    while (str[i] && str[i] != '\'' && str[i] != '"')
+        i++;
+    if (i >= ft_strlen(str))
+        return ;
+    quotationmark = str[i];
+    start = ft_strchr(str, quotationmark);
+    if (!start)
+        return ;
+    end = ft_strchr(start + 1, quotationmark);
+    if (!end)
+        return ;
+    ft_memmove(start, start + 1, end - start - 1);
+    ft_memmove(start + (end - start - 1), end + 1, ft_strlen(end + 1) + 1);
+}
+
+t_quote_type    merge_quote_types(t_quote_type q1, t_quote_type q2)
+{
+    if (q1 == q2)
+        return (q1);
+    if ((q1 == Q_NONE && q2 == Q_SINGLE) || (q1 == Q_SINGLE && q2 == Q_NONE))
+        return (Q_SINGLE);
+    if ((q1 == Q_NONE && q2 == Q_DOUBLE) || (q1 == Q_DOUBLE && q2 == Q_NONE))
+        return (Q_DOUBLE);
+    return (Q_MIXED);
+}
+
+void    join_token_content(t_token *previous, t_token *current, t_msh *msh)
+{
+    char    *joined;
+
+    joined = ft_strjoin(previous->value, current->value);
+    if (!joined)
+        msh_end(msh, "token value merging ft_strjoin malloc failed", 1);
+    free(previous->value);
+    previous->value = joined;
+    previous->quoted = merge_quote_types(previous->quoted, current->quoted);
+}
+
+void    merge_adjacent_tokens(t_list **tokens, t_msh *msh)
+{
+    t_list  *cur_node;
+    t_token *cur_token;
+    t_token *prev_token;
+    t_list  *prev_node;
+
+    cur_node = *tokens;
+    while (cur_node)
+    {
+        cur_token = (t_token *)cur_node->content;
+        if (cur_token->type == T_WORD 
+            && cur_token->is_adjacent && cur_node->prev 
+            && ((t_token *)cur_node->prev->content)->type == T_WORD)
+        {
+            prev_node = cur_node->prev;
+            prev_token = (t_token *)prev_node->content;
+            join_token_content(prev_token, cur_token, msh);
+            prev_node->next = cur_node->next;
+            if (cur_node->next)
+                cur_node->next->prev = prev_node;
+            ft_lstdelone(cur_node, free_token);
+            cur_node = prev_node->next;       
+        }
+        else
+            cur_node = cur_node->next;
+    }
+}
+
 void	remove_quotationmarks_in_tokens(t_list *tokens)
 {
-	t_list	*current;
-	t_token	*token;
+	t_list	*cur_node;
+	t_token	*cur_token;
 
-	current = tokens;
-	while (current)
+	cur_node = tokens;
+	while (cur_node)
 	{
-		token = (t_token *)(current->content);
-		if (token->type == T_WORD)
-			remove_quotationmarks(token->value);
-		current = current->next;
+		cur_token = (t_token *)(cur_node->content);
+		if (cur_token->type == T_WORD)
+			remove_quotationmarks(cur_token->value);
+		cur_node = cur_node->next;
 	}
 }
 
@@ -243,12 +319,14 @@ void	msh_tokenizer(t_msh *msh)
 			free(word);
 		}
 	}
-	//printf("\nraw tokens:");
-	//print_tokens(msh->tokens);
-	//expansion
+	printf("\nraw tokens:");
+	print_tokens(msh->tokens);
 	remove_quotationmarks_in_tokens(msh->tokens);
-	//printf("\nafter quote removal:");
-	//print_tokens(msh->tokens);
+	printf("\nafter quote removal:");
+	print_tokens(msh->tokens);
+	expand_word_tokens(msh->tokens, msh);
+	printf("\nafter expansion:");
+	print_tokens(msh->tokens);
 	merge_adjacent_tokens(&msh->tokens, msh);
-	//printf("\nafter adjacency handling:");
+	printf("\nafter adjacency handling:");
 }
