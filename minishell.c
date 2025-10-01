@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/01 23:00:57 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/01 23:03:14 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,6 +177,7 @@ int	main(int argc, char **argv, char **envp)
 		if (ft_strlen(msh.in_str) == 0)
 		{
 			free(msh.in_str);
+			msh.in_str = NULL;
 			continue ;
 		}
 		add_history(msh.in_str); //original bash doesnt add it when its starting with a whitespace
