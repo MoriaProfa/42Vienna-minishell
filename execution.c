@@ -6,11 +6,13 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/02 18:11:21 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/02 20:55:33 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+void	msh_builtins(t_msh *msh, int i);
 
 void	msh_pid(t_msh *msh)
 {

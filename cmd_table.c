@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/02 20:36:55 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/02 20:53:41 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void	print_cmd_table(t_msh *msh)
 		j = 0;
 		while (cmd->args[j] && j < cmd->n_args)
 			printf("[%s] ", cmd->args[j++]);
-		printf("\n\tBuiltin args[0]: %d\n", cmd->builtin);
+		printf("\n\tBuiltin args[0]: %d\n", cmd->builtin.builtin);
 		if (cmd->infiles)
 		{
 			j = 0;

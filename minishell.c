@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/02 20:47:55 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/02 20:55:05 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ void	run_command(t_msh *msh, int i);
 void	msh_pid(t_msh *msh);
 void	msh_fork(t_msh *msh, int i, int fd_in, int fd_out);
 void	msh_execute(t_msh *msh, int i);
+void	msh_builtins(t_msh *msh, int i);
 
 volatile sig_atomic_t   g_signal_flag = 0;
 
@@ -196,7 +197,7 @@ int	main(int argc, char **argv, char **envp)
 		if (!msh.error_check)
 		{
 			if (((t_cmd *)msh.cmd_table[0])->builtin.builtin == true && msh.n_cmds == 1)
-			msh_builtins(msh, 0);
+			msh_builtins(&msh, 0);
 		}
 		// if (!msh.error_check)
 		// 	run_command(&msh, -1);

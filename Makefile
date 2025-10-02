@@ -4,7 +4,7 @@ CC = cc
 
 CFLAGS = -Wall -Wextra -Werror -MMD -MP -g
 
-MY_SOURCES = minishell.c lexing.c tokenizer.c expansion.c cmd_table.c execution.c
+MY_SOURCES = minishell.c lexing.c tokenizer.c expansion.c cmd_table.c execution.c redirection.c builtins.c
 
 MY_OBJECTS = $(MY_SOURCES:.c=.o)
 
