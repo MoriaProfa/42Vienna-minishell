@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/02 17:51:09 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/02 20:35:24 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,7 @@
 
 typedef enum e_builtin_type
 {
+	B_NOT_BUILTIN,
 	B_PWD,
 	B_CD,
 	B_EXIT,
@@ -69,7 +70,6 @@ typedef enum e_builtin_type
 	B_EXPORT,
 	B_UNSET,
 	B_ECHO,
-	B_NOT_BUILTIN,
 }					t_builtin_type;
 
 typedef struct s_builtin

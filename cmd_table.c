@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/02 17:47:46 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/02 20:36:55 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,7 +130,7 @@ t_builtin	builtin_check(char *s)
 				builtin_list[i], ft_strlen(s)))
 		{
 			builtin.builtin = true;
-			builtin.type = i;
+			builtin.type = i + 1;
 		}
 	}
 	return (builtin);

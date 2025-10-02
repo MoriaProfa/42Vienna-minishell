@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/22 20:10:38 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/02 20:43:11 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ void	msh_builtins(t_msh *msh, int i)
 		msh_cd(msh, i);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_EXIT)
-		msh_exit(msh, "exit");
+		msh_end(msh, "exit", 0);
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_ENV)
 	{
 		msh_env(msh);

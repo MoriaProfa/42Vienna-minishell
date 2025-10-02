@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/02 10:52:30 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/02 20:41:33 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,7 +200,12 @@ int	main(int argc, char **argv, char **envp)
 		if (!msh.error_check)
 			msh_pid(&msh); //allocates for msh.pid
 		if (!msh.error_check)
-			run_command(&msh, -1);
+		{
+			if (((t_cmd *)msh.cmd_table[0])->builtin.builtin == true && msh.n_cmds == 1)
+			msh_builtins(msh, 0);
+		}
+		// if (!msh.error_check)
+		// 	run_command(&msh, -1);
 		msh_free(&msh);
 	}
 	msh_end(&msh, NULL, msh.status);

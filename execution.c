@@ -6,38 +6,12 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/02 17:53:10 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/02 18:11:21 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-/*
-void	heredoc_collector(t_msh *msh, t_cmd **cmds)
-{
-	int	i;
 
-	i = 0;
-	while (cmds[msh->n_cmds])
-	{
-		while (i < cmds[msh->n_cmds]->n_hd)
-		{
-			while (1)
-			{
-				cmds[msh->n_cmds]->heredocs[i].buffer = readline("> ");
-				if (!cmds[msh->n_cmds]->heredocs[i].buffer)
-				{
-					printf("heredoc readline failed");
-					break ;
-				}
-				if (ft_strncmp(cmds[msh->n_cmds]->heredocs[i].buffer, cmds[msh->n_cmds]->heredocs[i].delimiter, ft_strlen(cmds[msh->n_cmds]->heredocs[i].buffer) == 0))
-					break ;
-				i++;
-			}
-		}
-		msh->n_cmds++;
-	}
-}
-*/
 void	msh_pid(t_msh *msh)
 {
 	int	i;
