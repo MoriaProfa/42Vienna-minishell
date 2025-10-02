@@ -3,14 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_table.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/01 21:40:32 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/02 20:36:55 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+void	heredoc_collector(t_msh *msh, t_cmd **cmds);
 
 // just for testing purposes
 void	print_cmd_table(t_msh *msh)
@@ -105,13 +107,14 @@ void	free_cmd_table(t_cmd **cmds, int n)
 	free(cmds);
 }
 
-bool	builtin_check(char *s)
+t_builtin	builtin_check(char *s)
 {
-	bool	builtin;
+	t_builtin	builtin;
 	char	*builtin_list[8];
 	int		i;
 
-	builtin = false;
+	builtin.builtin = false;
+	builtin.type = B_NOT_BUILTIN;
 	builtin_list[0] = "pwd";
 	builtin_list[1] = "cd";
 	builtin_list[2] = "exit";
@@ -120,15 +123,15 @@ bool	builtin_check(char *s)
 	builtin_list[5] = "unset";
 	builtin_list[6] = "echo";
 	builtin_list[7] = NULL;
-	i = 0;
-	while (builtin_list[i])
+	i = -1;
+	while (builtin_list[++i])
 	{
-		if (ft_strlen(s) == ft_strlen(builtin_list[i]))
+		if (ft_strlen(s) == ft_strlen(builtin_list[i]) && !ft_strncmp(s,
+				builtin_list[i], ft_strlen(s)))
 		{
-			if (!ft_strncmp(s, builtin_list[i], ft_strlen(s)))
-				return (true);
+			builtin.builtin = true;
+			builtin.type = i + 1;
 		}
-		i++;
 	}
 	return (builtin);
 }
@@ -276,8 +279,8 @@ void	parse_single_cmd_tokens(t_cmd *cmd, t_list **tokens, t_msh *msh)
 	}
 	if ((*tokens) && ((t_token *)(*tokens)->content)->type == T_PIPE)
 		*tokens = (*tokens)->next;
-	if (cmd->args && cmd->args[0] && builtin_check(cmd->args[0]))
-		cmd->builtin = true;
+	if (cmd->args && cmd->args[0])
+		cmd->builtin = builtin_check(cmd->args[0]);
 }
 
 char	*resolve_cmd_pathname(t_msh *msh, char **paths, char *cmd)

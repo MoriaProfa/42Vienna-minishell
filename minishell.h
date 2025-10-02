@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/30 15:14:37 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/02 20:35:24 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,24 @@
 # include <termios.h>
 //tcsetattr, tcgetattr
 
+typedef enum e_builtin_type
+{
+	B_NOT_BUILTIN,
+	B_PWD,
+	B_CD,
+	B_EXIT,
+	B_ENV,
+	B_EXPORT,
+	B_UNSET,
+	B_ECHO,
+}					t_builtin_type;
+
+typedef struct s_builtin
+{
+	bool			builtin;
+	t_builtin_type	type;
+}					t_builtin;
+
 typedef enum e_quote_type
 {
 	Q_NONE,
@@ -105,7 +123,7 @@ typedef struct s_cmd
 	char			**args;//command + args
 	int				n_args;// amount of args
 	int				capacity_args;// capacity of **args
-	bool			builtin;// true if args[0] == builtin
+	t_builtin		builtin;
 	char			**infiles;// list of <
 	int				n_inf;// amount of infiles
 	int				capacity_inf;// capacity of **infiles
@@ -121,24 +139,27 @@ typedef struct s_cmd
 
 typedef struct s_msh
 {
-	bool	error_check;
-	char	*in_str;
-	char	*cpy_in_str;
-	t_list	*tokens;
-	t_cmd	**cmd_table;
-	int		n_cmds;
-	char	**envp;
-	int		status;
-	pid_t	*pid;
-	int		fd[2];
-	int		fd_in_previous;
-	int		fd_in;
-	int		fd_out;
-	int		hd_fd[2];
-}			t_msh;
+	bool			error_check;
+	char			*in_str;
+	char			*cpy_in_str;
+	t_list			*tokens;
+	t_cmd			**cmd_table;
+	int				n_cmds;
+	char			**envp;
+	int				status;
+	pid_t			*pid;
+	int				fd[2];
+	int				fd_in_previous;
+	int				fd_in;
+	int				fd_out;
+	int				hd_fd[2];
+}					t_msh;
 
 void	free_token(void *content);
 void	msh_end(t_msh *msh, char *msg, int status);
 void	msh_error(t_msh *msh, char *msg, int status);
+
+// redirection.c
+void	set_redirections(t_msh *msh, int i);
 
 #endif
