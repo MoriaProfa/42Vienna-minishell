@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/01 23:16:01 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/02 17:53:10 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,78 +50,6 @@ void	msh_pid(t_msh *msh)
 		msh->pid[i] = -1;
 }
 
-int	check_access_read(char *file)
-{
-	if (access(file, F_OK) == 0 && access(file, R_OK) != 0)
-	{
-		perror(file);
-		return (0);
-	}
-	else
-		return (1);
-}
-
-int	check_access_write(char *file)
-{
-	if (access(file, F_OK) == 0 && access(file, W_OK) != 0)
-	{
-		perror(file);
-		return (0);
-	}
-	else
-		return (1);
-}
-
-void	set_fd_in(t_msh *msh, int i, int j)
-{
-	msh->fd_in = msh->fd_in_previous;
-	/*if (((t_cmd *)msh->cmd_table[i])->n_hd > 0)
-	{
-		if (msh->fd_in != STDIN_FILENO)
-			close(msh->fd_in);
-		if (pipe(msh->hd_fd) == -1)
-			msh_end(msh, "pipe failed");
-		write(msh->hd_fd[1], ((t_cmd *)msh->cmd_table[i])->heredocs->buffer,
-			ft_strlen(((t_cmd *)msh->cmd_table[i])->heredocs->buffer));
-		close(msh->hd_fd[1]);
-		msh->fd_in = msh->hd_fd[0];
-	}
-	else */if (((t_cmd *)msh->cmd_table[i])->n_inf > 0)
-	{
-		while (++j < ((t_cmd *)msh->cmd_table[i])->n_inf)
-		{
-			if (check_access_read(((t_cmd *)msh->cmd_table[i])->infiles[j]) == 0)
-				return ;
-			msh->fd_in = open(((t_cmd *)msh->cmd_table[i])->infiles[j],
-					O_RDONLY);
-			if (msh->fd_in == -1)
-				perror(((t_cmd *)msh->cmd_table[i])->infiles[j]);
-		}
-	}
-}
-
-void	set_fd_out(t_msh *msh, int i, int j)
-{
-	while (((t_cmd *)msh->cmd_table[i])->outfiles[++j].filename)
-	{
-		if (check_access_write(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename) == 0)
-			return ;
-		if (((t_cmd *)msh->cmd_table[i])->outfiles[j].append == false)
-			msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename,
-					O_RDWR | O_CREAT | O_TRUNC, 0666);
-		else
-			msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename,
-					O_RDWR | O_CREAT | O_APPEND, 0666);
-		if (msh->fd_out == -1)
-			perror(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename);
-		if (msh->fd_out != STDOUT_FILENO && msh->fd_out != -1)
-		{
-			dup2(msh->fd_out, STDOUT_FILENO);
-			close(msh->fd_out);
-		}
-	}
-}
-
 void	msh_execute(t_msh *msh, int i)
 {
 	if (!((t_cmd *)msh->cmd_table[i])->pathname)
@@ -156,13 +84,12 @@ void	close_fds(t_msh *msh, int fd1, int fd2)
 
 void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
 {
-	// printf("fd_in = %d fd_out = %d \n", fd_in, fd_out);
 	msh->pid[i] = fork();
 	if (msh->pid[i] == -1)
 		msh_end(msh, "fork failed", 1);
 	if (msh->pid[i] == 0)
 	{
-		// printf("child[%d]: msh->in = %d msh->out = %d \n", i + 1, msh->fd_in, msh->fd_out);
+		set_redirections(msh, i);
 		close_fds(msh, fd_in, fd_out);
 		if (fd_in != STDIN_FILENO)
 		{
@@ -174,30 +101,38 @@ void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
 			dup2(fd_out, STDOUT_FILENO);
 			close(fd_out);
 		}
-		msh_execute(msh, i);
+		if (((t_cmd *)msh->cmd_table[i])->builtin.builtin == false)
+			msh_execute(msh, i);
+		else
+		{
+			msh_builtins(msh, i);
+			exit(0);
+		}
 	}
 }
 
-void	msh_pipeline(t_msh *msh, int i)
+void	set_pipes(t_msh *msh)
+{
+	if (pipe(msh->fd) == -1)
+		msh_end(msh, "pipe failed", 1);
+	if (msh->fd_in_previous != STDIN_FILENO)
+	{
+		dup2(msh->fd[0], msh->fd_in_previous);
+		close(msh->fd[0]);
+	}
+	dup2(msh->fd[1], STDOUT_FILENO);
+	close(msh->fd[1]);
+}
+
+void	run_command(t_msh *msh, int i)
 {
 	// need to add signal handling in the child
 	while (++i < msh->n_cmds)
 	{
-		set_fd_in(msh, i, 0);
-		set_fd_out(msh, i, -1);
-		if (i < msh->n_cmds - 1 && ((t_cmd *)msh->cmd_table[i])->n_outf == 0)
-		{
-			if (pipe(msh->fd) == -1)
-				msh_end(msh, "pipe failed", 1);
-			msh->fd_out = msh->fd[1];
-			msh->fd_in_previous = msh->fd[0];
-		}
-		else
-		{
-			if (msh->fd_in_previous != STDIN_FILENO)
-				close(msh->fd_in_previous);
-			msh->fd_in_previous = STDIN_FILENO;
-		}
+		if (i < msh->n_cmds - 1)
+			set_pipes(msh);
+		if (((t_cmd *)msh->cmd_table[i])->builtin.builtin == true && msh->n_cmds == 1)
+			msh_builtins(msh, i);
 		msh_fork(msh, msh->fd_in, msh->fd_out, i);
 		if (msh->fd_in != STDIN_FILENO)
 			close(msh->fd_in);

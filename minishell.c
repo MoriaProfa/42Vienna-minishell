@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/01 23:24:45 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/02 10:52:30 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	check_tokens(t_msh *msh);
 void	msh_tokenizer(t_msh *msh);
 void	build_cmd_table(t_msh *msh);
 void    free_cmd_table(t_cmd **cmds, int n);
-void	msh_pipeline(t_msh *msh, int i);
+void	run_command(t_msh *msh, int i);
 void	msh_pid(t_msh *msh);
 void	msh_fork(t_msh *msh, int i, int fd_in, int fd_out);
 void	msh_execute(t_msh *msh, int i);
@@ -200,7 +200,7 @@ int	main(int argc, char **argv, char **envp)
 		if (!msh.error_check)
 			msh_pid(&msh); //allocates for msh.pid
 		if (!msh.error_check)
-			msh_pipeline(&msh, -1);
+			run_command(&msh, -1);
 		msh_free(&msh);
 	}
 	msh_end(&msh, NULL, msh.status);
