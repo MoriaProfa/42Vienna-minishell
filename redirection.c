@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/02 13:20:26 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/03 00:00:42 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,10 +39,8 @@ static void	set_input(t_msh *msh, int i, int j)
 	msh->fd_in = msh->fd_in_previous;
 	if (((t_cmd *)msh->cmd_table[i])->n_hd > 0)
 	{
-		if (msh->fd_in != STDIN_FILENO)
-			close(msh->fd_in);
 		if (pipe(msh->hd_fd) == -1)
-			msh_end(msh, "pipe failed", 1);
+			msh_end(msh, "heredoc pipe failed", 1);
 		write(msh->hd_fd[1], ((t_cmd *)msh->cmd_table[i])->heredocs->buffer,
 			ft_strlen(((t_cmd *)msh->cmd_table[i])->heredocs->buffer));
 		close(msh->hd_fd[1]);
@@ -58,6 +56,11 @@ static void	set_input(t_msh *msh, int i, int j)
 					O_RDONLY);
 			if (msh->fd_in == -1)
 				perror(((t_cmd *)msh->cmd_table[i])->infiles[j]);
+			if (msh->fd_in != STDIN_FILENO)
+			{
+				dup2(msh->fd_in, STDIN_FILENO);
+				close(msh->fd_in);
+			}
 		}
 	}
 }
@@ -67,7 +70,7 @@ static void	set_output(t_msh *msh, int i, int j)
 	while (((t_cmd *)msh->cmd_table[i])->outfiles[++j].filename)
 	{
 		if (check_access_write(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename) == 0)
-			return ;
+			break ;
 		if (((t_cmd *)msh->cmd_table[i])->outfiles[j].append == false)
 			msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename,
 					O_RDWR | O_CREAT | O_TRUNC, 0644);

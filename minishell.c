@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/02 20:55:05 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/03 02:05:40 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,6 +159,8 @@ void	handle_signal(int signal)
 	}	
 }
 
+void	collect_all_heredocs(t_msh *msh, int i, int j);
+
 int	main(int argc, char **argv, char **envp)
 {
 	t_msh				msh;
@@ -194,11 +196,12 @@ int	main(int argc, char **argv, char **envp)
 			(build_cmd_table(&msh)/*, print_cmd_table(&msh)*/); //print just for testing
 		if (!msh.error_check)
 			msh_pid(&msh); //allocates for msh.pid
-		if (!msh.error_check)
-		{
-			if (((t_cmd *)msh.cmd_table[0])->builtin.builtin == true && msh.n_cmds == 1)
-			msh_builtins(&msh, 0);
-		}
+		collect_all_heredocs(&msh, -1, -1);
+		// if (!msh.error_check)
+		// {
+		// 	if (((t_cmd *)msh.cmd_table[0])->builtin.builtin == true && msh.n_cmds == 1)
+		// 	msh_builtins(&msh, 0);
+		// }
 		// if (!msh.error_check)
 		// 	run_command(&msh, -1);
 		msh_free(&msh);
