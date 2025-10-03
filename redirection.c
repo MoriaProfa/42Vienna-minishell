@@ -6,11 +6,13 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/03 00:00:42 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/03 02:27:24 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+void	collect_all_heredocs(t_msh *msh, int i, int j);
 
 static int	check_access_read(char *file)
 {
@@ -38,15 +40,8 @@ static void	set_input(t_msh *msh, int i, int j)
 {
 	msh->fd_in = msh->fd_in_previous;
 	if (((t_cmd *)msh->cmd_table[i])->n_hd > 0)
-	{
-		if (pipe(msh->hd_fd) == -1)
-			msh_end(msh, "heredoc pipe failed", 1);
-		write(msh->hd_fd[1], ((t_cmd *)msh->cmd_table[i])->heredocs->buffer,
-			ft_strlen(((t_cmd *)msh->cmd_table[i])->heredocs->buffer));
-		close(msh->hd_fd[1]);
-		msh->fd_in = msh->hd_fd[0];
-	}
-	else if (((t_cmd *)msh->cmd_table[i])->n_inf > 0)
+		collect_all_heredocs(msh, i, j);
+	if (((t_cmd *)msh->cmd_table[i])->n_inf > 0)
 	{
 		while (++j < ((t_cmd *)msh->cmd_table[i])->n_inf)
 		{
