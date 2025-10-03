@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/03 02:03:51 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/03 02:15:16 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ void	collect_one_heredoc(t_msh *msh, int i, int j)
 		((t_cmd *)msh->cmd_table[i])->heredocs[j].buffer = readline("> ");
 		if (!((t_cmd *)msh->cmd_table[i])->heredocs[j].buffer)
 			break ;
+		// add expansion -> should I tokenize the input to expand?
 		if (ft_strncmp(((t_cmd *)msh->cmd_table[i])->heredocs[j].buffer,
 				((t_cmd *)msh->cmd_table[i])->heredocs[j].delimiter,
 				ft_strlen(((t_cmd *)msh->cmd_table[i])->heredocs[j].buffer)) == 0)
