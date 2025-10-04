@@ -6,58 +6,57 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/04 05:15:05 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/04 01:46:36 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include "libft/libft.h"
+# include "libft/libft.h" 
 //<stdint.h>
 //<stdlib.h> (malloc, free, getenv)
-//<unistd.h> (write, access, read, close, fork, exit, getcwd, chdir, stat,
-// lstat, fstat, unlink, execve, dup, dup2, pipe, isatty, ttyname, ttyslot,
-// tcsetattr, tcgetattr)
+//<unistd.h> (write, access, read, close, fork, exit, getcwd, chdir, stat, 
+//lstat, fstat, unlink, execve, dup, dup2, pipe, isatty, ttyname, ttyslot, 
+//tcsetattr, tcgetattr)
 # include <curses.h>
-// tgetent, tgetflag, tgetnum, tgetstr, tgoto, tputs
+//tgetent, tgetflag, tgetnum, tgetstr, tgoto, tputs
 # include <dirent.h>
-// opendir, readdir, closedir
+//opendir, readdir, closedir
 # include <errno.h>
-// perror
+//perror
 # include <fcntl.h>
-// open
+//open
 # include <limits.h>
-// INT_MAX, INT_MIN
+//INT_MAX, INT_MIN
 # include <readline/readline.h>
-// readline, rl_clear_history, rl_on_new_line, rl_replace_line,
-// rl_redisplay, add_history
+//readline, rl_clear_history, rl_on_new_line, rl_replace_line, 
+//rl_redisplay, add_history
 # include <readline/history.h>
-// readline, rl_clear_history, rl_on_new_line, rl_replace_line,
-// rl_redisplay, add_history
+//readline, rl_clear_history, rl_on_new_line, rl_replace_line,
+//rl_redisplay, add_history
 # include <signal.h>
-// signal, sigaction, sigemptyset, sigaddset, kill
-# include <stdbool.h>
-// booleans
+//signal, sigaction, sigemptyset, sigaddset, kill
+#include <stdbool.h>
+//booleans
 # include <stdio.h>
-// printf, perror
+//printf, perror
 # include <string.h>
-// strerror
+//strerror
 # include <sys/ioctl.h>
-// ioctl
+//ioctl
 # include <sys/resource.h>
-// wait3, wait4
+//wait3, wait4
 # include <sys/stat.h>
-// stat, lstat, fstat
+//stat, lstat, fstat
 # include <sys/time.h>
-// wait3, wait4
+//wait3, wait4
 # include <sys/types.h>
-// fork, wait, waitpid, wait3, wait4, kill, stat, lstat, fstat, opendir,
-// closedir
+//fork, wait, waitpid, wait3, wait4, kill, stat, lstat, fstat, opendir, closedir
 # include <sys/wait.h>
-// wait, waitpid, wait3, wait4
+//wait, waitpid, wait3, wait4
 # include <term.h>
-// tgetent, tgetflag, tgetnum, tgetstr, tgoto, tputs
+//tgetent, tgetflag, tgetnum, tgetstr, tgoto, tputs
 # include <termios.h>
 //tcsetattr, tcgetattr
 
@@ -102,7 +101,7 @@ typedef enum e_token_type
 	T_OUT_REDIRECT,
 	T_APPEND_REDIRECT,
 	T_HEREDOC_REDIRECT
-}					t_token_type;
+}	t_token_type;
 
 typedef struct s_token
 {

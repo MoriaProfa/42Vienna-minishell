@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/04 05:15:30 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/04 05:10:43 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ void	msh_end(t_msh *msh, char *msg, int status)
 
 	msh->status = status;
 	if (msh->status != 0)
-		fd = STDERR_FILENO;
+		fd = 2;
 	else
 		fd = 1;
 	if (msg)
