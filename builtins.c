@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/02 20:59:09 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/04 19:52:23 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void	msh_free(t_msh *msh);
 int	msh_pwd(t_msh *msh)
 {
 	char	*pwd;
-
+ 
 	pwd = getcwd(NULL, 0);
 	if (!pwd)
 		return (msh->status);

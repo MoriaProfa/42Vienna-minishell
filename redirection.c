@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/03 02:27:24 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/04 21:57:58 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,9 @@ static int	check_access_write(char *file)
 
 static void	set_input(t_msh *msh, int i, int j)
 {
-	msh->fd_in = msh->fd_in_previous;
+	// fd_in_previous, or fd_in, or hd_fd[0]
 	if (((t_cmd *)msh->cmd_table[i])->n_hd > 0)
-		collect_all_heredocs(msh, i, j);
+		collect_all_heredocs(msh, i, j); 
 	if (((t_cmd *)msh->cmd_table[i])->n_inf > 0)
 	{
 		while (++j < ((t_cmd *)msh->cmd_table[i])->n_inf)

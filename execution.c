@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/02 20:55:33 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/04 22:30:26 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,18 +65,6 @@ void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
 		msh_end(msh, "fork failed", 1);
 	if (msh->pid[i] == 0)
 	{
-		set_redirections(msh, i);
-		close_fds(msh, fd_in, fd_out);
-		if (fd_in != STDIN_FILENO)
-		{
-			dup2(fd_in, STDIN_FILENO);
-			close(fd_in);
-		}
-		if (fd_out != STDOUT_FILENO)
-		{
-			dup2(fd_out, STDOUT_FILENO);
-			close(fd_out);
-		}
 		if (((t_cmd *)msh->cmd_table[i])->builtin.builtin == false)
 			msh_execute(msh, i);
 		else
@@ -107,9 +95,11 @@ void	run_command(t_msh *msh, int i)
 	{
 		if (i < msh->n_cmds - 1)
 			set_pipes(msh);
-		if (((t_cmd *)msh->cmd_table[i])->builtin.builtin == true && msh->n_cmds == 1)
+		set_redirections(msh, i);
+		if (msh->n_cmds == 1 && ((t_cmd *)msh->cmd_table[i])->builtin.builtin == true)
 			msh_builtins(msh, i);
-		msh_fork(msh, msh->fd_in, msh->fd_out, i);
+		else
+			msh_fork(msh, msh->fd_in, msh->fd_out, i);
 		if (msh->fd_in != STDIN_FILENO)
 			close(msh->fd_in);
 		if (msh->fd_out != STDOUT_FILENO)

@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/03 02:42:29 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/04 22:49:52 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,14 +16,13 @@ void	collect_one_heredoc(t_msh *msh, int i, int j)
 {
 	if (pipe(msh->hd_fd) == -1)
 		msh_end(msh, "heredoc pipe failed", 1);
-	printf("fd[0] = %d fd[1] = %d\n", msh->hd_fd[0], msh->hd_fd[1]);
 	while (1)
 	{
 		((t_cmd *)msh->cmd_table[i])->heredocs[j].buffer = readline("> ");
 		if (!((t_cmd *)msh->cmd_table[i])->heredocs[j].buffer)
 			break ;
-		if (((t_cmd *)msh->cmd_table[i])->heredocs[j].expand == true)
-			printf("ATTENTION to expansion!\n"); // add expansion -> should I tokenize the input to expand?
+		// if (((t_cmd *)msh->cmd_table[i])->heredocs[j].expand == true)
+		// 	printf("ATTENTION to expansion!\n"); // add expansion -> should I tokenize the input to expand?
 		if (ft_strlen(((t_cmd *)msh->cmd_table[i])->heredocs[j].buffer) == ft_strlen(((t_cmd *)msh->cmd_table[i])->heredocs[j].delimiter)
 			&& ft_strncmp(((t_cmd *)msh->cmd_table[i])->heredocs[j].buffer,
 				((t_cmd *)msh->cmd_table[i])->heredocs[j].delimiter,
