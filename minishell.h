@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/02 20:35:24 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/04 01:46:36 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,12 @@
 //tgetent, tgetflag, tgetnum, tgetstr, tgoto, tputs
 # include <termios.h>
 //tcsetattr, tcgetattr
+
+typedef struct s_env_var
+{
+	char	*name;
+	char	*value;
+}			t_env_var;
 
 typedef enum e_builtin_type
 {
@@ -142,10 +148,11 @@ typedef struct s_msh
 	bool			error_check;
 	char			*in_str;
 	char			*cpy_in_str;
+	t_list			*env_vars;
+	char			**envp;
 	t_list			*tokens;
 	t_cmd			**cmd_table;
 	int				n_cmds;
-	char			**envp;
 	int				status;
 	pid_t			*pid;
 	int				fd[2];

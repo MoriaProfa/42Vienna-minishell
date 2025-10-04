@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenizer.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/01 23:23:30 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/04 05:02:53 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,10 @@ void	free_token(void *content)
 	t_token	*cur_token;
 
 	cur_token = (t_token *)content;
-	free(cur_token->value);
+	if (!cur_token)
+		return ;
+	if (cur_token->value)
+		free(cur_token->value);
 	free(cur_token);
 }
 
