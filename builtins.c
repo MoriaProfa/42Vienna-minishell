@@ -3,25 +3,26 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/22 20:10:38 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/04 05:26:19 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	envp_free(t_msh *msh);
+void	ft_printenv(t_list *env_vars);
+void    build_envp_array(t_msh *msh);
 void	msh_free(t_msh *msh);
 
-int	msh_pwd(t_msh *msh)
+int	msh_pwd(t_msh *msh)//maybe this also needs to set the value of PWD to OLDPWD first?
 {
 	char	*pwd;
 
 	pwd = getcwd(NULL, 0);
 	if (!pwd)
-		return (msh->status);
+		return (msh->status);//where is this return value catched? what should it do?
 	ft_putendl_fd(pwd, msh->fd_out);
 	free(pwd);
 	return (0);
@@ -29,7 +30,7 @@ int	msh_pwd(t_msh *msh)
 
 int	msh_cd(t_msh *msh, int i)
 {
-	//struct stat	stats;
+	// struct stat	stats;
 	size_t	len;
 
 	if (((t_cmd *)msh->cmd_table[i])->args[2])
@@ -37,6 +38,7 @@ int	msh_cd(t_msh *msh, int i)
 	len = ft_strlen(((t_cmd *)msh->cmd_table[i])->args[1]);
 	if (!((t_cmd *)msh->cmd_table[i])->args[1])
 		msh->status = chdir("/home/edarmaev/");
+	(void)len;
 	/*stat(((t_cmd *)msh->cmd_table[i])->args[1], &stats);
 	//	msh_end(msh, "cd: stat failed");
 	if (!S_ISDIR(stats.st_mode))
@@ -50,21 +52,14 @@ int	msh_cd(t_msh *msh, int i)
 	return (msh->status);
 }
 
-void	msh_exit(t_msh *msh, char *msg)
-{
-	ft_putendl_fd(msg, STDOUT_FILENO);
-	envp_free(msh);
-	msh_free(msh);
-	rl_clear_history();
-	exit(0);
-}
-
+/* //probably not needed as ft_printenv does exactly what msh_env should do
 int	msh_env(t_msh *msh)
 {
 	(void)msh;
 	printf("env\n");
 	return (0);
 }
+*/
 
 int	msh_export(t_msh *msh)
 {
@@ -96,20 +91,21 @@ void	msh_builtins(t_msh *msh, int i)
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_CD)
 	{
 		msh_cd(msh, i);
+		build_envp_array(msh);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_EXIT)
-		msh_exit(msh, "exit");
+		msh_end(msh, "exit", 0);
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_ENV)
-	{
-		msh_env(msh);
-	}
+		ft_printenv(msh->env_vars);
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_EXPORT)
 	{
 		msh_export(msh);
+		build_envp_array(msh);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_UNSET)
 	{
 		msh_unset(msh);
+		build_envp_array(msh);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_ECHO)
 	{

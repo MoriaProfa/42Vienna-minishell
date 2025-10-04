@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 20:48:16 by astehl            #+#    #+#             */
-/*   Updated: 2025/08/27 22:58:07 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/01 21:42:28 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,9 @@ void	handle_quotationmark_error(t_msh *msh, char quotationmark)
 
 	str[0] = quotationmark;
 	str[1] = '\0';
-	ft_putstr_fd("minishell: unexpected EOF while looking for matching `", 2);
+	ft_putstr_fd("unexpected EOF while looking for matching `", 2);
 	(ft_putstr_fd(str, 2), ft_putendl_fd("'", 2));
-	msh_error(msh, "minishell: syntax error: unexpected end of file");
+	msh_error(msh, "syntax error: unexpected end of file", 2);
 }
 
 void	check_quotationmarks(t_msh *msh)
@@ -46,35 +46,43 @@ void	check_quotationmarks(t_msh *msh)
 		handle_quotationmark_error(msh, quotationmark);
 }
 
+void	check_middle_tokens(t_msh *msh)
+{
+	t_list	*cur_node;
+	t_token	*cur_token;
+	t_token	*next_token;
+
+	cur_node = msh->tokens;
+	while (!msh->error_check && cur_node && cur_node->next)
+	{
+		cur_token = cur_node->content;
+		next_token = cur_node->next->content;
+		if (cur_token->type != T_WORD && cur_token->type != T_PIPE
+			&& next_token->type != T_WORD)
+		{
+			ft_putstr_fd("syntax error near unexpected token `", 2);
+			(ft_putstr_fd(next_token->value, 2), ft_putendl_fd("'", 2));
+			msh_error(msh, NULL, 2);
+		}
+		cur_node = cur_node->next;
+	}
+}
+
 void	check_tokens(t_msh *msh)
 {
-	t_list	*token_list;
-	t_token *current_token;
-	//t_token *next_token;
+	t_list	*cur_node;
 	t_token	*first_token;
 	t_token	*last_token;
 
-	token_list = msh->tokens;
-	current_token = token_list->content;
-	first_token = current_token;
-	last_token = ft_lstlast(token_list)->content;
+	cur_node = msh->tokens;
+	first_token = cur_node->content;
+	last_token = ft_lstlast(cur_node)->content;
 	if (first_token->type == T_PIPE)
-		msh_error(msh, "minishell: syntax error near unexpected token `|'");
-	//if (last_token->type == T_PIPE)
-		//bash opens an input line
-		//if ctrl+c is pressed it gives the prompt back without error msg 
-		//but if ctrl+D is pressed it exits with error message "bash: syntax error: unexpected end of file" and in next line "exit"
-	if ((first_token->type != T_WORD && first_token->type != T_PIPE) || 
-		(last_token->type != T_WORD && last_token->type != T_PIPE))
-		msh_error(msh, "minishell: syntax error near unexpected token `newline'");
-	/*while (token_list->next && !msh->error_check)
-	{
-		current_token = token_list->content;
-		next_token = token_list->next->content;
-		if (current_token->type != T_WORD && next_token->type != T_WORD)
-		{
-			msh_error(msh, "minishell: syntax error near unexpected token `");
-			(ft_putstr_fd(current_token->value, 2), ft_putendl_fd("'", 2));
-		}
-	}*/
+		msh_error(msh, "syntax error near unexpected token `|'", 2);
+	check_middle_tokens(msh);
+	if (!msh->error_check && last_token->type == T_PIPE)
+		msh_error(msh, "syntax error: unexpected end of file", 2);
+	if (!msh->error_check && last_token->type != T_WORD
+		&& last_token->type != T_PIPE)
+		msh_error(msh, "syntax error near unexpected token `newline'", 2);
 }

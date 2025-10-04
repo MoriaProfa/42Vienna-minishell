@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com>   +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/06 17:06:37 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/04/23 18:08:02 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/09/23 05:32:09 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ static char	**ft_fillarray(size_t counter, size_t len, char **arr, char *copy)
 		arr[j] = (char *)malloc(sizeof(char) * (ft_strlen(&copy[i]) + 1));
 		if (arr[j] == NULL)
 		{
-			ft_array_free(arr);
+			ft_array_free(arr, ft_array_size(arr));
 			return (free(copy), NULL);
 		}
 		while (copy[i] != '\0')

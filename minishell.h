@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/22 18:36:35 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/04 05:15:05 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,10 +59,17 @@
 # include <term.h>
 // tgetent, tgetflag, tgetnum, tgetstr, tgoto, tputs
 # include <termios.h>
-// tcsetattr, tcgetattr
+//tcsetattr, tcgetattr
+
+typedef struct s_env_var
+{
+	char	*name;
+	char	*value;
+}			t_env_var;
 
 typedef enum e_builtin_type
 {
+	B_NOT_BUILTIN,
 	B_PWD,
 	B_CD,
 	B_EXIT,
@@ -70,7 +77,6 @@ typedef enum e_builtin_type
 	B_EXPORT,
 	B_UNSET,
 	B_ECHO,
-	B_NOT_BUILTIN,
 }					t_builtin_type;
 
 typedef struct s_builtin
@@ -79,8 +85,17 @@ typedef struct s_builtin
 	t_builtin_type	type;
 }					t_builtin;
 
+typedef enum e_quote_type
+{
+	Q_NONE,
+	Q_SINGLE,
+	Q_DOUBLE,
+	Q_MIXED
+}	t_quote_type;
+
 typedef enum e_token_type
 {
+	T_NONE,
 	T_WORD,
 	T_PIPE,
 	T_IN_REDIRECT,
@@ -93,34 +108,40 @@ typedef struct s_token
 {
 	char			*value;
 	t_token_type	type;
-	int				quoted;
+	t_quote_type	quoted;
 	bool			is_adjacent;
 }					t_token;
 
-typedef struct s_heredoc
-{
-	char			*delimeter;
-	char			*buffer;
-	bool			quoted;
-}					t_heredoc;
-
 typedef struct s_outfile
 {
-	char			*filename;
-	bool			append;
-}					t_outfile;
+	char	*filename;
+	bool	append;// true if >>
+}			t_outfile;
+
+typedef struct s_heredoc
+{
+	char	*delimiter;
+	char	*buffer;
+	bool	expand;// true if delimiter is unquoted = expansion happens in buffer
+}			t_heredoc;
 
 typedef struct s_cmd
 {
-	char			**args;
+	char			**args;//command + args
+	int				n_args;// amount of args
+	int				capacity_args;// capacity of **args
 	t_builtin		builtin;
-	char			*infile;
-	char			*outfile;
-	bool			append;
-	t_heredoc		*heredoc;
-	int				argc;
-	int				args_capacity;
-	char			*pathname;
+	char			**infiles;// list of <
+	int				n_inf;// amount of infiles
+	int				capacity_inf;// capacity of **infiles
+	t_outfile		*outfiles;// list of > or >>
+	int				n_outf;// amount of outfiles
+	int				capacity_outf;// capacity of *outfiles
+	t_heredoc		*heredocs;// list of <<
+	int				n_hd;//amount of heredocs
+	int				capacity_hd;//capacity of *heredocs
+	t_token_type	last_input;//infile or heredoc
+	char			*pathname;//pathname to an executable
 }					t_cmd;
 
 typedef struct s_msh
@@ -128,10 +149,11 @@ typedef struct s_msh
 	bool			error_check;
 	char			*in_str;
 	char			*cpy_in_str;
+	t_list			*env_vars;
+	char			**envp;
 	t_list			*tokens;
 	t_cmd			**cmd_table;
 	int				n_cmds;
-	char			**envp;
 	int				status;
 	pid_t			*pid;
 	int				fd[2];
@@ -141,7 +163,11 @@ typedef struct s_msh
 	int				hd_fd[2];
 }					t_msh;
 
-void				msh_end(t_msh *msh, char *msg);
-void				msh_error(t_msh *msh, char *msg);
+void	free_token(void *content);
+void	msh_end(t_msh *msh, char *msg, int status);
+void	msh_error(t_msh *msh, char *msg, int status);
+
+// redirection.c
+void	set_redirections(t_msh *msh, int i);
 
 #endif

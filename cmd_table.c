@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_table.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/09/22 19:36:47 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/04 05:17:41 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char		*create_cmd_pathname(t_msh *msh, char *cmd);
+void	heredoc_collector(t_msh *msh, t_cmd **cmds);
 
 // just for testing purposes
 void	print_cmd_table(t_msh *msh)
@@ -29,46 +29,77 @@ void	print_cmd_table(t_msh *msh)
 	{
 		cmd = msh->cmd_table[i];
 		printf("Command %i:\n", i);
-		printf("\targs: ");
+		printf("\targs (%i): ", cmd->n_args);
 		j = 0;
-		while (cmd->args[j] && j < cmd->argc)
+		while (cmd->args[j] && j < cmd->n_args)
 			printf("[%s] ", cmd->args[j++]);
 		printf("\n\tBuiltin args[0]: %d\n", cmd->builtin.builtin);
-		if (cmd->infile)
-			printf("\tinfile: %s\n", cmd->infile);
-		if (cmd->outfile)
-			printf("\toutfile: %s (append = %d)\n", cmd->outfile, cmd->append);
-		if (cmd->heredoc->delimeter)
-			printf("\theredoc: %s\n", cmd->heredoc->delimeter);
+		if (cmd->infiles)
+		{
+			j = 0;
+			printf("\tinfiles (%i): ", cmd->n_inf);
+			while (cmd->infiles[j] && j < cmd->n_inf)
+				printf("[%s] ", cmd->infiles[j++]);
+			printf("\n");
+		}
+		if (cmd->outfiles)
+		{
+			j = -1;
+			printf("\toutfiles (%i): ", cmd->n_outf);
+			while (cmd->outfiles[++j].filename && j < cmd->n_outf)
+				printf("[%s (append = %d)] ", cmd->outfiles[j].filename,
+					cmd->outfiles[j].append);
+			printf("\n");
+		}
+		if (cmd->heredocs)
+		{
+			j = -1;
+			printf("\theredocs (%i): ", cmd->n_hd);
+			while (cmd->heredocs[++j].delimiter && j < cmd->n_hd)
+				printf("[%s (expand = %d)] ", cmd->heredocs[j].delimiter,
+					cmd->heredocs[j].expand);
+			printf("\n");
+		}
+		printf("\tlast_input: %i\n", cmd->last_input);
+		// 0 if T_NONE, 3 if T_IN_REDIRECT, 6 if T_HEREDOC_REDIRECT
 		if (cmd->pathname)
 			printf("\tpathname: %s\n", cmd->pathname);
 		i++;
 	}
 }
 
+void	free_single_cmd_structs_data(t_cmd *cmd)
+{
+	int	j;
+
+	j = -1;
+	while (cmd->outfiles && ++j < cmd->n_outf)
+		free(cmd->outfiles[j].filename);
+	j = -1;
+	while (cmd->heredocs && ++j < cmd->n_hd)
+	{
+		free(cmd->heredocs[j].delimiter);
+		if (cmd->heredocs[j].buffer)
+			free(cmd->heredocs[j].buffer);
+	}
+}
+
 void	free_cmd_table(t_cmd **cmds, int n)
 {
 	int	i;
-	int	j;
 
 	i = -1;
 	if (!cmds)
 		return ;
 	while (cmds[++i] && i < n)
 	{
-		j = -1;
-		while (cmds[i]->args[++j] && j < cmds[i]->argc)
-			free(cmds[i]->args[j]);
-		if (cmds[i]->args)
-			free(cmds[i]->args);
-		if (cmds[i]->infile)
-			free(cmds[i]->infile);
-		if (cmds[i]->outfile)
-			free(cmds[i]->outfile);
-		/*if (cmds[i]->heredoc->delimeter)
-			free(cmds[i]->heredoc->delimeter);
-		if (cmds[i]->heredoc->buffer)
-			free(cmds[i]->heredoc->buffer);*/
+		ft_array_free(cmds[i]->args, (size_t)cmds[i]->n_args);
+		ft_array_free(cmds[i]->infiles, (size_t)cmds[i]->n_inf);
+		free_single_cmd_structs_data(cmds[i]);
+		if (cmds[i]->outfiles)
+			free(cmds[i]->outfiles);
+		if (cmds[i]->heredocs)
+			free(cmds[i]->heredocs);
 		if (cmds[i]->pathname)
 			free(cmds[i]->pathname);
 		free(cmds[i]);
@@ -76,23 +107,11 @@ void	free_cmd_table(t_cmd **cmds, int n)
 	free(cmds);
 }
 
-void	*grow_array(void *old, int old_capacity, int new_capacity, size_t size)
-{
-	void	*new;
-
-	new = ft_calloc(new_capacity, size);
-	if (!new)
-		return (NULL); // maybe msh_end
-	ft_memcpy(new, old, old_capacity * size);
-	free(old);
-	return (new);
-}
-
 t_builtin	builtin_check(char *s)
 {
 	t_builtin	builtin;
-	char		*builtin_list[8];
-	int			i;
+	char	*builtin_list[8];
+	int		i;
 
 	builtin.builtin = false;
 	builtin.type = B_NOT_BUILTIN;
@@ -111,138 +130,233 @@ t_builtin	builtin_check(char *s)
 				builtin_list[i], ft_strlen(s)))
 		{
 			builtin.builtin = true;
-			builtin.type = i;
+			builtin.type = i + 1;
 		}
 	}
 	return (builtin);
 }
 
-t_cmd	*init_cmd(void)
+t_cmd	*init_cmd(t_msh *msh)
 {
 	t_cmd	*cmd;
 
 	cmd = ft_calloc(1, sizeof(t_cmd));
 	if (!cmd)
-		return (NULL); // maybe msh_end
-	cmd->args_capacity = 4;
-	cmd->args = ft_calloc(cmd->args_capacity, sizeof(char *));
+		msh_end(msh, "malloc for cmd failed", 1);
+	cmd->capacity_args = 4;
+	cmd->args = ft_calloc(cmd->capacity_args, sizeof(char *));
 	if (!cmd->args)
-	{
-		free(cmd);
-		return (NULL); // maybe msh_end
-	}
-	cmd->argc = 0;
-	cmd->pathname = NULL;
+		msh_end(msh, "malloc for cmd->args failed", 1);
+	cmd->capacity_inf = 4;
+	cmd->infiles = ft_calloc(cmd->capacity_inf, sizeof(char *));
+	if (!cmd->infiles)
+		msh_end(msh, "malloc for cmd->infiles failed", 1);
+	cmd->capacity_outf = 4;
+	cmd->outfiles = ft_calloc(cmd->capacity_outf, sizeof(t_outfile));
+	if (!cmd->outfiles)
+		msh_end(msh, "malloc for cmd->outfiles failed", 1);
+	cmd->capacity_hd = 4;
+	cmd->heredocs = ft_calloc(cmd->capacity_hd, sizeof(t_heredoc));
+	if (!cmd->heredocs)
+		msh_end(msh, "malloc for cmd->heredocs failed", 1);
+	cmd->last_input = T_NONE;
 	return (cmd);
 }
 
-int	add_cmd(t_cmd **cmds, int count, t_msh *msh)
+void	*grow_array(void *old_array, int old_capacity, int new_capacity,
+		size_t size)
 {
-	cmds[count] = init_cmd();
-	if (!cmds[count])
-	{
-		free_cmd_table(msh->cmd_table, count);
-		perror("cmd calloc");
-		return (0); // maybe msh_end
-	}
-	return (1);
+	void	*new_array;
+
+	new_array = ft_calloc(new_capacity, size);
+	if (!new_array)
+		return (NULL);
+	ft_memcpy(new_array, old_array, old_capacity * size);
+	free(old_array);
+	return (new_array);
 }
 
-void	add_to_cmd_args(t_cmd *cmd, char *word)
+bool	ensure_capacity(void **array, int *count, int *capacity, size_t size)
 {
-	int	new_capacity;
+	int		new_capacity;
+	void	*new_array;
 
-	if (cmd->argc + 1 >= cmd->args_capacity)
+	if (*count + 1 >= *capacity)
 	{
-		new_capacity = cmd->args_capacity * 2;
-		cmd->args = grow_array(cmd->args, cmd->args_capacity, new_capacity,
-				sizeof(char *));
-		cmd->args_capacity = new_capacity;
+		new_capacity = (*capacity) * 2;
+		new_array = grow_array(*array, *capacity, new_capacity, size);
+		if (!new_array)
+			return (false);
+		*array = new_array;
+		*capacity = new_capacity;
 	}
-	cmd->args[cmd->argc++] = ft_strdup(word);
-	cmd->args[cmd->argc] = NULL;
+	return (true);
 }
 
-char	*get_next_word_token(t_list **tokens)
+void	cmd_arrays_capacity_check(t_cmd *cmd, t_msh *msh)
 {
-	char	*value;
+	if (!ensure_capacity((void **)&cmd->args, &cmd->n_args, &cmd->capacity_args,
+			sizeof(char *)))
+		msh_end(msh, "cmd args array capacity increase malloc failed", 1);
+	if (!ensure_capacity((void **)&cmd->infiles, &cmd->n_inf,
+			&cmd->capacity_inf, sizeof(char *)))
+		msh_end(msh, "cmd infiles array capacity increase malloc failed", 1);
+	if (!ensure_capacity((void **)&cmd->outfiles, &cmd->n_outf,
+			&cmd->capacity_outf, sizeof(t_outfile)))
+		msh_end(msh, "cmd outfiles array capacity increase malloc failed", 1);
+	if (!ensure_capacity((void **)&cmd->heredocs, &cmd->n_hd, &cmd->capacity_hd,
+			sizeof(t_heredoc)))
+		msh_end(msh, "cmd heredocs array capacity increase malloc failed", 1);
+}
+
+t_token	*get_next_token(t_list **tokens)
+{
+	t_token	*token;
 
 	if ((*tokens)->next
 		&& ((t_token *)(*tokens)->next->content)->type == T_WORD)
 	{
 		*tokens = (*tokens)->next;
-		value = ft_strdup(((t_token *)(*tokens)->content)->value); // malloc check missing... if !value = msh_end?
-		return (value);
+		token = (t_token *)(*tokens)->content;
+		return (token);
 	}
 	return (NULL);
 }
 
-void	parse_single_cmd_tokens(t_cmd *cmd, t_list **token_list)
+void	parse_heredoc_token(t_cmd *cmd, t_token *word_token, char *word)
+{
+	if (word_token->quoted == Q_NONE)
+		cmd->heredocs[cmd->n_hd].expand = 1;
+	cmd->heredocs[cmd->n_hd++].delimiter = word;
+	cmd->last_input = T_HEREDOC_REDIRECT;
+}
+
+void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens,
+		t_msh *msh)
+{
+	t_token	*word_token;
+	char	*word;
+
+	word_token = get_next_token(tokens);
+	if (!word_token)
+		return ;
+	word = ft_strdup(word_token->value);
+	if (!word)
+		msh_end(msh, "word_token->value ft_strdup malloc failed", 1);
+	if (token->type == T_IN_REDIRECT)
+	{
+		cmd->infiles[cmd->n_inf++] = word;
+		cmd->last_input = T_IN_REDIRECT;
+	}
+	else if (token->type == T_OUT_REDIRECT)
+		cmd->outfiles[cmd->n_outf++].filename = word;
+	else if (token->type == T_APPEND_REDIRECT)
+	{
+		cmd->outfiles[cmd->n_outf].filename = word;
+		cmd->outfiles[cmd->n_outf++].append = true;
+	}
+	else if (token->type == T_HEREDOC_REDIRECT)
+		parse_heredoc_token(cmd, word_token, word);
+}
+
+void	parse_single_cmd_tokens(t_cmd *cmd, t_list **tokens, t_msh *msh)
 {
 	t_token	*token;
 
-	while (*token_list && ((t_token *)(*token_list)->content)->type != T_PIPE)
+	while (*tokens && ((t_token *)(*tokens)->content)->type != T_PIPE)
 	{
-		token = (*token_list)->content;
+		cmd_arrays_capacity_check(cmd, msh);
+		token = (*tokens)->content;
 		if (token->type == T_WORD)
-			add_to_cmd_args(cmd, token->value);
-		else if (token->type == T_IN_REDIRECT)
-			cmd->infile = get_next_word_token(token_list);
-		else if (token->type == T_OUT_REDIRECT)
-			cmd->outfile = get_next_word_token(token_list);
-		else if (token->type == T_APPEND_REDIRECT)
 		{
-			cmd->outfile = get_next_word_token(token_list);
-			cmd->append = true;
+			cmd->args[cmd->n_args] = ft_strdup(token->value);
+			if (!cmd->args[cmd->n_args++])
+				msh_end(msh, "cmd args ft_strdup malloc failed", 1);
 		}
-		else if (token->type == T_HEREDOC_REDIRECT)
-		{
-			cmd->heredoc->delimeter = get_next_word_token(token_list);
-			cmd->heredoc->buffer = NULL;
-		}
-		*token_list = (*token_list)->next;
+		else
+			parse_redirection_token(cmd, token, tokens, msh);
+		*tokens = (*tokens)->next;
 	}
-	if ((*token_list) && ((t_token *)(*token_list)->content)->type == T_PIPE)
-		*token_list = (*token_list)->next;
-	cmd->builtin = builtin_check(cmd->args[0]);
+	if ((*tokens) && ((t_token *)(*tokens)->content)->type == T_PIPE)
+		*tokens = (*tokens)->next;
+	if (cmd->args && cmd->args[0])
+		cmd->builtin = builtin_check(cmd->args[0]);
 }
 
-t_cmd	**ensure_cmd_capacity(t_cmd **cmds, int *capacity, int count)
+char	*resolve_cmd_pathname(t_msh *msh, char **paths, char *cmd)
 {
-	int	new_capacity;
+	char	*pathname;
+	char	*tmp;
+	int		j;
 
-	if (count < *capacity)
-		return (cmds);
-	new_capacity = (*capacity) * 2;
-	cmds = grow_array(cmds, *capacity, new_capacity, sizeof(t_cmd *));
-	*capacity = new_capacity;
-	return (cmds);
+	j = -1;
+	pathname = NULL;
+	while (paths[++j])
+	{
+		tmp = ft_strjoin(paths[j], "/");
+		if (!tmp)
+			msh_end(msh, "pathname tmp ft_strjoin malloc failed", 1);
+		pathname = ft_strjoin(tmp, cmd);
+		free(tmp);
+		if (!pathname)
+			msh_end(msh, "pathname ft_strjoin malloc failed", 1);
+		if (access(pathname, F_OK) == 0)
+			return (pathname);
+		free(pathname);
+	}
+	return (NULL);
+}
+
+char	*create_cmd_pathname(t_msh *msh, char *cmd)
+{
+	char	**paths;
+	char	*pathname;
+	int		j;
+
+	j = 0;
+	pathname = NULL;
+	if (access(cmd, F_OK) == 0)
+	{
+		pathname = ft_strdup(cmd);
+		if (!pathname)
+			msh_end(msh, "pathname ft_strdup malloc failed", 1);
+		return (pathname);
+	}
+	while (msh->envp[j] && ft_strncmp(msh->envp[j], "PATH=", 5) != 0)
+		j++;
+	if (msh->envp[j])
+	{
+		paths = ft_split(msh->envp[j] + 5, ':');
+		if (!paths)
+			msh_end(msh, "paths ft_split malloc failed", 1);
+		pathname = resolve_cmd_pathname(msh, paths, cmd);
+		ft_array_free(paths, ft_array_size(paths));
+	}
+	return (pathname);
 }
 
 void	build_cmd_table(t_msh *msh)
 {
 	int		capacity;
-	int		count;
 	t_cmd	**cmds;
-	t_list	*token_list;
+	t_list	*tokens;
 
 	capacity = 4;
-	count = 0;
 	cmds = ft_calloc(capacity, sizeof(t_cmd *));
 	if (!cmds)
-		msh_end(msh, "cmd table malloc failed");
-	token_list = msh->tokens;
-	while (token_list)
+		msh_end(msh, "cmd table malloc failed", 1);
+	tokens = msh->tokens;
+	while (tokens)
 	{
-		cmds = ensure_cmd_capacity(cmds, &capacity, count);
-		if (!add_cmd(cmds, count, msh))
-			return ; // maybe msh_end?
-		parse_single_cmd_tokens(cmds[count], &token_list);
-		cmds[count]->pathname = create_cmd_pathname(msh, cmds[count]->args[0]); // cmds[count]->args[0]->value -->array of struct containing value = string + information about quotationmarks
-		count++;
+		if (!ensure_capacity((void **)&cmds, &msh->n_cmds, &capacity,
+				sizeof(t_cmd *)))
+			msh_end(msh, "cmd table array capacity increase malloc failed", 1);
+		cmds[msh->n_cmds] = init_cmd(msh);
+		parse_single_cmd_tokens(cmds[msh->n_cmds], &tokens, msh);
+		if (cmds[msh->n_cmds]->args[0])
+			cmds[msh->n_cmds]->pathname = create_cmd_pathname(msh,
+					cmds[msh->n_cmds]->args[0]);
+		msh->n_cmds++;
 	}
-	cmds = ensure_cmd_capacity(cmds, &capacity, count);
-	cmds[count] = NULL;
 	msh->cmd_table = cmds;
-	msh->n_cmds = count;
 }
