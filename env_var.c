@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 21:20:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/04 03:16:55 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/05 02:07:41 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ void	ft_printenv(t_list *env_vars)
 	}
 }
 
-void	fill_env_vars_list(t_msh *msh, const char *name, const char *value)
+void	add_to_env_vars(t_msh *msh, const char *name, const char *value)
 {
 	t_list	    *cur_node;
     t_env_var	*cur_env_var;
@@ -51,13 +51,13 @@ void	fill_env_vars_list(t_msh *msh, const char *name, const char *value)
 		msh_end(msh, "env: cur_env_var malloc failed", 1);
 	cur_env_var->name = ft_strdup(name);
     if (!cur_env_var->name)
-		msh_end(msh, "env: name malloc failed", 1);
+		msh_end(msh, "env: name strdup malloc failed", 1);
    	cur_env_var->value = ft_strdup(value);
 	if (!cur_env_var->value)
-		msh_end(msh, "env: value malloc failed", 1);
+		msh_end(msh, "env: value strdup malloc failed", 1);
 	cur_node = ft_lstnew(cur_env_var);
 	if (!cur_node)
-		msh_end(msh, "env: node malloc failed", 1);
+		msh_end(msh, "env: new node malloc failed", 1);
 	ft_lstadd_back(&msh->env_vars, cur_node);
 }
 
@@ -65,40 +65,61 @@ void    create_env(t_msh *msh)
 {
     char    *cwd;
     
-    fill_env_vars_list(msh, "SHLVL", "1");
+    add_to_env_vars(msh, "SHLVL", "1");
     cwd = getcwd(NULL, 0);
     if (!cwd)
         cwd = ft_strdup("/");
-    fill_env_vars_list(msh, "PWD", cwd);
+    add_to_env_vars(msh, "PWD", cwd);
     free(cwd);
-    fill_env_vars_list(msh, "OLDPWD", "");
+    add_to_env_vars(msh, "OLDPWD", "");
 }
 
-void	init_env_vars(t_msh *msh, char **envp, size_t len)
+char    *get_env_value(char *str, size_t name_len)
 {
-	char    *name;
     char    *value;
-    int     i;
-    int     j;
+    size_t  str_len;
 
+    str_len = ft_strlen(str);
+    if (name_len < str_len)
+        value = ft_substr(str, name_len, str_len - name_len);
+    else
+        value = ft_strdup("");
+    return (value);
+}
+
+char    *get_env_name(char *str, size_t *name_len)
+{
+    int     i;
+
+    i = -1;
+    while (str && str[++i] != '=')
+        (*name_len)++;
+    return (ft_substr(str, 0, *name_len));
+}
+
+void	init_env_vars(t_msh *msh, char **envp)
+{
+    char    *name;
+    char    *value;
+    size_t  name_len;
+    int     i;
+    
     if (!envp || !envp[0])
         create_env(msh);
-    i = -1;
-    while (envp[++i])
+    else
     {
-        j = -1;
-        len = 0;
-        while (envp[i] && envp[i][++j] != '=')
-            len++;
-        name = ft_substr(envp[i], 0, len);
-        if (!name)
-            msh_end(msh, "env: name init malloc failed", 1);
-        if (++len < ft_strlen(envp[i]))
-            value = ft_substr(envp[i], len, ft_strlen(envp[i]) - len);
-        else
-            value = ft_strdup("");
-        if (!value)
-            (free(name), msh_end(msh, "env: value init malloc failed", 1));
-        (fill_env_vars_list(msh, name, value), free(name), free(value));
+        i = -1;
+        while (envp[++i])
+        {
+            name_len = 0;
+            name = get_env_name(envp[i], &name_len);
+            if (!name)
+                msh_end(msh, "env: name init malloc failed", 1);
+            value = get_env_value(envp[i], name_len + 1);
+            if (!value)
+                (free(name), msh_end(msh, "env: value init malloc failed", 1));
+            (add_to_env_vars(msh, name, value), free(name), free(value));
+        }
+        //check if there are SHLVL, PWD and OLDPWD -> if not, add them manually
     }
 }

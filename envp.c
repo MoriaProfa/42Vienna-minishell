@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 02:39:40 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/04 05:02:07 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/05 02:15:33 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ void    build_envp_array(t_msh *msh)
         msh_end(msh, "(re)building envp array malloc failed", 1);
     cur_node = msh->env_vars;
     i = -1;
-	while (++i <= size && cur_node)
+	while (++i < size && cur_node)
 	{
 		cur_env_var = (t_env_var *)(cur_node->content);
 		if (cur_env_var && cur_env_var->name && cur_env_var->value)
