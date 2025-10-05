@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/03 02:39:59 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/05 00:07:16 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,6 +131,7 @@ typedef struct s_cmd
 	int				n_outf;// amount of outfiles
 	int				capacity_outf;// capacity of *outfiles
 	t_heredoc		*heredocs;// list of <<
+	int				hd_fd;
 	int				n_hd;//amount of heredocs
 	int				capacity_hd;//capacity of *heredocs
 	t_token_type	last_input;//infile or heredoc
@@ -152,7 +153,7 @@ typedef struct s_msh
 	int				fd_in_previous;
 	int				fd_in;
 	int				fd_out;
-	int				hd_fd[2];
+	int				fd_heredoc;
 }					t_msh;
 
 void	free_token(void *content);

@@ -6,13 +6,11 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/04 21:57:58 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/05 13:40:09 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-void	collect_all_heredocs(t_msh *msh, int i, int j);
 
 static int	check_access_read(char *file)
 {
@@ -36,31 +34,22 @@ static int	check_access_write(char *file)
 		return (1);
 }
 
-static void	set_input(t_msh *msh, int i, int j)
+static void	set_infile(t_msh *msh, int i, int j)
 {
-	// fd_in_previous, or fd_in, or hd_fd[0]
-	if (((t_cmd *)msh->cmd_table[i])->n_hd > 0)
-		collect_all_heredocs(msh, i, j); 
-	if (((t_cmd *)msh->cmd_table[i])->n_inf > 0)
+	while (((t_cmd *)msh->cmd_table[i])->infiles[++j])
 	{
-		while (++j < ((t_cmd *)msh->cmd_table[i])->n_inf)
-		{
-			if (check_access_read(((t_cmd *)msh->cmd_table[i])->infiles[j]) == 0)
-				return ;
-			msh->fd_in = open(((t_cmd *)msh->cmd_table[i])->infiles[j],
-					O_RDONLY);
-			if (msh->fd_in == -1)
-				perror(((t_cmd *)msh->cmd_table[i])->infiles[j]);
-			if (msh->fd_in != STDIN_FILENO)
-			{
-				dup2(msh->fd_in, STDIN_FILENO);
-				close(msh->fd_in);
-			}
-		}
+		if (msh->fd_in != STDIN_FILENO)
+			close(msh->fd_in);
+		if (check_access_read(((t_cmd *)msh->cmd_table[i])->infiles[j]) == 0)
+			return ;
+		msh->fd_in = open(((t_cmd *)msh->cmd_table[i])->infiles[j],
+				O_RDONLY);
+		if (msh->fd_in == -1)
+			perror(((t_cmd *)msh->cmd_table[i])->infiles[j]);
 	}
 }
 
-static void	set_output(t_msh *msh, int i, int j)
+static void	set_outfile(t_msh *msh, int i, int j)
 {
 	while (((t_cmd *)msh->cmd_table[i])->outfiles[++j].filename)
 	{
@@ -84,7 +73,18 @@ static void	set_output(t_msh *msh, int i, int j)
 
 void	set_redirections(t_msh *msh, int i)
 {
-	set_input(msh, i, -1);
-	set_output(msh, i, -1);
-	
+	set_infile(msh, i, -1);
+	set_outfile(msh, i, -1);
+	if (((t_cmd *)msh->cmd_table[i])->n_inf == 0 && ((t_cmd *)msh->cmd_table[i])->n_hd == 0)
+		dup2(msh->fd_in_previous, STDIN_FILENO);
+	else if (((t_cmd *)msh->cmd_table[i])->last_input == T_IN_REDIRECT)
+		dup2(msh->fd_in, STDIN_FILENO);
+	else if (((t_cmd *)msh->cmd_table[i])->last_input == T_HEREDOC_REDIRECT)
+		dup2(((t_cmd *)msh->cmd_table[i])->hd_fd, STDIN_FILENO);
+	if (msh->fd_in_previous != STDIN_FILENO)
+		close(msh->fd_in_previous);
+	if (msh->fd_in != -1)
+		close(msh->fd_in);
+	if (((t_cmd *)msh->cmd_table[i])->hd_fd != -1)
+		close(((t_cmd *)msh->cmd_table[i])->hd_fd);
 }

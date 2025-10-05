@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/04 22:30:26 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/05 12:18:25 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,8 @@ void	close_fds(t_msh *msh, int fd1, int fd2)
 
 void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
 {
+	(void)fd_in;
+	(void)fd_out;
 	msh->pid[i] = fork();
 	if (msh->pid[i] == -1)
 		msh_end(msh, "fork failed", 1);
@@ -81,8 +83,8 @@ void	set_pipes(t_msh *msh)
 		msh_end(msh, "pipe failed", 1);
 	if (msh->fd_in_previous != STDIN_FILENO)
 	{
-		dup2(msh->fd[0], msh->fd_in_previous);
-		close(msh->fd[0]);
+		close(msh->fd_in_previous);
+		msh->fd_in_previous = msh->fd[0];
 	}
 	dup2(msh->fd[1], STDOUT_FILENO);
 	close(msh->fd[1]);

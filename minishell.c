@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/03 02:05:40 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/05 11:11:03 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	run_command(t_msh *msh, int i);
 void	msh_pid(t_msh *msh);
 void	msh_fork(t_msh *msh, int i, int fd_in, int fd_out);
 void	msh_execute(t_msh *msh, int i);
-void	msh_builtins(t_msh *msh, int i);
+void	collect_all_heredocs(t_msh *msh, int i, int j);
 
 volatile sig_atomic_t   g_signal_flag = 0;
 
@@ -146,8 +146,7 @@ void	msh_initialize(t_msh *msh)
 	msh->fd_out = STDOUT_FILENO;
 	msh->fd[0] = -1;
 	msh->fd[1] = -1;
-	msh->hd_fd[0] = -1;
-	msh->hd_fd[1] = -1;
+	msh->fd_heredoc = -1;
 }
 
 void	handle_signal(int signal)
@@ -158,8 +157,6 @@ void	handle_signal(int signal)
 		return_prompt();
 	}	
 }
-
-void	collect_all_heredocs(t_msh *msh, int i, int j);
 
 int	main(int argc, char **argv, char **envp)
 {
@@ -196,14 +193,10 @@ int	main(int argc, char **argv, char **envp)
 			(build_cmd_table(&msh)/*, print_cmd_table(&msh)*/); //print just for testing
 		if (!msh.error_check)
 			msh_pid(&msh); //allocates for msh.pid
-		collect_all_heredocs(&msh, -1, -1);
-		// if (!msh.error_check)
-		// {
-		// 	if (((t_cmd *)msh.cmd_table[0])->builtin.builtin == true && msh.n_cmds == 1)
-		// 	msh_builtins(&msh, 0);
-		// }
-		// if (!msh.error_check)
-		// 	run_command(&msh, -1);
+		if (!msh.error_check)
+			collect_all_heredocs(&msh, -1, -1);
+		if (!msh.error_check)
+			run_command(&msh, -1);
 		msh_free(&msh);
 	}
 	msh_end(&msh, NULL, msh.status);
