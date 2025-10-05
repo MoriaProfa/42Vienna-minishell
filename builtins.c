@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/05 23:52:18 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/06 00:09:00 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,8 +168,8 @@ void	handle_export_wo_args(t_msh *msh)
 
 void	print_export_error(t_msh *msh, char *str)
 {
-	ft_putstr_fd("export: `", 2);
-	ft_putstr_fd(str, 2);
+	ft_putstr_fd("export: `", STDERR_FILENO);
+	ft_putstr_fd(str, STDERR_FILENO);
 	msh_print(msh, "': not a valid identifier", 1);
 }
 

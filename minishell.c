@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/05 23:25:38 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/06 00:16:23 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,9 +42,9 @@ void	msh_print(t_msh *msh, char *msg, int status)
 
 	msh->status = status;
 	if (msh->status != 0)
-		fd = 2;
+		fd = STDERR_FILENO;
 	else
-		fd = 1;
+		fd = STDOUT_FILENO;
 	if (msg)
 		ft_putendl_fd(msg, fd);
 	if (msh->status != 0)
@@ -70,9 +70,9 @@ void	msh_exit(t_msh *msh, char *msg, int status)
 
 	msh->status = status;
 	if (msh->status != 0)
-		fd = 2;
+		fd = STDERR_FILENO;
 	else
-		fd = 1;
+		fd = STDOUT_FILENO;
 	if (msg)
 		ft_putendl_fd(msg, fd);
 	ft_lstclear(&msh->env_vars, free_env_var);
@@ -150,7 +150,7 @@ int	main(int argc, char **argv, char **envp)
 	t_msh				msh;
 	
 	if (argc > 1)
-		return (ft_putendl_fd("No arguments accepted.", 2), 1);
+		return (ft_putendl_fd("No arguments accepted.", STDERR_FILENO), 1);
 	(void)argv;
 	signal(SIGINT, handle_signal);
 	signal(SIGQUIT, SIG_IGN);
