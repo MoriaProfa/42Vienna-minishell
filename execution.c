@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/05 12:18:25 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/05 23:45:36 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	msh_pid(t_msh *msh)
 	i = -1;
 	msh->pid = (pid_t *)ft_calloc(msh->n_cmds + 1, sizeof(pid_t));
 	if (!msh->pid)
-		msh_end(msh, "pid malloc error", 1);
+		msh_exit(msh, "pid malloc error", 1);
 	while (++i < msh->n_cmds)
 		msh->pid[i] = -1;
 }
@@ -31,19 +31,19 @@ void	msh_execute(t_msh *msh, int i)
 	if (!((t_cmd *)msh->cmd_table[i])->pathname)
 	{
 		msh->status = 127;
-		msh_end(msh, "command not found", 1);
+		msh_exit(msh, "command not found", 1);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->pathname
 		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == -1)
 	{
 		msh->status = 126;
-		msh_end(msh, "permission denied", 1);
+		msh_exit(msh, "permission denied", 1);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->pathname
 		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == 0)
 		execve(((t_cmd *)msh->cmd_table[i])->pathname,
 			((t_cmd *)msh->cmd_table[i])->args, msh->envp);
-	msh_end(msh, "execve failed", 1);
+	msh_exit(msh, "execve failed", 1);
 }
 
 void	close_fds(t_msh *msh, int fd1, int fd2)
@@ -64,7 +64,7 @@ void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
 	(void)fd_out;
 	msh->pid[i] = fork();
 	if (msh->pid[i] == -1)
-		msh_end(msh, "fork failed", 1);
+		msh_exit(msh, "fork failed", 1);
 	if (msh->pid[i] == 0)
 	{
 		if (((t_cmd *)msh->cmd_table[i])->builtin.builtin == false)
@@ -80,7 +80,7 @@ void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
 void	set_pipes(t_msh *msh)
 {
 	if (pipe(msh->fd) == -1)
-		msh_end(msh, "pipe failed", 1);
+		msh_exit(msh, "pipe failed", 1);
 	if (msh->fd_in_previous != STDIN_FILENO)
 	{
 		close(msh->fd_in_previous);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenizer.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/01 23:23:30 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/05 23:25:38 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,10 @@ void	free_token(void *content)
 	t_token	*cur_token;
 
 	cur_token = (t_token *)content;
-	free(cur_token->value);
+	if (!cur_token)
+		return ;
+	if (cur_token->value)
+		free(cur_token->value);
 	free(cur_token);
 }
 
@@ -52,16 +55,16 @@ void	fill_token_list(t_msh *msh, const char *value, t_token_type type,
 
 	cur_token = ft_calloc(1, sizeof(t_token));
 	if (!cur_token)
-		msh_end(msh, "tokenizer: token malloc failed", 1);
+		msh_exit(msh, "tokenizer: token malloc failed", 1);
 	cur_token->value = ft_strdup(value);
 	if (!cur_token->value)
-		msh_end(msh, "tokenizer: value malloc failed", 1);
+		msh_exit(msh, "tokenizer: value malloc failed", 1);
 	cur_token->type = type;
 	cur_token->quoted = quoted_adjacent[0];
 	cur_token->is_adjacent = quoted_adjacent[1];
 	cur_node = ft_lstnew(cur_token);
 	if (!cur_node)
-		msh_end(msh, "tokenizer: node malloc failed", 1);
+		msh_exit(msh, "tokenizer: node malloc failed", 1);
 	ft_lstadd_back(&msh->tokens, cur_node);
 }
 
@@ -170,7 +173,7 @@ char	*create_word_token(t_msh *msh)
 		start = handle_unquoted(msh, &len);
 	word = ft_calloc(len + 1, sizeof(char));
 	if (!word)
-		msh_end(msh, "tokenizer: word malloc failed", 1);
+		msh_exit(msh, "tokenizer: word malloc failed", 1);
 	ft_memcpy(word, start, len);
 	word[len] = '\0';
 	return (word);
@@ -244,7 +247,7 @@ void	join_token_content(t_token *previous, t_token *current, t_msh *msh)
 
 	joined = ft_strjoin(previous->value, current->value);
 	if (!joined)
-		msh_end(msh, "token value merging ft_strjoin malloc failed", 1);
+		msh_exit(msh, "token value merging ft_strjoin malloc failed", 1);
 	free(previous->value);
 	previous->value = joined;
 	previous->quoted = merge_quote_types(previous->quoted, current->quoted);

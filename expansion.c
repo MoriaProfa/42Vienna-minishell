@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 16:29:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/01 20:23:47 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/05 23:25:38 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,17 +17,17 @@ static void	add_to_result(char *tmp, char **result, size_t *i, t_msh *msh)
 	char	*new_result;
 
 	if (!tmp)
-		msh_end(msh, "expander: tmp substr/itoa malloc failed", 1);
+		msh_exit(msh, "expander: tmp substr/itoa malloc failed", 1);
 	new_result = ft_strjoin(*result, tmp);
 	free(*result);
 	free(tmp);
 	if (!new_result)
-		msh_end(msh, "expander: new_result strjoin malloc failed", 1);
+		msh_exit(msh, "expander: new_result strjoin malloc failed", 1);
 	*result = new_result;
 	(*i)++;
 }
 
-static void	ft_getenv(char *var_name, size_t len, char ***result, t_msh *msh)
+static void	exp_getenv(char *var_name, size_t len, char ***result, t_msh *msh)
 {
 	char	*env_value;
 	size_t	j;
@@ -51,12 +51,12 @@ static void	ft_getenv(char *var_name, size_t len, char ***result, t_msh *msh)
 		tmp = ft_strjoin(**result, env_value);
 		free(**result);
 		if (!tmp)
-			msh_end(msh, "expander: env_value join malloc failed", 1);
+			msh_exit(msh, "expander: env_value join malloc failed", 1);
 		**result = tmp;
 	}
 }
 
-static void	get_env_var_value(char *value, char **result, size_t *i, t_msh *msh)
+static void	exp_getenv_value(char *value, char **result, size_t *i, t_msh *msh)
 {
 	size_t	var_len;
 	size_t	start;
@@ -73,9 +73,9 @@ static void	get_env_var_value(char *value, char **result, size_t *i, t_msh *msh)
 	if (!var_name)
 	{
 		free(*result);
-		msh_end(msh, "expander: var_name substr malloc failed", 1);
+		msh_exit(msh, "expander: var_name substr malloc failed", 1);
 	}
-	ft_getenv(var_name, ft_strlen(var_name), &result, msh);
+	exp_getenv(var_name, ft_strlen(var_name), &result, msh);
 }
 
 char	*expand_value(char *value, char *result, t_msh *msh)
@@ -95,7 +95,7 @@ char	*expand_value(char *value, char *result, t_msh *msh)
 			else if (ft_isalpha(value[i + 1]) || value[i + 1] == '_')
 			{
 				i++;
-				get_env_var_value(value, &result, &i, msh);
+				exp_getenv_value(value, &result, &i, msh);
 			}
 			else
 				add_to_result(ft_substr(value, i, 1), &result, &i, msh);
@@ -121,7 +121,7 @@ void	expand_word_tokens(t_list *tokens, t_msh *msh)
 		{
 			result = ft_strdup("");
 			if (!result)
-				msh_end(msh, "expander: result init malloc failed", 1);
+				msh_exit(msh, "expander: result init malloc failed", 1);
 			result = expand_value(cur_token->value, result, msh);
 			free(cur_token->value);
 			cur_token->value = result;

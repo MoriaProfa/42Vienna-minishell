@@ -6,13 +6,15 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/04 19:52:23 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/05 23:42:24 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	envp_free(t_msh *msh);
+void	ft_printenv(t_list *env_vars);
+void	add_to_env_vars(t_msh *msh, const char *name, const char *value);
+void    build_envp_array(t_msh *msh);
 void	msh_free(t_msh *msh);
 
 int	msh_pwd(t_msh *msh)
@@ -21,13 +23,13 @@ int	msh_pwd(t_msh *msh)
  
 	pwd = getcwd(NULL, 0);
 	if (!pwd)
-		return (msh->status);
+		return (msh->status);//where is this return value catched? what should it do?
 	ft_putendl_fd(pwd, msh->fd_out);
 	free(pwd);
 	return (0);
 }
 
-int	msh_cd(t_msh *msh, int i)
+int	msh_cd(t_msh *msh, int i) //also needs to change the value in OLDPWD to what has been the value of PWD before
 {
 	// struct stat	stats;
 	size_t	len;
@@ -39,7 +41,7 @@ int	msh_cd(t_msh *msh, int i)
 		msh->status = chdir("/home/edarmaev/");
 	(void)len;
 	/*stat(((t_cmd *)msh->cmd_table[i])->args[1], &stats);
-	//	msh_end(msh, "cd: stat failed");
+	//	msh_exit(msh, "cd: stat failed");
 	if (!S_ISDIR(stats.st_mode))
 		printf("cd: %s: not a directory\n", array[1]);
 	if (stats.st_mode & F_OK)
@@ -51,18 +53,165 @@ int	msh_cd(t_msh *msh, int i)
 	return (msh->status);
 }
 
-int	msh_env(t_msh *msh)
+void    populate_names_array(t_msh *msh, char **names_array, size_t size)
 {
-	(void)msh;
-	printf("env\n");
-	return (0);
+    t_list	    *cur_node;
+	t_env_var	*cur_env_var;
+    size_t      i;
+
+    cur_node = msh->env_vars;
+    i = 0;
+	while (i < size && cur_node)
+	{
+		cur_env_var = (t_env_var *)(cur_node->content);
+		if (cur_env_var && cur_env_var->name)
+        {
+			names_array[i] = ft_strdup(cur_env_var->name);
+			if (!names_array[i])
+			{
+				ft_array_free(names_array, i);
+            	msh_exit(msh, "env names array strdup malloc failed", 1);
+			}
+//			printf("names_array[%li] = %s\n", i, names_array[i]);//for testing
+			i++;
+		}
+		cur_node = cur_node->next;
+	}
+	names_array[size] = NULL;
 }
 
-int	msh_export(t_msh *msh)
+size_t	get_max_size(char *str1, char *str2)
 {
-	(void)msh;
-	printf("export\n");
-	return (0);
+	size_t	len1;
+	size_t	len2;
+
+	len1 = ft_strlen(str1);
+	len2 = ft_strlen(str2);
+	if (len1 > len2)
+		return (len1);
+	return (len2);
+}
+
+void	sort_names_array(char **array, size_t size)
+{
+	char	*tmp;
+	size_t	i;
+	size_t	max_size;
+	bool	swapped;
+
+	if (!array || size < 2)
+		return ;
+	swapped = true;
+	while (swapped)
+	{
+		swapped = false;
+		i = 0;
+		while (i + 1 < size && array[i] && array[i + 1])
+		{
+			max_size = get_max_size(array[i], array[i + 1]);
+			if (ft_strncmp(array[i], array[i + 1], max_size) > 0)
+			{
+				tmp = array[i];
+				array[i] = array[i + 1];
+				array[i + 1] = tmp;
+				swapped = true;
+			}
+			i++;
+		}
+	}
+}
+
+void	print_env_var(t_msh *msh, char *name)
+{
+	t_list	    *cur_node;
+	t_env_var	*cur_env_var;
+	size_t		max_size;
+
+	cur_node = msh->env_vars;
+	while (cur_node)
+	{
+		cur_env_var = (t_env_var *)(cur_node->content);
+		if (cur_env_var && cur_env_var->name)
+		{
+			max_size = get_max_size(name, cur_env_var->name);
+			if (!ft_strncmp(name, cur_env_var->name, max_size))
+			{
+				if (cur_env_var->value && ft_strlen(cur_env_var->value))
+					printf("declare -x %s=\"%s\"\n", cur_env_var->name, 
+						cur_env_var->value);
+				else
+					printf("declare -x %s\n", cur_env_var->name);
+				return ;
+			}
+		}
+		cur_node = cur_node->next;
+	}
+}
+
+void	handle_export_wo_args(t_msh *msh)
+{
+	char		**names_array;
+	size_t		size;
+	int			i;
+
+	size = ft_lstsize(msh->env_vars);
+    names_array = ft_calloc(size + 1, sizeof(char *));
+    if (!names_array)
+	    msh_exit(msh, "env names array init malloc failed", 1);
+	populate_names_array(msh, names_array, size);
+	sort_names_array(names_array, size);
+	i = -1;
+	while (names_array[++i])
+		print_env_var(msh, names_array[i]);
+	ft_array_free(names_array, size);
+}
+
+void	print_export_error(t_msh *msh, char *str)
+{
+	ft_putstr_fd("export: `", 2);
+	ft_putstr_fd(str, 2);
+	msh_print(msh, "': not a valid identifier", 1);
+}
+
+bool	check_name_validity(t_msh *msh, char *str)
+{
+	int	i;
+
+	i = 0;
+	if (!ft_isalpha(str[0]) && str[0] != '_')
+	{
+		print_export_error(msh, str);
+		return (false);
+	}
+	while (str[++i] && str[i] != '=')
+	{
+		if (!ft_isalnum(str[i]) && str[i] != '_')
+		{
+			print_export_error(msh, str);
+			return (false);
+		}
+	}
+	return (true);
+}
+
+void	msh_export(t_msh *msh, char **args)
+{
+//	char	*name;
+//	char	*value;
+//	size_t	name_len;
+	int		i;
+
+	if (!args[1])
+	{
+		handle_export_wo_args(msh);
+		return ;
+	}
+	i = 0;
+	while (args[++i])
+	{
+		if (!check_name_validity(msh, args[i]) || !ft_strchr(args[i], '='))
+			continue ;
+	}
 }
 
 int	msh_unset(t_msh *msh)
@@ -72,40 +221,39 @@ int	msh_unset(t_msh *msh)
 	return (0);
 }
 
-int	msh_echo(t_msh *msh)
+void	msh_echo(t_msh *msh, char **args)
 {
-	(void)msh;
-	printf("echo\n");
-	return (0);
+	int	i;
+
+	i = 0;
+	while (args[++i])
+		msh_print(msh, args[i], 0);
 }
 
 void	msh_builtins(t_msh *msh, int i)
 {
 	if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_PWD)
-	{
 		msh_pwd(msh);
-	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_CD)
 	{
 		msh_cd(msh, i);
+		build_envp_array(msh);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_EXIT)
-		msh_end(msh, "exit", 0);
+		msh_exit(msh, "exit", 0);//if there are more entries in the args-array than just "exit" it should print an error (only cares for args[1], args[1+] are ignored) and change msh->status to 2 before ending
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_ENV)
-	{
-		msh_env(msh);
-	}
+		ft_printenv(msh->env_vars);
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_EXPORT)
 	{
-		msh_export(msh);
+		msh_export(msh, msh->cmd_table[i]->args);
+		build_envp_array(msh);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_UNSET)
 	{
 		msh_unset(msh);
+		build_envp_array(msh);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_ECHO)
-	{
-		msh_echo(msh);
-	}
+		msh_echo(msh, msh->cmd_table[i]->args);
 	return ;
 }

@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/05 00:07:16 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/05 23:43:32 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,12 @@
 //tgetent, tgetflag, tgetnum, tgetstr, tgoto, tputs
 # include <termios.h>
 //tcsetattr, tcgetattr
+
+typedef struct s_env_var
+{
+	char	*name;
+	char	*value;
+}			t_env_var;
 
 typedef enum e_builtin_type
 {
@@ -143,10 +149,11 @@ typedef struct s_msh
 	bool			error_check;
 	char			*in_str;
 	char			*cpy_in_str;
+	t_list			*env_vars;
+	char			**envp;
 	t_list			*tokens;
 	t_cmd			**cmd_table;
 	int				n_cmds;
-	char			**envp;
 	int				status;
 	pid_t			*pid;
 	int				fd[2];
@@ -157,8 +164,8 @@ typedef struct s_msh
 }					t_msh;
 
 void	free_token(void *content);
-void	msh_end(t_msh *msh, char *msg, int status);
-void	msh_error(t_msh *msh, char *msg, int status);
+void	msh_exit(t_msh *msh, char *msg, int status);
+void	msh_print(t_msh *msh, char *msg, int status);
 
 // redirection.c
 void	set_redirections(t_msh *msh, int i);
