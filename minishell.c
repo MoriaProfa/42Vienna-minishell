@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/04 14:51:42 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/05 23:25:38 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void    free_envp(t_msh *msh);
 
 volatile sig_atomic_t   g_signal_flag;
 
-void	msh_error(t_msh *msh, char *msg, int status)
+void	msh_print(t_msh *msh, char *msg, int status)
 {
 	int	fd;
 
@@ -47,7 +47,8 @@ void	msh_error(t_msh *msh, char *msg, int status)
 		fd = 1;
 	if (msg)
 		ft_putendl_fd(msg, fd);
-	msh->error_check = true;
+	if (msh->status != 0)
+		msh->error_check = true;
 }
 
 void	msh_free(t_msh *msh)
@@ -63,7 +64,7 @@ void	msh_free(t_msh *msh)
 	msh->pid = NULL;
 }
 
-void	msh_end(t_msh *msh, char *msg, int status)
+void	msh_exit(t_msh *msh, char *msg, int status)
 {
 	int	fd;
 
@@ -160,7 +161,7 @@ int	main(int argc, char **argv, char **envp)
 	{
 		msh.in_str = readline("minishell> ");
 		if (!msh.in_str) //by pressing CTRL+D
-			break ;//msh_end(&msh, "exit", 0);//didnt work as intended for not yet known reason?!
+			break ;//msh_exit(&msh, "exit", 0);//didnt work as intended for not yet known reason?!
 		add_history(msh.in_str); //original bash doesnt add it when its starting with a whitespace
 		if (g_signal_flag)
 		{
@@ -183,13 +184,13 @@ int	main(int argc, char **argv, char **envp)
 			msh_pid(&msh); //allocates for msh.pid
 		if (!msh.error_check)
 		{
-			if (((t_cmd *)msh.cmd_table[0])->builtin.builtin == true && msh.n_cmds == 1)
+			if (((t_cmd *)msh.cmd_table[0])->builtin.builtin == true && msh.n_cmds == 1)//why only if n_cmds is 1?
 			msh_builtins(&msh, 0);
 		}
 		// if (!msh.error_check)
 		// 	run_command(&msh, -1);
 		msh_free(&msh);
 	}
-	msh_end(&msh, NULL, msh.status);
+	msh_exit(&msh, NULL, msh.status);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/05 03:34:23 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/05 23:25:49 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ int	msh_cd(t_msh *msh, int i) //also needs to change the value in OLDPWD to what
 		msh->status = chdir("/home/edarmaev/");
 	(void)len;
 	/*stat(((t_cmd *)msh->cmd_table[i])->args[1], &stats);
-	//	msh_end(msh, "cd: stat failed");
+	//	msh_exit(msh, "cd: stat failed");
 	if (!S_ISDIR(stats.st_mode))
 		printf("cd: %s: not a directory\n", array[1]);
 	if (stats.st_mode & F_OK)
@@ -70,7 +70,7 @@ void    populate_names_array(t_msh *msh, char **names_array, size_t size)
 			if (!names_array[i])
 			{
 				ft_array_free(names_array, i);
-            	msh_end(msh, "env names array strdup malloc failed", 1);
+            	msh_exit(msh, "env names array strdup malloc failed", 1);
 			}
 //			printf("names_array[%li] = %s\n", i, names_array[i]);//for testing
 			i++;
@@ -157,7 +157,7 @@ void	handle_export_wo_args(t_msh *msh)
 	size = ft_lstsize(msh->env_vars);
     names_array = ft_calloc(size + 1, sizeof(char *));
     if (!names_array)
-	    msh_end(msh, "env names array init malloc failed", 1);
+	    msh_exit(msh, "env names array init malloc failed", 1);
 	populate_names_array(msh, names_array, size);
 	sort_names_array(names_array, size);
 	i = -1;
@@ -166,19 +166,52 @@ void	handle_export_wo_args(t_msh *msh)
 	ft_array_free(names_array, size);
 }
 
+void	print_export_error(t_msh *msh, char *str)
+{
+	ft_putstr_fd("export: `", 2);
+	ft_putstr_fd(str, 2);
+	msh_print(msh, "': not a valid identifier", 1);
+}
+
+bool	check_name_validity(t_msh *msh, char *str)
+{
+	int	i;
+
+	i = 0;
+	if (!ft_isalpha(str[0]) && str[0] != '_')
+	{
+		print_export_error(msh, str);
+		return (false);
+	}
+	while (str[++i] && str[i] != '=')
+	{
+		if (!ft_isalnum(str[i]) && str[i] != '_')
+		{
+			print_export_error(msh, str);
+			return (false);
+		}
+	}
+	return (true);
+}
+
 void	msh_export(t_msh *msh, char **args)
 {
 //	char	*name;
 //	char	*value;
 //	size_t	name_len;
-//	int		i;
+	int		i;
 
 	if (!args[1])
 	{
 		handle_export_wo_args(msh);
 		return ;
 	}
-//	i = 1;//or 0 if we do ++i in beginning instead of i++ in end
+	i = 0;
+	while (args[++i])
+	{
+		if (!check_name_validity(msh, args[i]) || !ft_strchr(args[i], '='))
+			continue ;
+	}
 }
 
 int	msh_unset(t_msh *msh)
@@ -188,11 +221,13 @@ int	msh_unset(t_msh *msh)
 	return (0);
 }
 
-int	msh_echo(t_msh *msh)
+void	msh_echo(t_msh *msh, char **args)
 {
-	(void)msh;
-	printf("echo\n");
-	return (0);
+	int	i;
+
+	i = 0;
+	while (args[++i])
+		msh_print(msh, args[i], 0);
 }
 
 void	msh_builtins(t_msh *msh, int i)
@@ -205,7 +240,7 @@ void	msh_builtins(t_msh *msh, int i)
 		build_envp_array(msh);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_EXIT)
-		msh_end(msh, "exit", 0);//if there are more entries in the args-array than just "exit" it should print an error (only cares for args[1], args[1+] are ignored) and change msh->status to 2 before ending
+		msh_exit(msh, "exit", 0);//if there are more entries in the args-array than just "exit" it should print an error (only cares for args[1], args[1+] are ignored) and change msh->status to 2 before ending
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_ENV)
 		ft_printenv(msh->env_vars);
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_EXPORT)
@@ -219,6 +254,6 @@ void	msh_builtins(t_msh *msh, int i)
 		build_envp_array(msh);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_ECHO)
-		msh_echo(msh);
+		msh_echo(msh, msh->cmd_table[i]->args);
 	return ;
 }

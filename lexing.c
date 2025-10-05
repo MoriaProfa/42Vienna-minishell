@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 20:48:16 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/01 21:42:28 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/05 23:26:36 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	handle_quotationmark_error(t_msh *msh, char quotationmark)
 	str[1] = '\0';
 	ft_putstr_fd("unexpected EOF while looking for matching `", 2);
 	(ft_putstr_fd(str, 2), ft_putendl_fd("'", 2));
-	msh_error(msh, "syntax error: unexpected end of file", 2);
+	msh_print(msh, "syntax error: unexpected end of file", 2);
 }
 
 void	check_quotationmarks(t_msh *msh)
@@ -62,7 +62,7 @@ void	check_middle_tokens(t_msh *msh)
 		{
 			ft_putstr_fd("syntax error near unexpected token `", 2);
 			(ft_putstr_fd(next_token->value, 2), ft_putendl_fd("'", 2));
-			msh_error(msh, NULL, 2);
+			msh_print(msh, NULL, 2);
 		}
 		cur_node = cur_node->next;
 	}
@@ -78,11 +78,11 @@ void	check_tokens(t_msh *msh)
 	first_token = cur_node->content;
 	last_token = ft_lstlast(cur_node)->content;
 	if (first_token->type == T_PIPE)
-		msh_error(msh, "syntax error near unexpected token `|'", 2);
+		msh_print(msh, "syntax error near unexpected token `|'", 2);
 	check_middle_tokens(msh);
 	if (!msh->error_check && last_token->type == T_PIPE)
-		msh_error(msh, "syntax error: unexpected end of file", 2);
+		msh_print(msh, "syntax error: unexpected end of file", 2);
 	if (!msh->error_check && last_token->type != T_WORD
 		&& last_token->type != T_PIPE)
-		msh_error(msh, "syntax error near unexpected token `newline'", 2);
+		msh_print(msh, "syntax error near unexpected token `newline'", 2);
 }

@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 21:20:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/05 02:07:41 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/05 23:25:38 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,16 +48,16 @@ void	add_to_env_vars(t_msh *msh, const char *name, const char *value)
 
 	cur_env_var = ft_calloc(1, sizeof(t_env_var));
 	if (!cur_env_var)
-		msh_end(msh, "env: cur_env_var malloc failed", 1);
+		msh_exit(msh, "env: cur_env_var malloc failed", 1);
 	cur_env_var->name = ft_strdup(name);
     if (!cur_env_var->name)
-		msh_end(msh, "env: name strdup malloc failed", 1);
+		msh_exit(msh, "env: name strdup malloc failed", 1);
    	cur_env_var->value = ft_strdup(value);
 	if (!cur_env_var->value)
-		msh_end(msh, "env: value strdup malloc failed", 1);
+		msh_exit(msh, "env: value strdup malloc failed", 1);
 	cur_node = ft_lstnew(cur_env_var);
 	if (!cur_node)
-		msh_end(msh, "env: new node malloc failed", 1);
+		msh_exit(msh, "env: new node malloc failed", 1);
 	ft_lstadd_back(&msh->env_vars, cur_node);
 }
 
@@ -114,10 +114,10 @@ void	init_env_vars(t_msh *msh, char **envp)
             name_len = 0;
             name = get_env_name(envp[i], &name_len);
             if (!name)
-                msh_end(msh, "env: name init malloc failed", 1);
+                msh_exit(msh, "env: name init malloc failed", 1);
             value = get_env_value(envp[i], name_len + 1);
             if (!value)
-                (free(name), msh_end(msh, "env: value init malloc failed", 1));
+                (free(name), msh_exit(msh, "env: value init malloc failed", 1));
             (add_to_env_vars(msh, name, value), free(name), free(value));
         }
         //check if there are SHLVL, PWD and OLDPWD -> if not, add them manually
