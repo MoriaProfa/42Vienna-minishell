@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/05 23:25:49 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/05 23:52:18 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -227,7 +227,13 @@ void	msh_echo(t_msh *msh, char **args)
 
 	i = 0;
 	while (args[++i])
-		msh_print(msh, args[i], 0);
+	{
+		if (i != 1)
+			ft_putchar_fd(' ', msh->fd_out);
+		ft_putstr_fd(args[i], msh->fd_out);
+		msh->status = 0;
+	}
+	ft_putchar_fd('\n', msh->fd_out);
 }
 
 void	msh_builtins(t_msh *msh, int i)
