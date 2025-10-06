@@ -6,20 +6,21 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/06 15:15:44 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/06 19:39:01 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 void	ft_printenv(t_list *env_vars);
-char    *get_env_name(char *str, size_t *name_len);
-char    *get_env_value(char *str, size_t name_len);
+char	*get_env_name(char *str, size_t *name_len);
+char	*get_env_value(char *str, size_t name_len);
 void	add_to_env_vars(t_msh *msh, const char *name, const char *value);
-void    build_envp_array(t_msh *msh);
+void	build_envp_array(t_msh *msh);
+void	free_env_var(void *content);
 void	msh_free(t_msh *msh);
 
-int	msh_pwd(t_msh *msh)//if !pwd, get value of PWD in env_var, if there is no PWD too, write error msg
+int	msh_pwd(t_msh *msh) // if !pwd, get value of PWD in env_var, if there is no PWD too, write error msg
 {
 	char	*pwd;
  
@@ -31,10 +32,11 @@ int	msh_pwd(t_msh *msh)//if !pwd, get value of PWD in env_var, if there is no PW
 	return (0);
 }
 
-int	msh_cd(t_msh *msh, int i) //also needs to change the value in OLDPWD to what has been the value of PWD before
+int	msh_cd(t_msh *msh, int i) // also needs to change the value in OLDPWD to
+// what has been the value of PWD before
 {
 	// struct stat	stats;
-	size_t	len;
+	size_t len;
 
 	if (((t_cmd *)msh->cmd_table[i])->args[2])
 		return (printf("%s\n", "cd: too many arguments"), 1);
@@ -55,24 +57,24 @@ int	msh_cd(t_msh *msh, int i) //also needs to change the value in OLDPWD to what
 	return (msh->status);
 }
 
-void    populate_names_array(t_msh *msh, char **names_array, size_t size)
+void	populate_names_array(t_msh *msh, char **names_array, size_t size)
 {
-    t_list	    *cur_node;
+	t_list		*cur_node;
 	t_env_var	*cur_env_var;
-    size_t      i;
+	size_t		i;
 
-    cur_node = msh->env_vars;
-    i = 0;
+	cur_node = msh->env_vars;
+	i = 0;
 	while (i < size && cur_node)
 	{
 		cur_env_var = (t_env_var *)(cur_node->content);
 		if (cur_env_var && cur_env_var->name)
-        {
+		{
 			names_array[i] = ft_strdup(cur_env_var->name);
 			if (!names_array[i])
 			{
 				ft_array_free(names_array, i);
-            	msh_exit(msh, "env names array strdup malloc failed", 1);
+				msh_exit(msh, "env names array strdup malloc failed", 1);
 			}
 //			printf("names_array[%li] = %s\n", i, names_array[i]);//for testing
 			i++;
@@ -125,7 +127,7 @@ void	sort_names_array(char **array, size_t size)
 
 void	print_env_var(t_msh *msh, char *name)
 {
-	t_list	    *cur_node;
+	t_list		*cur_node;
 	t_env_var	*cur_env_var;
 	size_t		max_size;
 
@@ -139,7 +141,7 @@ void	print_env_var(t_msh *msh, char *name)
 			if (!ft_strncmp(name, cur_env_var->name, max_size))
 			{
 				if (cur_env_var->value && ft_strlen(cur_env_var->value))
-					printf("declare -x %s=\"%s\"\n", cur_env_var->name, 
+					printf("declare -x %s=\"%s\"\n", cur_env_var->name,
 						cur_env_var->value);
 				else
 					printf("declare -x %s\n", cur_env_var->name);
@@ -152,14 +154,14 @@ void	print_env_var(t_msh *msh, char *name)
 
 void	handle_export_wo_args(t_msh *msh)
 {
-	char		**names_array;
-	size_t		size;
-	int			i;
+	char	**names_array;
+	size_t	size;
+	int		i;
 
 	size = ft_lstsize(msh->env_vars);
-    names_array = ft_calloc(size + 1, sizeof(char *));
-    if (!names_array)
-	    msh_exit(msh, "env names array init malloc failed", 1);
+	names_array = ft_calloc(size + 1, sizeof(char *));
+	if (!names_array)
+		msh_exit(msh, "env names array init malloc failed", 1);
 	populate_names_array(msh, names_array, size);
 	sort_names_array(names_array, size);
 	i = -1;
@@ -198,7 +200,7 @@ bool	check_name_validity(t_msh *msh, char *str)
 
 bool	check_and_update_env_var_value(t_msh *msh, char *name, char *value)
 {
-	t_list	    *cur_node;
+	t_list		*cur_node;
 	t_env_var	*cur_env_var;
 	size_t		max_size;
 
@@ -223,23 +225,23 @@ bool	check_and_update_env_var_value(t_msh *msh, char *name, char *value)
 
 void	msh_export(t_msh *msh, char **args)
 {
-	char    *name;
-    char    *value;
-    size_t  name_len;
+	char	*name;
+	char	*value;
+	size_t	name_len;
 	int		i;
 
 	i = 0;
 	while (args[++i])
 	{
-        if (!check_name_validity(msh, args[i]) || !ft_strchr(args[i], '='))
+		if (!check_name_validity(msh, args[i]) || !ft_strchr(args[i], '='))
 			continue ;
 		name_len = 0;
 		name = get_env_name(args[i], &name_len);
-        if (!name)
-            msh_exit(msh, "export: name init malloc failed", 1);
-        value = get_env_value(args[i], name_len + 1);
-        if (!value)
-            (free(name), msh_exit(msh, "export: value init malloc failed", 1));
+		if (!name)
+			msh_exit(msh, "export: name init malloc failed", 1);
+		value = get_env_value(args[i], name_len + 1);
+		if (!value)
+			(free(name), msh_exit(msh, "export: value init malloc failed", 1));
 		if (!check_and_update_env_var_value(msh, name, value))
 			(add_to_env_vars(msh, name, value), free(value));
 		free(name);
@@ -248,11 +250,38 @@ void	msh_export(t_msh *msh, char **args)
 		handle_export_wo_args(msh);
 }
 
-int	msh_unset(t_msh *msh)
+void	check_and_delete_env_var(t_msh *msh, char *name)
 {
-	(void)msh;
-	printf("unset\n");
-	return (0);
+	t_list		*cur_node;
+	t_env_var	*cur_env_var;
+
+	cur_node = msh->env_vars;
+	while (cur_node)
+	{
+		cur_env_var = (t_env_var *)cur_node->content;
+		if (!ft_strncmp(name, cur_env_var->name, get_max_size(name,
+					cur_env_var->name)))
+		{
+			if (cur_node->prev)
+				cur_node->prev->next = cur_node->next;
+			else
+				msh->env_vars = cur_node->next;
+			if (cur_node->next)
+				cur_node->next->prev = cur_node->prev;
+			ft_lstdelone(cur_node, free_env_var);
+			break ;
+		}
+		cur_node = cur_node->next;
+	}
+}
+
+void	msh_unset(t_msh *msh, char **args)
+{
+	int	i;
+
+	i = 0;
+	while (args[++i])
+		check_and_delete_env_var(msh, args[i]);
 }
 
 void	msh_echo(t_msh *msh, char **args)
@@ -280,7 +309,7 @@ void	msh_builtins(t_msh *msh, int i)
 		build_envp_array(msh);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_EXIT)
-		msh_exit(msh, "exit", 0);//if there are more entries in the args-array than just "exit" it should print an error (only cares for args[1], args[1+] are ignored) and change msh->status to 2 before ending
+		msh_exit(msh, "exit", 0); // if there are more entries in the args-array than just "exit" it should print an error (only cares for args[1], args[1+] are ignored) and change msh->status to 2 before ending
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_ENV)
 		ft_printenv(msh->env_vars);
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_EXPORT)
@@ -290,7 +319,7 @@ void	msh_builtins(t_msh *msh, int i)
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_UNSET)
 	{
-		msh_unset(msh);
+		msh_unset(msh, msh->cmd_table[i]->args);
 		build_envp_array(msh);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_ECHO)
