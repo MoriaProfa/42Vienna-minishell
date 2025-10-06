@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 20:48:16 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/05 23:26:36 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/06 00:16:56 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,9 @@ void	handle_quotationmark_error(t_msh *msh, char quotationmark)
 
 	str[0] = quotationmark;
 	str[1] = '\0';
-	ft_putstr_fd("unexpected EOF while looking for matching `", 2);
-	(ft_putstr_fd(str, 2), ft_putendl_fd("'", 2));
+	ft_putstr_fd("unexpected EOF while looking for matching `", STDERR_FILENO);
+	ft_putstr_fd(str, STDERR_FILENO);
+	ft_putendl_fd("'", STDERR_FILENO);
 	msh_print(msh, "syntax error: unexpected end of file", 2);
 }
 
@@ -60,8 +61,9 @@ void	check_middle_tokens(t_msh *msh)
 		if (cur_token->type != T_WORD && cur_token->type != T_PIPE
 			&& next_token->type != T_WORD)
 		{
-			ft_putstr_fd("syntax error near unexpected token `", 2);
-			(ft_putstr_fd(next_token->value, 2), ft_putendl_fd("'", 2));
+			ft_putstr_fd("syntax error near unexpected token `", STDERR_FILENO);
+			ft_putstr_fd(next_token->value, STDERR_FILENO);
+			ft_putendl_fd("'", STDERR_FILENO);
 			msh_print(msh, NULL, 2);
 		}
 		cur_node = cur_node->next;
