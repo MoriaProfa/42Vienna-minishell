@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/06 19:01:17 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/06 22:43:59 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,16 +49,20 @@ void	msh_execute(t_msh *msh, int i)
 	msh_exit(msh, "execve failed", 1);
 }
 
-void	close_fds(t_msh *msh, int fd1, int fd2)
+void	close_fds(t_msh *msh)
 {
-	if (msh->fd_in != fd1)
+	if (msh->fd_in != -1)
 		close(msh->fd_in);
-	if (msh->fd_out != fd2)
+	if (msh->fd_out != -1)
 		close(msh->fd_out);
-	if (msh->fd[0] != fd1 && msh->fd[0] != -1)
+	if (msh->fd[0] != -1)
 		close(msh->fd[0]);
-	if (msh->fd[1] != fd2 && msh->fd[1] != -1)
+	if (msh->fd[1] != -1)
 		close(msh->fd[1]);
+	if (msh->fd_hd[0] != -1)
+		close(msh->fd_hd[0]);
+	if (msh->fd_hd[1] != -1)
+		close(msh->fd_hd[1]);
 }
 
 void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
@@ -83,31 +87,35 @@ void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
 
 void	set_pipes(t_msh *msh)
 {
+	// if (msh->fd_pipe_read != STDIN_FILENO)
+	// 	close(msh->fd_pipe_read);
 	if (pipe(msh->fd) == -1)
 		msh_exit(msh, "pipe failed", 1);
 	dup2(msh->fd[1], STDOUT_FILENO);
 	close(msh->fd[1]);
-	if (msh->fd_pipe_read != STDIN_FILENO)
-		close(msh->fd_pipe_read);
 	msh->fd_pipe_read = msh->fd[0];
 }
-void	set_outfile(t_msh *msh, int i, int j);
+void	set_outfile(t_msh *msh, t_cmd *cmd, int j);
 
 void	run_command(t_msh *msh, int i)
 {
 	// need to add signal handling in the child
 	while (++i < msh->n_cmds)
 	{
-		if (i < msh->n_cmds - 1)
-			set_pipes(msh);
+		// if (i < msh->n_cmds - 1)
+		// 	set_pipes(msh);
+		if (pipe(msh->fd) == -1)
+			msh_exit(msh, "pipe failed", 1);
 		if (((t_cmd *)msh->cmd_table[i])->args[0] && ((t_cmd *)msh->cmd_table[i])->builtin.builtin == true)
 		{	
 			//if (((t_cmd *)msh->cmd_table[i])->n_outf)
-			set_outfile(msh, i, -1);
+			set_outfile(msh, ((t_cmd *)msh->cmd_table[i]), -1);
 			msh_builtins(msh, i);
 		}
 		else if (((t_cmd *)msh->cmd_table[i])->args[0])
 			msh_fork(msh, msh->fd_in, msh->fd_out, i);
+		msh->fd_pipe_read = msh->fd[0];
+		close_fds(msh);
 	}
 	i = -1;
 	while (++i < msh->n_cmds && msh->pid[i] != -1)

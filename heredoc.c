@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/06 19:35:06 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/06 22:07:37 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,13 +57,14 @@ void	collect_all_heredocs(t_msh *msh, int i, int j)
 	{
 		while (++j < ((t_cmd *)msh->cmd_table[i])->n_hd)
 		{
-			if (((t_cmd *)msh->cmd_table[i])->fd_heredoc != -1)
-				close(((t_cmd *)msh->cmd_table[i])->fd_heredoc);
+			if (msh->fd_hd[0] != -1)
+				close(msh->fd_hd[0]);
 			if (pipe(msh->fd_hd) == -1)
 				msh_exit(msh, "heredoc pipe failed", 1);
 			collect_one_heredoc(msh, (t_cmd *)msh->cmd_table[i], j);
-			close(msh->fd_hd[1]);
-			((t_cmd *)msh->cmd_table[i])->fd_heredoc = msh->fd_hd[0];
+			if (msh->fd_hd[1] != -1)
+				close(msh->fd_hd[1]);
 		}
+		((t_cmd *)msh->cmd_table[i])->heredoc_read = msh->fd_hd[0];
 	}
 }

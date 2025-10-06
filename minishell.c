@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/06 18:38:50 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/06 22:02:46 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,8 +128,8 @@ void	msh_initialize(t_msh *msh)
 	msh->error_check = false;
 	msh->cpy_in_str = msh->in_str;
 	msh->fd_pipe_read = STDIN_FILENO;
-	msh->fd_in = STDIN_FILENO; 
-	msh->fd_out = STDOUT_FILENO;
+	msh->fd_in = -1; 
+	msh->fd_out = -1;
 	msh->fd[0] = -1;
 	msh->fd[1] = -1;
 	msh->fd_hd[0] = -1;
