@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/06 17:32:33 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/06 18:38:50 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,6 +132,8 @@ void	msh_initialize(t_msh *msh)
 	msh->fd_out = STDOUT_FILENO;
 	msh->fd[0] = -1;
 	msh->fd[1] = -1;
+	msh->fd_hd[0] = -1;
+	msh->fd_hd[1] = -1;
 }
 
 void	handle_signal(int signal)

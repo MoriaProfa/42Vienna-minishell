@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/06 02:01:38 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/06 18:38:20 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,6 +160,7 @@ typedef struct s_msh
 	int				fd_pipe_read;
 	int				fd_in;
 	int				fd_out;
+	int				fd_hd[2];
 }					t_msh;
 
 void	free_token(void *content);
