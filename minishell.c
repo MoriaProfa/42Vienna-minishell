@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/05 23:44:58 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/06 02:02:03 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,9 +42,9 @@ void	msh_print(t_msh *msh, char *msg, int status)
 
 	msh->status = status;
 	if (msh->status != 0)
-		fd = 2;
+		fd = STDERR_FILENO;
 	else
-		fd = 1;
+		fd = STDOUT_FILENO;
 	if (msg)
 		ft_putendl_fd(msg, fd);
 	if (msh->status != 0)
@@ -70,9 +70,9 @@ void	msh_exit(t_msh *msh, char *msg, int status)
 
 	msh->status = status;
 	if (msh->status != 0)
-		fd = 2;
+		fd = STDERR_FILENO;
 	else
-		fd = 1;
+		fd = STDOUT_FILENO;
 	if (msg)
 		ft_putendl_fd(msg, fd);
 	ft_lstclear(&msh->env_vars, free_env_var);
@@ -127,12 +127,11 @@ void	msh_initialize(t_msh *msh)
 {
 	msh->error_check = false;
 	msh->cpy_in_str = msh->in_str;
-	msh->fd_in_previous = STDIN_FILENO;
+	msh->fd_pipe_read = STDIN_FILENO;
 	msh->fd_in = STDIN_FILENO; 
 	msh->fd_out = STDOUT_FILENO;
 	msh->fd[0] = -1;
 	msh->fd[1] = -1;
-	msh->fd_heredoc = -1;
 }
 
 void	handle_signal(int signal)
@@ -182,12 +181,14 @@ int	main(int argc, char **argv, char **envp)
 		if (!msh.error_check)
 			msh_pid(&msh); //allocates for msh.pid
 		if (!msh.error_check)
-		{
-			if (((t_cmd *)msh.cmd_table[0])->builtin.builtin == true && msh.n_cmds == 1)//why only if n_cmds is 1?
-			msh_builtins(&msh, 0);
-		}
+			collect_all_heredocs(&msh, -1, -1);
 		// if (!msh.error_check)
-		// 	run_command(&msh, -1);
+		// {
+		// 	if (((t_cmd *)msh.cmd_table[0])->builtin.builtin == true && msh.n_cmds == 1)//why only if n_cmds is 1?
+		// 	msh_builtins(&msh, 0);
+		// }
+		if (!msh.error_check)
+			run_command(&msh, -1);
 		msh_free(&msh);
 	}
 	msh_exit(&msh, NULL, msh.status);

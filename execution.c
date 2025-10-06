@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/05 23:45:36 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/06 02:12:21 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,13 +81,11 @@ void	set_pipes(t_msh *msh)
 {
 	if (pipe(msh->fd) == -1)
 		msh_exit(msh, "pipe failed", 1);
-	if (msh->fd_in_previous != STDIN_FILENO)
-	{
-		close(msh->fd_in_previous);
-		msh->fd_in_previous = msh->fd[0];
-	}
 	dup2(msh->fd[1], STDOUT_FILENO);
 	close(msh->fd[1]);
+	if (msh->fd_pipe_read != STDIN_FILENO)
+		close(msh->fd_pipe_read);
+	msh->fd_pipe_read = msh->fd[0];
 }
 
 void	run_command(t_msh *msh, int i)
@@ -102,10 +100,6 @@ void	run_command(t_msh *msh, int i)
 			msh_builtins(msh, i);
 		else
 			msh_fork(msh, msh->fd_in, msh->fd_out, i);
-		if (msh->fd_in != STDIN_FILENO)
-			close(msh->fd_in);
-		if (msh->fd_out != STDOUT_FILENO)
-			close(msh->fd_out);
 	}
 	i = -1;
 	while (++i < msh->n_cmds)
