@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/06 11:25:55 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/06 18:51:15 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ char    *get_env_name(char *str, size_t *name_len);
 char    *get_env_value(char *str, size_t name_len);
 void	add_to_env_vars(t_msh *msh, const char *name, const char *value);
 void    build_envp_array(t_msh *msh);
+void	free_env_var(void *content);
 void	msh_free(t_msh *msh);
 
 int	msh_pwd(t_msh *msh)//if !pwd, get value of PWD in env_var, if there is no PWD too, write error msg
@@ -248,11 +249,38 @@ void	msh_export(t_msh *msh, char **args)
 		handle_export_wo_args(msh);
 }
 
-int	msh_unset(t_msh *msh)
+void	check_and_delete_env_var(t_msh *msh, char *name)
 {
-	(void)msh;
-	printf("unset\n");
-	return (0);
+	t_list		*cur_node;
+	t_env_var	*cur_env_var;
+
+	cur_node = msh->env_vars;
+	while (cur_node)
+	{
+		cur_env_var = (t_env_var *)cur_node->content;
+		if (!ft_strncmp(name, cur_env_var->name, 
+			get_max_size(name, cur_env_var->name)))
+		{
+			if (cur_node->prev)
+				cur_node->prev->next = cur_node->next;
+			else
+				msh->env_vars = cur_node->next;
+			if (cur_node->next)
+				cur_node->next->prev = cur_node->prev;
+			ft_lstdelone(cur_node, free_env_var);
+			break ;
+		}
+		cur_node = cur_node->next;
+	}	
+}
+
+void	msh_unset(t_msh *msh, char **args)
+{
+	int			i;
+
+	i = 0;
+	while (args[++i])
+		check_and_delete_env_var(msh, args[i]);
 }
 
 void	msh_echo(t_msh *msh, char **args)
@@ -290,7 +318,7 @@ void	msh_builtins(t_msh *msh, int i)
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_UNSET)
 	{
-		msh_unset(msh);
+		msh_unset(msh, msh->cmd_table[i]->args);
 		build_envp_array(msh);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_ECHO)
