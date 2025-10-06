@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/06 03:33:35 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/06 04:00:39 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,8 @@ static void	set_infile(t_msh *msh, int i, int j)
 			close(msh->fd_in);
 		if (check_access_read(((t_cmd *)msh->cmd_table[i])->infiles[j]) == 0)
 			msh_print(msh, NULL, 1);
-		msh->fd_in = -1/*open(((t_cmd *)msh->cmd_table[i])->infiles[j],
-				O_RDONLY)*/;
+		msh->fd_in = open(((t_cmd *)msh->cmd_table[i])->infiles[j],
+				O_RDONLY);
 		if (msh->fd_in == -1)
 		{
 			perror(((t_cmd *)msh->cmd_table[i])->infiles[j]);
