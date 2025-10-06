@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/06 15:55:58 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/06 19:01:17 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,13 +31,16 @@ void	msh_execute(t_msh *msh, int i)
 	if (!((t_cmd *)msh->cmd_table[i])->pathname)
 	{
 		msh->status = 127;
-		msh_exit(msh, "command not found", 1);
+		ft_putstr_fd(((t_cmd *)msh->cmd_table[i])->args[0], STDERR_FILENO);
+		ft_putstr_fd(": ", STDERR_FILENO);
+		msh_exit(msh, "Command not found", 1);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->pathname
 		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == -1)
 	{
 		msh->status = 126;
-		msh_exit(msh, "permission denied", 1);
+		perror(((t_cmd *)msh->cmd_table[i])->args[0]);
+		msh_exit(msh, NULL, 1);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->pathname
 		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == 0)
@@ -97,13 +100,13 @@ void	run_command(t_msh *msh, int i)
 	{
 		if (i < msh->n_cmds - 1)
 			set_pipes(msh);
-		if (msh->n_cmds == 1 && ((t_cmd *)msh->cmd_table[i])->builtin.builtin == true)
+		if (((t_cmd *)msh->cmd_table[i])->args[0] && ((t_cmd *)msh->cmd_table[i])->builtin.builtin == true)
 		{	
 			//if (((t_cmd *)msh->cmd_table[i])->n_outf)
 			set_outfile(msh, i, -1);
 			msh_builtins(msh, i);
 		}
-		else
+		else if (((t_cmd *)msh->cmd_table[i])->args[0])
 			msh_fork(msh, msh->fd_in, msh->fd_out, i);
 	}
 	i = -1;
