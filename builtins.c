@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/06 14:09:40 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/06 15:15:44 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -196,7 +196,7 @@ bool	check_name_validity(t_msh *msh, char *str)
 	return (true);
 }
 
-bool	update_env_var_value(t_msh *msh, char *name, char *value)
+bool	check_and_update_env_var_value(t_msh *msh, char *name, char *value)
 {
 	t_list	    *cur_node;
 	t_env_var	*cur_env_var;
@@ -209,8 +209,11 @@ bool	update_env_var_value(t_msh *msh, char *name, char *value)
 		max_size = get_max_size(name, cur_env_var->name);
 		if (!ft_strncmp(name, cur_env_var->name, max_size))
 		{
-			free(cur_env_var->value);
-			cur_env_var->value = value;
+			if (value)
+			{
+				free(cur_env_var->value);
+				cur_env_var->value = value;
+			}
 			return (true);
 		}
 		cur_node = cur_node->next;
@@ -237,7 +240,7 @@ void	msh_export(t_msh *msh, char **args)
         value = get_env_value(args[i], name_len + 1);
         if (!value)
             (free(name), msh_exit(msh, "export: value init malloc failed", 1));
-		if (!update_env_var_value(msh, name, value))
+		if (!check_and_update_env_var_value(msh, name, value))
 			(add_to_env_vars(msh, name, value), free(value));
 		free(name);
 	}
