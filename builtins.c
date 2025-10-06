@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/06 23:51:32 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/07 01:00:11 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -371,7 +371,6 @@ void	msh_echo(t_msh *msh, char **args)
 	{
 		if (!check_newline_skipping(args[start]))
 			break ;
-		start++;
 	}
 	if (!skip_newline)
 		start = 0;
@@ -380,7 +379,7 @@ void	msh_echo(t_msh *msh, char **args)
 	print_echo_args(msh, args, start);	
 	if (!skip_newline)
 		ft_putchar_fd('\n', msh->fd_out);
-	ft_putstr_fd("\tnewline for better visibility\n", msh->fd_out);
+	//ft_putstr_fd("\tnewline for better visibility\n", msh->fd_out);//just for testing
 }
 
 void	msh_builtins(t_msh *msh, int i)
