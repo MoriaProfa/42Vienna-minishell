@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/06 04:00:39 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/06 14:05:22 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ static void	set_outfile(t_msh *msh, int i, int j)
 	while (((t_cmd *)msh->cmd_table[i])->outfiles[++j].filename)
 	{
 		if (check_access_write(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename) == 0)
-			break ;
+			msh_print(msh, NULL, 1);
 		if (((t_cmd *)msh->cmd_table[i])->outfiles[j].append == false)
 			msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename,
 					O_RDWR | O_CREAT | O_TRUNC, 0644);
@@ -65,7 +65,10 @@ static void	set_outfile(t_msh *msh, int i, int j)
 			msh->fd_out = open(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename,
 					O_RDWR | O_CREAT | O_APPEND, 0644);
 		if (msh->fd_out == -1)
+		{
 			perror(((t_cmd *)msh->cmd_table[i])->outfiles[j].filename);
+			msh_print(msh, NULL, 1);
+		}
 		if (msh->fd_out != STDOUT_FILENO && msh->fd_out != -1)
 		{
 			dup2(msh->fd_out, STDOUT_FILENO);

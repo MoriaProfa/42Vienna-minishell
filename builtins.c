@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/06 03:58:55 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/06 14:09:40 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,6 @@ int	msh_pwd(t_msh *msh)//if !pwd, get value of PWD in env_var, if there is no PW
 	if (!pwd)
 		return (msh->status);//where is this return value catched? what should it do?
 	ft_putendl_fd(pwd, STDOUT_FILENO);
-		return (msh->status);
-	ft_putendl_fd(pwd, msh->fd_out);
 	free(pwd);
 	return (0);
 }
