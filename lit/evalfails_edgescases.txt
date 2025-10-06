@@ -1,0 +1,103 @@
+export: remeber to order in ASCII order (1st uppercase and then lowercase) 
+
+pressing Ctr-C and followed by Ctr-D it doesn't print 130, it prints 0
+
+export, when you find an special char ($, ") 
+
+executing executables with relative path - Remember to update OLDPWD and PWD in export
+
+return "2" when and option is invalid 
+
+cat <<eof"" we can not exit the heredoc
+
+ulimit -n 6; ./minishell
+
+(ulimit -n 6; ./minishell) then MAkefile | cat | ... | cat > out 
+
+exit builtin didn't handle LONG_MIN correctly -> exit code and error message was wrong
+
+In the go crazy part a new line was missing when exiting with CTRL-C after cat | cat | ls. And $"USER" gave slightly different output than bash. 
+
+cat <<EOF | cat <<EOF1 and pressing ctrl+c doesn't stop the execution. 
+ls | exit 123 => $? doesn't return the exit code 123. 
+cat <<"EOF" => Expand $USER cat <<EOF => didn't expand '$USER'
+
+cat | cat | cat | cat and then cntl \ prints quit core dumped as many as cat, should be only once , 
+
+in heredoc if we specify "" like this cat <<eof"" we can not exit the heredoc with delimiter only with force using signals
+
+/dev/urandom
+minishell inside of minishell - Ctrl + C behaves weirdly
+Redirections without permissions: error msg and return value not correct. 
+Return value for signals WTERMSIG + 128
+Relative path for execution (eg. ../minishell). 
+Multiple shells overwrite each others heredocs. 
+Ambigous redirect only works for nothing.
+
+Minishell segfaults for $A | $B | $C where the variables are not set. 
+
+mkdir a; cd a; mkdir b; cd b; rm -rf ../../a; cd .. 
+
+echo 'oo''$USER' will expand the $USER variable - error
+
+segmentation fault when trying to export the USER variable more than one time. 
+USER variable also doesn't get updated in the env. "wc < Makefile > test2" doesn't 
+correctly redirect the output to test2 but prints it directly.
+
+"<< hi" minishell crashes 
+echo prints double new lines and "cat | cat | ls" 
+
+echo "" -> leads to Invalid read of size 
+"" -> leads to Invalid read of size 
+cat << "" -> leads to an error massage minishell: command not found, but shouldn't 
+exit | exit 42 -> minishell: too many arguments \n minishell: too many arguments. should be nothing 
+do not push supp file 
+
+CTRL-C after cat | cat | ls. And $"USER" gave slightly different output than bash
+
+
+exit : return value of exit with too many args should return last exitstatus 
+syntax: pipes in a row should be syntax error 
+export: export shows vars with "" env doesnt 
+valgrind --leak-check=full --show-leak-kinds=all --suppressions=readline.supp ./minishell 
+SIGNALS: ctr-\ in blocking command HEREDOC 
+LEAK: echo <<here"" | && here SYNTAXERROR echo hey |||||| 
+LEAK: >minishell$ export a=" -la" >minishell$ ls$a 
+
+segfault in case mkdir a -> cd a -> mkdir b -> cd b -> rm -rf ../../a -> cd.
+invalid write in heredoc and invalid free in case: << a << b << c -> ctrl D + ctrl D + ctrl D 
+
+new line was missing when exiting with CTRL-C after cat | cat | ls. And $"USER" gave slightly different output than bash
+
+heredoc + ctrl C, than heredoc stops working.
+<< test"" leaks. 
+redirection at the beginning of a line -> syntax error. 
+exit | exit -> prints exit.
+
+asdf/ is command. ./minishell in minishell signals inherited. ctrl + \ is not doing anything in blocking command. 
+should quit exit code 131 exit 123 123 exits the shell but it should print just the error message for double args. 
+
+"<<eof1 > file1 | <<eof2" that here file1 sould not be created when we are at the second heredoc
+
+a new line was missing when exiting with CTRL-C after cat | cat | ls. 
+$"USER" gave slightly different output than bash. 
+
+unsetting the environment with "env -i" lead to weird behavior in some cases (executing "env" said path not found, which is weird). 
+SHLVL and PATH wasn't updated when opening new shells or changing directories.
+
+ - Leaks when you have a permission denied during an execution 
+ - echo return value is not changed except if you make it do a echo $? 
+ - echo "$PWD+$PWD" 
+ - export test="s -la" l$test -> command not found 
+ - CTRL + C -> heredoc 
+ - Combination with single/doubles quotes produce leaks -> '""'' 
+ - Export _ is considered as an not a non-valid identifier 
+ - ls -l"a" -> cannot access
+
+echo hi | - should print a syntax error but we had some leaks; << 1 | << 2 | << 3 cat 
+- we had some open file descriptors and control c should close heredoc at once. 
+
+export XXX="unset AAA" $XXX caused a segfault in heredoc: empty delimiter ("") didn't exit heredoc 
+some syntax parsing errors: echo hi >1.txt | >2.txt echo ho 
+
+exit: numeric argument required exit 2983476927340927034623856738 exit -., - " " echo hallo 
