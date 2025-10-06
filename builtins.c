@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/07 01:00:11 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/07 01:46:09 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,59 +20,20 @@ void	build_envp_array(t_msh *msh);
 void	free_env_var(void *content);
 void	msh_free(t_msh *msh);
 
-/*
-//not sure if it does what it should and tester is failing 
-//path_check 11 with it:
-// env -i ./minishell
-//cd /bin/
-//ls -S
-
-char	*get_env_var_value(t_msh *msh, char *name)
-{
-	t_list		*cur_node;
-	t_env_var	*cur_env_var;
-	size_t		max_size;
-
-	cur_node = msh->env_vars;
-	while (cur_node)
-	{
-		cur_env_var = (t_env_var *)(cur_node->content);
-		max_size = get_max_size(name, cur_env_var->name);
-		if (cur_env_var && !ft_strncmp(name, cur_env_var->name, max_size))
-			return (ft_strdup(cur_env_var->value));
-		cur_node = cur_node->next;
-	}
-	return (NULL);
-}
-
-void	msh_pwd(t_msh *msh) //if !pwd, get value of PWD in env_var, if there is no PWD too, write error msg
-{
-	char		*pwd;
-
-	pwd = getcwd(NULL, 0);
-	if (!pwd)
-		pwd = get_env_var_value(msh, "PWD");
-	if (!pwd)
-	{
-		ft_putstr_fd("pwd: error retrieving ", STDERR_FILENO);
-		ft_putstr_fd("current directory: ", STDERR_FILENO);
-		msh_exit(msh, "getcwd: cannot access parent directories", 1);
-	}
-	ft_putendl_fd(pwd, msh->fd_out);
-	free(pwd);
-}
-*/
-
-int	msh_pwd(t_msh *msh) // if !pwd, get value of PWD in env_var, if there is no PWD too, write error msg
+void	msh_pwd(t_msh *msh)
 {
 	char	*pwd;
 
 	pwd = getcwd(NULL, 0);
 	if (!pwd)
-		return (msh->status);
+	{
+		ft_putstr_fd("pwd: error retrieving ", STDERR_FILENO);
+		ft_putstr_fd("current directory: ", STDERR_FILENO);
+		msh_exit(msh, "getcwd: cannot access parent directories", 1);
+		return ;
+	}
 	ft_putendl_fd(pwd, msh->fd_out);
 	free(pwd);
-	return (0);
 }
 
 int	msh_cd(t_msh *msh, int i) // also needs to change the value in OLDPWD to
