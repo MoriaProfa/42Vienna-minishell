@@ -6,11 +6,13 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 21:20:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/06 03:26:57 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/06 11:26:13 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+size_t	get_max_size(char *str1, char *str2);
+bool	check_and_update_env_var_value(t_msh *msh, char *name, char *value);
 
 void	free_env_var(void *content)
 {
@@ -65,13 +67,18 @@ void    create_env(t_msh *msh)
 {
     char    *cwd;
     
-    add_to_env_vars(msh, "SHLVL", "1");
-    cwd = getcwd(NULL, 0);
-    if (!cwd)
-        cwd = ft_strdup("/");
-    add_to_env_vars(msh, "PWD", cwd);
-    free(cwd);
-    add_to_env_vars(msh, "OLDPWD", "");
+    if (!check_and_update_env_var_value(msh, "SHLVL", NULL))
+        add_to_env_vars(msh, "SHLVL", "1");
+    if (!check_and_update_env_var_value(msh, "PWD", NULL))
+    {
+        cwd = getcwd(NULL, 0);
+        if (!cwd)
+            cwd = ft_strdup("/");
+        add_to_env_vars(msh, "PWD", cwd);
+        free(cwd);
+    }
+    if (!check_and_update_env_var_value(msh, "OLDPWD", NULL))
+        add_to_env_vars(msh, "OLDPWD", "");
 }
 
 char    *get_env_value(char *str, size_t name_len)
@@ -103,23 +110,23 @@ void	init_env_vars(t_msh *msh, char **envp)
     char    *value;
     size_t  name_len;
     int     i;
-    
-    if (!envp || !envp[0])
-        create_env(msh);
-    else
+
+    i = -1;
+    while (envp && envp[++i])
     {
-        i = -1;
-        while (envp[++i])
+        name_len = 0;
+        name = get_env_name(envp[i], &name_len);
+        if (!name)
+            msh_exit(msh, "env: name init malloc failed", 1);
+        value = get_env_value(envp[i], name_len + 1);
+        if (!value)
         {
-            name_len = 0;
-            name = get_env_name(envp[i], &name_len);
-            if (!name)
-                msh_exit(msh, "env: name init malloc failed", 1);
-            value = get_env_value(envp[i], name_len + 1);
-            if (!value)
-                (free(name), msh_exit(msh, "env: value init malloc failed", 1));
-            (add_to_env_vars(msh, name, value), free(name), free(value));
+            free(name);
+            msh_exit(msh, "env: value init malloc failed", 1);
         }
-        //check if there are SHLVL, PWD and OLDPWD -> if not, add them manually
+        add_to_env_vars(msh, name, value);
+        free(name);
+        free(value);
     }
+    create_env(msh);      
 }
