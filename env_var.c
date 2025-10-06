@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 21:20:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/05 23:25:38 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/06 03:26:57 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ char    *get_env_name(char *str, size_t *name_len)
     int     i;
 
     i = -1;
-    while (str && str[++i] != '=')
+    while (str[++i] && str[i] != '=')
         (*name_len)++;
     return (ft_substr(str, 0, *name_len));
 }

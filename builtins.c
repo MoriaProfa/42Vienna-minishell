@@ -6,24 +6,26 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/06 00:09:00 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/06 03:24:17 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 void	ft_printenv(t_list *env_vars);
+char    *get_env_name(char *str, size_t *name_len);
+char    *get_env_value(char *str, size_t name_len);
 void	add_to_env_vars(t_msh *msh, const char *name, const char *value);
 void    build_envp_array(t_msh *msh);
 void	msh_free(t_msh *msh);
 
-int	msh_pwd(t_msh *msh)
+int	msh_pwd(t_msh *msh)//if !pwd, get value of PWD in env_var, if there is no PWD too, write error msg
 {
 	char	*pwd;
 
 	pwd = getcwd(NULL, 0);
 	if (!pwd)
-		return (msh->status);//where is this return value catched? what should it do?
+		return (msh->status);
 	ft_putendl_fd(pwd, msh->fd_out);
 	free(pwd);
 	return (0);
@@ -194,24 +196,53 @@ bool	check_name_validity(t_msh *msh, char *str)
 	return (true);
 }
 
+bool	update_env_var_value(t_msh *msh, char *name, char *value)
+{
+	t_list	    *cur_node;
+	t_env_var	*cur_env_var;
+	size_t		max_size;
+
+	cur_node = msh->env_vars;
+	while (cur_node)
+	{
+		cur_env_var = (t_env_var *)(cur_node->content);
+		max_size = get_max_size(name, cur_env_var->name);
+		if (!ft_strncmp(name, cur_env_var->name, max_size))
+		{
+			free(cur_env_var->value);
+			cur_env_var->value = value;
+			return (true);
+		}
+		cur_node = cur_node->next;
+	}
+	return (false);
+}
+
 void	msh_export(t_msh *msh, char **args)
 {
-//	char	*name;
-//	char	*value;
-//	size_t	name_len;
+	char    *name;
+    char    *value;
+    size_t  name_len;
 	int		i;
 
-	if (!args[1])
-	{
-		handle_export_wo_args(msh);
-		return ;
-	}
 	i = 0;
 	while (args[++i])
 	{
-		if (!check_name_validity(msh, args[i]) || !ft_strchr(args[i], '='))
+        if (!check_name_validity(msh, args[i]) || !ft_strchr(args[i], '='))
 			continue ;
+		name_len = 0;
+		name = get_env_name(args[i], &name_len);
+        if (!name)
+            msh_exit(msh, "export: name init malloc failed", 1);
+        value = get_env_value(args[i], name_len + 1);
+        if (!value)
+            (free(name), msh_exit(msh, "export: value init malloc failed", 1));
+		if (!update_env_var_value(msh, name, value))
+			(add_to_env_vars(msh, name, value), free(value));
+		free(name);
 	}
+	if (!args[1])
+		handle_export_wo_args(msh);
 }
 
 int	msh_unset(t_msh *msh)
