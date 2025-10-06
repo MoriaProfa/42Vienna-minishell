@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/06 02:12:21 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/06 03:36:32 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,12 +97,15 @@ void	run_command(t_msh *msh, int i)
 			set_pipes(msh);
 		set_redirections(msh, i);
 		if (msh->n_cmds == 1 && ((t_cmd *)msh->cmd_table[i])->builtin.builtin == true)
+		{
 			msh_builtins(msh, i);
+			msh_print(msh, NULL, 0);
+		}
 		else
 			msh_fork(msh, msh->fd_in, msh->fd_out, i);
 	}
 	i = -1;
 	while (++i < msh->n_cmds)
 		waitpid(msh->pid[i], &msh->status, 0);
-	close_fds(msh, STDIN_FILENO, STDOUT_FILENO);
+	// close_fds(msh, STDIN_FILENO, STDOUT_FILENO);
 }

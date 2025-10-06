@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/06 00:18:49 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/06 03:47:03 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int	msh_pwd(t_msh *msh)
 	pwd = getcwd(NULL, 0);
 	if (!pwd)
 		return (msh->status);//where is this return value catched? what should it do?
-	ft_putendl_fd(pwd, msh->fd_out);
+	ft_putendl_fd(pwd, STDOUT_FILENO);
 	free(pwd);
 	return (0);
 }
@@ -229,8 +229,8 @@ void	msh_echo(t_msh *msh, char **args)
 	while (args[++i])
 	{
 		if (i != 1)
-			ft_putchar_fd(' ', msh->fd_out);
-		ft_putstr_fd(args[i], msh->fd_out);
+			ft_putchar_fd(' ', STDOUT_FILENO);
+		ft_putstr_fd(args[i], STDOUT_FILENO);
 		msh->status = 0;
 	}
 	ft_putchar_fd('\n', msh->fd_out);

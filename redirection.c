@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/06 02:11:08 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/06 03:33:35 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,11 +41,14 @@ static void	set_infile(t_msh *msh, int i, int j)
 		if (msh->fd_in != STDIN_FILENO)
 			close(msh->fd_in);
 		if (check_access_read(((t_cmd *)msh->cmd_table[i])->infiles[j]) == 0)
-			return ;
-		msh->fd_in = open(((t_cmd *)msh->cmd_table[i])->infiles[j],
-				O_RDONLY);
+			msh_print(msh, NULL, 1);
+		msh->fd_in = -1/*open(((t_cmd *)msh->cmd_table[i])->infiles[j],
+				O_RDONLY)*/;
 		if (msh->fd_in == -1)
+		{
 			perror(((t_cmd *)msh->cmd_table[i])->infiles[j]);
+			msh_print(msh, NULL, 1);
+		}
 	}
 }
 
@@ -83,7 +86,7 @@ void	set_redirections(t_msh *msh, int i)
 		dup2(msh->fd_in, STDIN_FILENO);
 	else if (((t_cmd *)msh->cmd_table[i])->last_input == T_HEREDOC_REDIRECT)
 		dup2(((t_cmd *)msh->cmd_table[i])->fd_heredoc, STDIN_FILENO);
-	if (msh->fd_in != STDIN_FILENO)
+	if (msh->fd_in != STDIN_FILENO && msh->fd_in != -1)
 		close(msh->fd_in);
 	if (((t_cmd *)msh->cmd_table[i])->fd_heredoc != -1)
 		close(((t_cmd *)msh->cmd_table[i])->fd_heredoc);
