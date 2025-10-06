@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/06 03:57:44 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/06 03:59:42 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +43,7 @@ void	msh_print(t_msh *msh, char *msg, int status)
 	msh->status = status;
 	if (msh->status != 0)
 		fd = STDERR_FILENO;
-		fd = STDERR_FILENO;
 	else
-		fd = STDOUT_FILENO;
 		fd = STDOUT_FILENO;
 	if (msg)
 		ft_putendl_fd(msg, fd);
@@ -73,9 +71,7 @@ void	msh_exit(t_msh *msh, char *msg, int status)
 	msh->status = status;
 	if (msh->status != 0)
 		fd = STDERR_FILENO;
-		fd = STDERR_FILENO;
 	else
-		fd = STDOUT_FILENO;
 		fd = STDOUT_FILENO;
 	if (msg)
 		ft_putendl_fd(msg, fd);
