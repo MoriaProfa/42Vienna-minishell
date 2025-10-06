@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/06 00:16:23 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/06 17:24:23 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ void	msh_print(t_msh *msh, char *msg, int status)
 void	msh_free(t_msh *msh)
 {
 	if (msh->in_str)
-		ft_free(&msh->in_str);
+		free(msh->in_str);
 	ft_lstclear(&msh->tokens, free_token);
 	free_cmd_table(msh->cmd_table, msh->n_cmds);
 	msh->cmd_table = NULL;
@@ -162,6 +162,11 @@ int	main(int argc, char **argv, char **envp)
 		msh.in_str = readline("minishell> ");
 		if (!msh.in_str) //by pressing CTRL+D
 			break ;//msh_exit(&msh, "exit", 0);//didnt work as intended for not yet known reason?!
+		if (msh.in_str[0] == '\0')
+		{
+			free(msh.in_str);
+			continue ;
+		}
 		add_history(msh.in_str); //original bash doesnt add it when its starting with a whitespace
 		if (g_signal_flag)
 		{
