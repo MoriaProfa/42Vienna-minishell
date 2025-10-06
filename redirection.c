@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/06 14:05:22 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/06 15:50:54 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ static void	set_infile(t_msh *msh, int i, int j)
 	}
 }
 
-static void	set_outfile(t_msh *msh, int i, int j)
+void	set_outfile(t_msh *msh, int i, int j)
 {
 	while (((t_cmd *)msh->cmd_table[i])->outfiles[++j].filename)
 	{

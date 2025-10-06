@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/06 14:02:11 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/06 15:55:58 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,7 @@ void	set_pipes(t_msh *msh)
 		close(msh->fd_pipe_read);
 	msh->fd_pipe_read = msh->fd[0];
 }
+void	set_outfile(t_msh *msh, int i, int j);
 
 void	run_command(t_msh *msh, int i)
 {
@@ -98,7 +99,8 @@ void	run_command(t_msh *msh, int i)
 			set_pipes(msh);
 		if (msh->n_cmds == 1 && ((t_cmd *)msh->cmd_table[i])->builtin.builtin == true)
 		{	
-			set_redirections(msh, i);
+			//if (((t_cmd *)msh->cmd_table[i])->n_outf)
+			set_outfile(msh, i, -1);
 			msh_builtins(msh, i);
 		}
 		else
