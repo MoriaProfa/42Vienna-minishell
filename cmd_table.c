@@ -6,13 +6,13 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/05 23:25:38 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/06 19:16:34 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	heredoc_collector(t_msh *msh, t_cmd **cmds);
+void		heredoc_collector(t_msh *msh, t_cmd **cmds);
 
 // just for testing purposes
 void	print_cmd_table(t_msh *msh)
@@ -110,8 +110,8 @@ void	free_cmd_table(t_cmd **cmds, int n)
 t_builtin	builtin_check(char *s)
 {
 	t_builtin	builtin;
-	char	*builtin_list[8];
-	int		i;
+	char		*builtin_list[8];
+	int			i;
 
 	builtin.builtin = false;
 	builtin.type = B_NOT_BUILTIN;
