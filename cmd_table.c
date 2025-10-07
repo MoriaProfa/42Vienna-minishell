@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/06 21:00:24 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/07 17:53:59 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ void	print_cmd_table(t_msh *msh)
 		// 0 if T_NONE, 3 if T_IN_REDIRECT, 6 if T_HEREDOC_REDIRECT
 		if (cmd->pathname)
 			printf("\tpathname: %s\n", cmd->pathname);
+		printf("\theredoc_read: %d\n", cmd->heredoc_read);
 		i++;
 	}
 }
