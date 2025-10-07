@@ -6,7 +6,11 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2025/10/06 19:39:01 by edarmaev         ###   ########.fr       */
+=======
+/*   Updated: 2025/10/07 01:00:11 by astehl           ###   ########.fr       */
+>>>>>>> main
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +23,49 @@ void	add_to_env_vars(t_msh *msh, const char *name, const char *value);
 void	build_envp_array(t_msh *msh);
 void	free_env_var(void *content);
 void	msh_free(t_msh *msh);
+
+/*
+//not sure if it does what it should and tester is failing 
+//path_check 11 with it:
+// env -i ./minishell
+//cd /bin/
+//ls -S
+
+char	*get_env_var_value(t_msh *msh, char *name)
+{
+	t_list		*cur_node;
+	t_env_var	*cur_env_var;
+	size_t		max_size;
+
+	cur_node = msh->env_vars;
+	while (cur_node)
+	{
+		cur_env_var = (t_env_var *)(cur_node->content);
+		max_size = get_max_size(name, cur_env_var->name);
+		if (cur_env_var && !ft_strncmp(name, cur_env_var->name, max_size))
+			return (ft_strdup(cur_env_var->value));
+		cur_node = cur_node->next;
+	}
+	return (NULL);
+}
+
+void	msh_pwd(t_msh *msh) //if !pwd, get value of PWD in env_var, if there is no PWD too, write error msg
+{
+	char		*pwd;
+
+	pwd = getcwd(NULL, 0);
+	if (!pwd)
+		pwd = get_env_var_value(msh, "PWD");
+	if (!pwd)
+	{
+		ft_putstr_fd("pwd: error retrieving ", STDERR_FILENO);
+		ft_putstr_fd("current directory: ", STDERR_FILENO);
+		msh_exit(msh, "getcwd: cannot access parent directories", 1);
+	}
+	ft_putendl_fd(pwd, msh->fd_out);
+	free(pwd);
+}
+*/
 
 int	msh_pwd(t_msh *msh) // if !pwd, get value of PWD in env_var, if there is no PWD too, write error msg
 {
@@ -283,20 +330,60 @@ void	msh_unset(t_msh *msh, char **args)
 	while (args[++i])
 		check_and_delete_env_var(msh, args[i]);
 }
-
-void	msh_echo(t_msh *msh, char **args)
+bool	check_newline_skipping(char *str)
 {
 	int	i;
 
+	if (str[0] != '-')
+		return (false);
 	i = 0;
-	while (args[++i])
+	while (str[++i])
 	{
-		if (i != 1)
-			ft_putchar_fd(' ', STDOUT_FILENO);
-		ft_putstr_fd(args[i], STDOUT_FILENO);
-		msh->status = 0;
+		if (str[i] != 'n')
+			return (false);
 	}
-	ft_putchar_fd('\n', msh->fd_out);
+	return (true);
+}
+
+void	print_echo_args(t_msh *msh, char **args, int start)
+{
+	bool	begin;
+
+	begin = true;
+	while (args[++start])
+	{
+		if (!begin)
+			ft_putchar_fd(' ', msh->fd_out);
+		ft_putstr_fd(args[start], msh->fd_out);
+		msh->status = 0;
+		begin = false;
+	}
+}
+void	msh_echo(t_msh *msh, char **args)
+{
+	int		start;
+	bool	skip_newline;
+
+	if (!args[1])
+	{
+		ft_putchar_fd('\n', msh->fd_out);
+		return ;
+	}
+	skip_newline = check_newline_skipping(args[1]);
+	start = 1;
+	while (skip_newline && args[++start])
+	{
+		if (!check_newline_skipping(args[start]))
+			break ;
+	}
+	if (!skip_newline)
+		start = 0;
+	else
+		start--;
+	print_echo_args(msh, args, start);	
+	if (!skip_newline)
+		ft_putchar_fd('\n', msh->fd_out);
+	//ft_putstr_fd("\tnewline for better visibility\n", msh->fd_out);//just for testing
 }
 
 void	msh_builtins(t_msh *msh, int i)
