@@ -6,13 +6,14 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/06 22:43:59 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/07 20:52:55 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 void	msh_builtins(t_msh *msh, int i);
+void	set_redirections(t_msh *msh, int i);
 
 void	msh_pid(t_msh *msh)
 {
@@ -65,16 +66,16 @@ void	close_fds(t_msh *msh)
 		close(msh->fd_hd[1]);
 }
 
-void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
+void	msh_fork(t_msh *msh, int i)
 {
-	(void)fd_in;
-	(void)fd_out;
 	msh->pid[i] = fork();
 	if (msh->pid[i] == -1)
 		msh_exit(msh, "fork failed", 1);
 	if (msh->pid[i] == 0)
 	{
 		set_redirections(msh, i);
+		if (msh->fd[0] != -1)
+			close(msh->fd[0]);
 		if (((t_cmd *)msh->cmd_table[i])->builtin.builtin == false)
 			msh_execute(msh, i);
 		else
@@ -83,39 +84,38 @@ void	msh_fork(t_msh *msh, int fd_in, int fd_out, int i)
 			exit(0);
 		}
 	}
+	if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
+		close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
+	if (msh->fd_pipe_read != -1)
+		close(msh->fd_pipe_read);
+	if (i < msh->n_cmds - 1)
+	{
+		if (msh->fd[1] != -1)
+			close(msh->fd[1]);
+		msh->fd_pipe_read = msh->fd[0];
+	}
 }
-
-void	set_pipes(t_msh *msh)
-{
-	// if (msh->fd_pipe_read != STDIN_FILENO)
-	// 	close(msh->fd_pipe_read);
-	if (pipe(msh->fd) == -1)
-		msh_exit(msh, "pipe failed", 1);
-	dup2(msh->fd[1], STDOUT_FILENO);
-	close(msh->fd[1]);
-	msh->fd_pipe_read = msh->fd[0];
-}
-void	set_outfile(t_msh *msh, t_cmd *cmd, int j);
 
 void	run_command(t_msh *msh, int i)
 {
 	// need to add signal handling in the child
 	while (++i < msh->n_cmds)
 	{
-		// if (i < msh->n_cmds - 1)
-		// 	set_pipes(msh);
-		if (pipe(msh->fd) == -1)
-			msh_exit(msh, "pipe failed", 1);
-		if (((t_cmd *)msh->cmd_table[i])->args[0] && ((t_cmd *)msh->cmd_table[i])->builtin.builtin == true)
-		{	
-			//if (((t_cmd *)msh->cmd_table[i])->n_outf)
-			set_outfile(msh, ((t_cmd *)msh->cmd_table[i]), -1);
+		if (((t_cmd *)msh->cmd_table[i])->args[0]
+			&& ((t_cmd *)msh->cmd_table[i])->builtin.builtin == true)
+		{
+			set_redirections(msh, i);
 			msh_builtins(msh, i);
 		}
 		else if (((t_cmd *)msh->cmd_table[i])->args[0])
-			msh_fork(msh, msh->fd_in, msh->fd_out, i);
-		msh->fd_pipe_read = msh->fd[0];
-		close_fds(msh);
+		{
+			if (i < msh->n_cmds - 1)
+			{
+				if (pipe(msh->fd) == -1)
+					msh_exit(msh, "pipe failed", 1);
+			}
+			msh_fork(msh, i);
+		}
 	}
 	i = -1;
 	while (++i < msh->n_cmds && msh->pid[i] != -1)

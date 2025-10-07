@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/06 22:02:46 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/07 19:50:30 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	run_command(t_msh *msh, int i);
 void	msh_pid(t_msh *msh);
 void	msh_fork(t_msh *msh, int i, int fd_in, int fd_out);
 void	msh_execute(t_msh *msh, int i);
-void	collect_all_heredocs(t_msh *msh, int i, int j);
+void	collect_all_heredocs(t_msh *msh, int i);
 void	init_env_vars(t_msh *msh, char **envp);
 void	free_env_var(void *content);
 void	ft_printenv(t_list *env_vars);
@@ -127,7 +127,7 @@ void	msh_initialize(t_msh *msh)
 {
 	msh->error_check = false;
 	msh->cpy_in_str = msh->in_str;
-	msh->fd_pipe_read = STDIN_FILENO;
+	msh->fd_pipe_read = -1;
 	msh->fd_in = -1; 
 	msh->fd_out = -1;
 	msh->fd[0] = -1;
@@ -144,6 +144,8 @@ void	handle_signal(int signal)
 		return_prompt();
 	}	
 }
+
+void	print_heredoc_fd(t_msh *msh); // test
 
 int	main(int argc, char **argv, char **envp)
 {
@@ -188,7 +190,8 @@ int	main(int argc, char **argv, char **envp)
 		if (!msh.error_check)
 			msh_pid(&msh); //allocates for msh.pid
 		if (!msh.error_check)
-			collect_all_heredocs(&msh, -1, -1);
+			collect_all_heredocs(&msh, -1);
+		//print_heredoc_fd(&msh);
 		// if (!msh.error_check)
 		// {
 		// 	if (((t_cmd *)msh.cmd_table[0])->builtin.builtin == true && msh.n_cmds == 1)//why only if n_cmds is 1?
