@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/08 16:47:19 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/08 20:36:52 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,34 +30,35 @@ void	msh_pwd(t_msh *msh)
 		ft_putstr_fd("pwd: error retrieving ", STDERR_FILENO);
 		ft_putstr_fd("current directory: ", STDERR_FILENO);
 		msh_quit(msh, "getcwd: cannot access parent directories", 1);
-		return ;
 	}
-	ft_putendl_fd(pwd, msh->fd_out);
+	ft_putendl_fd(pwd, STDOUT_FILENO);
 	free(pwd);
 }
 
 int	msh_cd(t_msh *msh, int i) // also needs to change the value in OLDPWD to
-// what has been the value of PWD before
+// what has been the value of PWD before // another case: delet parent directory of the series of nested directories
 {
-	// struct stat	stats;
-	size_t len;
+	t_cmd	*cmd;
+	char	*path;
+	char	*oldpwd;
 
-	if (((t_cmd *)msh->cmd_table[i])->args[2])
-		return (printf("%s\n", "cd: too many arguments"), 1);
-	len = ft_strlen(((t_cmd *)msh->cmd_table[i])->args[1]);
-	if (!((t_cmd *)msh->cmd_table[i])->args[1])
-		msh->status = chdir("/home/edarmaev/");
-	(void)len;
-	/*stat(((t_cmd *)msh->cmd_table[i])->args[1], &stats);
-	//	msh_quit(msh, "cd: stat failed");
-	if (!S_ISDIR(stats.st_mode))
-		printf("cd: %s: not a directory\n", array[1]);
-	if (stats.st_mode & F_OK)
-		msh->status = chdir(((t_cmd *)msh->cmd_table[i])->args[1]);
-	if (!(stats.st_mode & F_OK))
-		printf("cd: %s: no such file or directory\n", ((t_cmd *)msh->cmd_table[i])->args[1]);
-	if (access(((t_cmd *)msh->cmd_table[i])->args[1], X_OK) == 0)
-		printf("cd: permission denied: %s\n", ((t_cmd *)msh->cmd_table[i])->args[1]);*/
+	cmd = msh->cmd_table[i];
+	path = ((t_cmd *)msh->cmd_table[i])->args[1];
+	oldpwd = "current working directory"; // should get it from env PWD
+	if (cmd->args[2])
+		msh_print(msh, "cd: too many arguments", 1);
+	if (!path)
+		path = "/home/edarmaev/"; // should get it from env HOME
+	// if (path[0] == '-' && path[1] == '\0')
+	// 	path = oldpwd;
+	msh->status = chdir(path);
+	if (msh->status != 0)
+		perror(path);
+	// else
+	// {
+	// 	if (!check_and_update_env_var_value(msh, "OLDPWD", oldpwd))
+	// 		add_to_env_vars(msh, "OLDPWD", oldpwd);
+	// }
 	return (msh->status);
 }
 

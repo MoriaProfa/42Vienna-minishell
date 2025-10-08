@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/08 17:13:43 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/08 19:41:21 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,7 @@ int	set_redirections(t_msh *msh, int i)
 		return (1);
 	if (((t_cmd *)msh->cmd_table[i])->last_input == T_HEREDOC_REDIRECT)
 	{
-		dup2(((t_cmd *)msh->cmd_table[i])->heredoc_read, STDIN_FILENO);
+		dup2(((t_cmd *)msh->cmd_table[i])->heredoc_read, STDIN_FILENO); // add close
 	}
 	close_heredoc_fds(msh);
 	if (msh->fd[1] != -1 && i < msh->n_cmds - 1)

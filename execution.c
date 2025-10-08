@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/08 17:41:27 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/08 19:39:41 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,6 @@ void	msh_execute(t_msh *msh, int i)
 		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == 0)
 		execve(((t_cmd *)msh->cmd_table[i])->pathname,
 			((t_cmd *)msh->cmd_table[i])->args, msh->envp);
-	msh_quit(msh, "execve failed", 1);
 	msh_quit(msh, "execve failed", 1);
 }
 
@@ -105,7 +104,7 @@ void	msh_fork(t_msh *msh, int i)
 		else
 		{
 			msh_builtins(msh, i);
-			exit(0);
+			exit(0); // close everything fds
 		}
 	}
 	if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
