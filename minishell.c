@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/08 18:15:36 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/09 00:36:22 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ void	free_env_var(void *content);
 void	ft_printenv(t_list *env_vars);
 void    build_envp_array(t_msh *msh);
 void    free_envp(t_msh *msh);
+void	msh_builtins(t_msh *msh, int i);
 
 volatile sig_atomic_t   g_signal_flag;
 
@@ -195,11 +196,11 @@ int	main(int argc, char **argv, char **envp)
 		if (!msh.error_check)
 			collect_all_heredocs(&msh, -1);
 		//print_heredoc_fd(&msh);
-		// if (!msh.error_check)
-		// {
-		// 	if (((t_cmd *)msh.cmd_table[0])->builtin.builtin == true && msh.n_cmds == 1)//why only if n_cmds is 1?
-		// 	msh_builtins(&msh, 0);
-		// }
+		if (!msh.error_check)
+		{
+			if (((t_cmd *)msh.cmd_table[0])->builtin.builtin == true && msh.n_cmds == 1)//why only if n_cmds is 1?
+			msh_builtins(&msh, 0);
+		}
 		if (!msh.error_check)
 			run_command(&msh, -1);
 		msh_free(&msh);
