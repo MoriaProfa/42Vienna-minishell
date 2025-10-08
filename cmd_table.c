@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/08 23:35:33 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/08 23:47:36 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -358,11 +358,11 @@ void	build_cmd_table(t_msh *msh)
 				sizeof(t_cmd *)))
 			msh_quit(msh, "cmd table array capacity increase malloc failed", 1);
 		msh->cmd_table[msh->n_cmds] = init_cmd(msh);
-		parse_single_cmd_tokens(msh->cmd_table[msh->n_cmds], &tokens, msh);
-		if (msh->cmd_table[msh->n_cmds]->args[0])
-			msh->cmd_table[msh->n_cmds]->pathname = create_cmd_pathname(msh,
-					msh->cmd_table[msh->n_cmds]->args[0]);
 		msh->n_cmds++;
+		parse_single_cmd_tokens(msh->cmd_table[msh->n_cmds - 1], &tokens, msh);
+		if (msh->cmd_table[msh->n_cmds - 1]->args[0])
+			msh->cmd_table[msh->n_cmds - 1]->pathname = create_cmd_pathname(msh,
+					msh->cmd_table[msh->n_cmds - 1]->args[0]);
 	}
 }
 
