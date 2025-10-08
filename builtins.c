@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/08 20:36:52 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/09 00:27:34 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -234,9 +234,10 @@ void	msh_export(t_msh *msh, char **args)
 		value = get_env_value(args[i], name_len + 1);
 		if (!value)
 			(free(name), msh_quit(msh, "export: value init malloc failed", 1));
-		if (!check_and_update_env_var_value(msh, name, value))
-			(add_to_env_vars(msh, name, value), free(value));
-		free(name);
+		if (check_and_update_env_var_value(msh, name, value))
+			free(name);
+		else
+			add_to_env_vars(msh, name, value);
 	}
 	if (!args[1])
 		handle_export_wo_args(msh);
