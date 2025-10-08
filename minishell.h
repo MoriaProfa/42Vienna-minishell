@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/08 16:49:10 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/08 17:18:56 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,6 +170,6 @@ __attribute__((noreturn)) void	msh_quit(t_msh *msh, char *msg, int status);
 void	msh_print(t_msh *msh, char *msg, int status);
 
 // redirection.c
-void	set_redirections(t_msh *msh, int i);
+int	set_redirections(t_msh *msh, int i);
 
 #endif

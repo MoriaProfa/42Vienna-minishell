@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/08 16:48:36 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/08 17:13:43 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,34 +34,34 @@ static int	check_access_write(char *file)
 		return (1);
 }
 
-static void	set_infile(t_msh *msh, t_cmd *cmd, int j)
+static int	set_infile(t_msh *msh, t_cmd *cmd, int j)
 {
 	while (cmd->infiles[++j])
 	{
 		if (msh->fd_in != -1)
 			close(msh->fd_in);
 		if (check_access_read(cmd->infiles[j]) == 0)
-			msh_quit(msh, NULL, 1);
+			return (1);
 		msh->fd_in = open(cmd->infiles[j], O_RDONLY);
 		if (msh->fd_in == -1)
 		{
 			perror(cmd->infiles[j]);
-			msh_quit(msh, NULL, 1); // msh_print(msh, NULL, 1);
-				// or should we exit?
+			return (1); // or should we exit?
 		}
 		dup2(msh->fd_in, STDIN_FILENO);
 		close(msh->fd_in);
 	}
+	return (0);
 }
 
-void	set_outfile(t_msh *msh, t_cmd *cmd, int j)
+static int	set_outfile(t_msh *msh, t_cmd *cmd, int j)
 {
 	while (cmd->outfiles[++j].filename)
 	{
 		if (msh->fd_out != -1)
 			close(msh->fd_out);
 		if (check_access_write(cmd->outfiles[j].filename) == 0)
-			msh_quit(msh, NULL, 1);
+			return (1);
 		if (cmd->outfiles[j].append == false)
 			msh->fd_out = open(cmd->outfiles[j].filename,
 					O_RDWR | O_CREAT | O_TRUNC, 0644);
@@ -71,11 +71,12 @@ void	set_outfile(t_msh *msh, t_cmd *cmd, int j)
 		if (msh->fd_out == -1)
 		{
 			perror(cmd->outfiles[j].filename);
-			msh_quit(msh, NULL, 1); // msh_print(msh, NULL, 1); // maybe exit?
+			return (1); // or should we exit?
 		}
 		dup2(msh->fd_out, STDOUT_FILENO);
 		close(msh->fd_out);
 	}
+	return (0);
 }
 
 void	close_heredoc_fds(t_msh *msh)
@@ -90,7 +91,7 @@ void	close_heredoc_fds(t_msh *msh)
 	}
 }
 
-void	set_redirections(t_msh *msh, int i)
+int	set_redirections(t_msh *msh, int i)
 {
 	if (msh->fd[0] != -1 && i < msh->n_cmds - 1)
 		close(msh->fd[0]);
@@ -99,7 +100,8 @@ void	set_redirections(t_msh *msh, int i)
 		dup2(msh->fd_pipe_read, STDIN_FILENO);
 		close(msh->fd_pipe_read);
 	}
-	set_infile(msh, ((t_cmd *)msh->cmd_table[i]), -1);
+	if (set_infile(msh, ((t_cmd *)msh->cmd_table[i]), -1) == 1)
+		return (1);
 	if (((t_cmd *)msh->cmd_table[i])->last_input == T_HEREDOC_REDIRECT)
 	{
 		dup2(((t_cmd *)msh->cmd_table[i])->heredoc_read, STDIN_FILENO);
@@ -110,5 +112,7 @@ void	set_redirections(t_msh *msh, int i)
 		dup2(msh->fd[1], STDOUT_FILENO);
 		close(msh->fd[1]);
 	}
-	set_outfile(msh, ((t_cmd *)msh->cmd_table[i]), -1);
+	if (set_outfile(msh, ((t_cmd *)msh->cmd_table[i]), -1) == 1)
+		return (1);
+	return (0);
 }
