@@ -6,13 +6,12 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 21:20:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/08 15:56:40 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/08 16:45:17 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-size_t	get_max_size(char *str1, char *str2);
 bool	check_and_update_env_var_value(t_msh *msh, char *name, char *value);
 
 void	free_env_var(void *content)
