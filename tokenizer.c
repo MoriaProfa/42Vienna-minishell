@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/06 19:14:39 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/08 05:56:32 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,24 +47,48 @@ void	free_token(void *content)
 	free(cur_token);
 }
 
-void	fill_token_list(t_msh *msh, const char *value, t_token_type type,
+t_token	*create_token(t_msh *msh, char *value, t_token_type type, 
+	int *quoted_adjacent)
+{
+	t_token	*token;
+
+	token = ft_calloc(1, sizeof(t_token));
+	if (!token)
+	{
+		if (type == T_WORD)
+			free(value);
+		msh_exit(msh, "tokenizer: create token malloc failed", 1);
+	}
+	token->value = ft_strdup(value);
+	if (!token->value)
+	{
+		if (type == T_WORD)
+			free(value);
+		free(token);
+		msh_exit(msh, "tokenizer: create token->value malloc failed", 1);
+	}
+	token->type = type;
+	token->quoted = quoted_adjacent[0];
+	token->is_adjacent = quoted_adjacent[1];
+	return (token);
+}
+
+void	fill_token_list(t_msh *msh, char *value, t_token_type type,
 		int *quoted_adjacent)
 {
 	t_list	*cur_node;
-	t_token	*cur_token;
+	t_token	*token;
 
-	cur_token = ft_calloc(1, sizeof(t_token));
-	if (!cur_token)
-		msh_exit(msh, "tokenizer: token malloc failed", 1);
-	cur_token->value = ft_strdup(value);
-	if (!cur_token->value)
-		msh_exit(msh, "tokenizer: value malloc failed", 1);
-	cur_token->type = type;
-	cur_token->quoted = quoted_adjacent[0];
-	cur_token->is_adjacent = quoted_adjacent[1];
-	cur_node = ft_lstnew(cur_token);
+	token = create_token(msh, value, type, quoted_adjacent);
+	cur_node = ft_lstnew(token);
 	if (!cur_node)
+	{
+		if (type == T_WORD)
+			free(value);
+		free(token->value);
+		free(token);
 		msh_exit(msh, "tokenizer: node malloc failed", 1);
+	}
 	ft_lstadd_back(&msh->tokens, cur_node);
 }
 

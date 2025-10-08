@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/07 01:46:09 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/08 04:18:39 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void	ft_printenv(t_list *env_vars);
 char	*get_env_name(char *str, size_t *name_len);
 char	*get_env_value(char *str, size_t name_len);
-void	add_to_env_vars(t_msh *msh, const char *name, const char *value);
+void	add_to_env_vars(t_msh *msh, char *name, char *value);
 void	build_envp_array(t_msh *msh);
 void	free_env_var(void *content);
 void	msh_free(t_msh *msh);
@@ -72,7 +72,8 @@ void	populate_names_array(t_msh *msh, char **names_array, size_t size)
 	while (i < size && cur_node)
 	{
 		cur_env_var = (t_env_var *)(cur_node->content);
-		if (cur_env_var && cur_env_var->name)
+		if (cur_env_var && cur_env_var->name && ft_strncmp(cur_env_var->name, 
+			"_", ft_strlen(cur_env_var->name) + 1))
 		{
 			names_array[i] = ft_strdup(cur_env_var->name);
 			if (!names_array[i])
@@ -85,26 +86,12 @@ void	populate_names_array(t_msh *msh, char **names_array, size_t size)
 		}
 		cur_node = cur_node->next;
 	}
-	names_array[size] = NULL;
-}
-
-size_t	get_max_size(char *str1, char *str2)
-{
-	size_t	len1;
-	size_t	len2;
-
-	len1 = ft_strlen(str1);
-	len2 = ft_strlen(str2);
-	if (len1 > len2)
-		return (len1);
-	return (len2);
 }
 
 void	sort_names_array(char **array, size_t size)
 {
 	char	*tmp;
 	size_t	i;
-	size_t	max_size;
 	bool	swapped;
 
 	if (!array || size < 2)
@@ -116,8 +103,7 @@ void	sort_names_array(char **array, size_t size)
 		i = 0;
 		while (i + 1 < size && array[i] && array[i + 1])
 		{
-			max_size = get_max_size(array[i], array[i + 1]);
-			if (ft_strncmp(array[i], array[i + 1], max_size) > 0)
+			if (ft_strncmp(array[i], array[i + 1], ft_strlen(array[i]) + 1) > 0)
 			{
 				tmp = array[i];
 				array[i] = array[i + 1];
@@ -133,7 +119,6 @@ void	print_env_var(t_msh *msh, char *name)
 {
 	t_list		*cur_node;
 	t_env_var	*cur_env_var;
-	size_t		max_size;
 
 	cur_node = msh->env_vars;
 	while (cur_node)
@@ -141,8 +126,7 @@ void	print_env_var(t_msh *msh, char *name)
 		cur_env_var = (t_env_var *)(cur_node->content);
 		if (cur_env_var && cur_env_var->name)
 		{
-			max_size = get_max_size(name, cur_env_var->name);
-			if (!ft_strncmp(name, cur_env_var->name, max_size))
+			if (!ft_strncmp(name, cur_env_var->name, ft_strlen(name) + 1))
 			{
 				if (cur_env_var->value && ft_strlen(cur_env_var->value))
 					printf("declare -x %s=\"%s\"\n", cur_env_var->name,
@@ -206,14 +190,12 @@ bool	check_and_update_env_var_value(t_msh *msh, char *name, char *value)
 {
 	t_list		*cur_node;
 	t_env_var	*cur_env_var;
-	size_t		max_size;
 
 	cur_node = msh->env_vars;
 	while (cur_node)
 	{
 		cur_env_var = (t_env_var *)(cur_node->content);
-		max_size = get_max_size(name, cur_env_var->name);
-		if (!ft_strncmp(name, cur_env_var->name, max_size))
+		if (!ft_strncmp(name, cur_env_var->name, ft_strlen(name) + 1))
 		{
 			if (value)
 			{
@@ -263,8 +245,7 @@ void	check_and_delete_env_var(t_msh *msh, char *name)
 	while (cur_node)
 	{
 		cur_env_var = (t_env_var *)cur_node->content;
-		if (!ft_strncmp(name, cur_env_var->name, get_max_size(name,
-					cur_env_var->name)))
+		if (!ft_strncmp(name, cur_env_var->name, ft_strlen(name) + 1))
 		{
 			if (cur_node->prev)
 				cur_node->prev->next = cur_node->next;
@@ -348,24 +329,18 @@ void	msh_builtins(t_msh *msh, int i)
 	if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_PWD)
 		msh_pwd(msh);
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_CD)
-	{
-		msh_cd(msh, i);
-		build_envp_array(msh);
-	}
+		(msh_cd(msh, i), build_envp_array(msh));
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_EXIT)
-		msh_exit(msh, "exit", 0); // if there are more entries in the args-array than just "exit" it should print an error (only cares for args[1], args[1+] are ignored) and change msh->status to 2 before ending
+	{		
+		msh_exit(msh, "exit", 0);
+	}
+	// if there are more entries in the args-array than just "exit" it should print an error (only cares for args[1], args[1+] are ignored) and change msh->status to 2 before ending
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_ENV)
 		ft_printenv(msh->env_vars);
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_EXPORT)
-	{
-		msh_export(msh, msh->cmd_table[i]->args);
-		build_envp_array(msh);
-	}
+		(msh_export(msh, msh->cmd_table[i]->args), build_envp_array(msh));
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_UNSET)
-	{
-		msh_unset(msh, msh->cmd_table[i]->args);
-		build_envp_array(msh);
-	}
+		(msh_unset(msh, msh->cmd_table[i]->args), build_envp_array(msh));
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_ECHO)
 		msh_echo(msh, msh->cmd_table[i]->args);
 	return ;
