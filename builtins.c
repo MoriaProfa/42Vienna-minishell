@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/09 00:27:34 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/08 17:02:58 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,35 +30,34 @@ void	msh_pwd(t_msh *msh)
 		ft_putstr_fd("pwd: error retrieving ", STDERR_FILENO);
 		ft_putstr_fd("current directory: ", STDERR_FILENO);
 		msh_quit(msh, "getcwd: cannot access parent directories", 1);
+		return ;
 	}
-	ft_putendl_fd(pwd, STDOUT_FILENO);
+	ft_putendl_fd(pwd, msh->fd_out);
 	free(pwd);
 }
 
 int	msh_cd(t_msh *msh, int i) // also needs to change the value in OLDPWD to
-// what has been the value of PWD before // another case: delet parent directory of the series of nested directories
+// what has been the value of PWD before
 {
-	t_cmd	*cmd;
-	char	*path;
-	char	*oldpwd;
+	// struct stat	stats;
+	size_t len;
 
-	cmd = msh->cmd_table[i];
-	path = ((t_cmd *)msh->cmd_table[i])->args[1];
-	oldpwd = "current working directory"; // should get it from env PWD
-	if (cmd->args[2])
-		msh_print(msh, "cd: too many arguments", 1);
-	if (!path)
-		path = "/home/edarmaev/"; // should get it from env HOME
-	// if (path[0] == '-' && path[1] == '\0')
-	// 	path = oldpwd;
-	msh->status = chdir(path);
-	if (msh->status != 0)
-		perror(path);
-	// else
-	// {
-	// 	if (!check_and_update_env_var_value(msh, "OLDPWD", oldpwd))
-	// 		add_to_env_vars(msh, "OLDPWD", oldpwd);
-	// }
+	if (((t_cmd *)msh->cmd_table[i])->args[2])
+		return (printf("%s\n", "cd: too many arguments"), 1);
+	len = ft_strlen(((t_cmd *)msh->cmd_table[i])->args[1]);
+	if (!((t_cmd *)msh->cmd_table[i])->args[1])
+		msh->status = chdir("/home/edarmaev/");
+	(void)len;
+	/*stat(((t_cmd *)msh->cmd_table[i])->args[1], &stats);
+	//	msh_quit(msh, "cd: stat failed");
+	if (!S_ISDIR(stats.st_mode))
+		printf("cd: %s: not a directory\n", array[1]);
+	if (stats.st_mode & F_OK)
+		msh->status = chdir(((t_cmd *)msh->cmd_table[i])->args[1]);
+	if (!(stats.st_mode & F_OK))
+		printf("cd: %s: no such file or directory\n", ((t_cmd *)msh->cmd_table[i])->args[1]);
+	if (access(((t_cmd *)msh->cmd_table[i])->args[1], X_OK) == 0)
+		printf("cd: permission denied: %s\n", ((t_cmd *)msh->cmd_table[i])->args[1]);*/
 	return (msh->status);
 }
 
@@ -298,8 +297,8 @@ void	print_echo_args(t_msh *msh, char **args, int start)
 	while (args[++start])
 	{
 		if (!begin)
-			ft_putchar_fd(' ', STDOUT_FILENO);
-		ft_putstr_fd(args[start], STDOUT_FILENO);
+			ft_putchar_fd(' ', msh->fd_out);
+		ft_putstr_fd(args[start], msh->fd_out);
 		msh->status = 0;
 		begin = false;
 	}
@@ -311,7 +310,7 @@ void	msh_echo(t_msh *msh, char **args)
 
 	if (!args[1])
 	{
-		ft_putchar_fd('\n', STDOUT_FILENO);
+		ft_putchar_fd('\n', msh->fd_out);
 		return ;
 	}
 	skip_newline = check_newline_skipping(args[1]);
@@ -327,8 +326,8 @@ void	msh_echo(t_msh *msh, char **args)
 		start--;
 	print_echo_args(msh, args, start);	
 	if (!skip_newline)
-		ft_putchar_fd('\n', STDOUT_FILENO);
-	//ft_putstr_fd("\tnewline for better visibility\n", STDOUT_FILENO);//just for testing
+		ft_putchar_fd('\n', msh->fd_out);
+	//ft_putstr_fd("\tnewline for better visibility\n", msh->fd_out);//just for testing
 }
 
 void	msh_builtins(t_msh *msh, int i)
