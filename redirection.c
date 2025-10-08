@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/05 23:25:38 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/08 14:36:19 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ static void	set_input(t_msh *msh, int i, int j)
 		if (msh->fd_in != STDIN_FILENO)
 			close(msh->fd_in);
 		if (pipe(msh->hd_fd) == -1)
-			msh_exit(msh, "pipe failed", 1);
+			msh_quit(msh, "pipe failed", 1);
 		write(msh->hd_fd[1], ((t_cmd *)msh->cmd_table[i])->heredocs->buffer,
 			ft_strlen(((t_cmd *)msh->cmd_table[i])->heredocs->buffer));
 		close(msh->hd_fd[1]);

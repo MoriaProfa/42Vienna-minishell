@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/08 05:56:32 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/08 14:36:19 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ t_token	*create_token(t_msh *msh, char *value, t_token_type type,
 	{
 		if (type == T_WORD)
 			free(value);
-		msh_exit(msh, "tokenizer: create token malloc failed", 1);
+		msh_quit(msh, "tokenizer: create token malloc failed", 1);
 	}
 	token->value = ft_strdup(value);
 	if (!token->value)
@@ -65,7 +65,7 @@ t_token	*create_token(t_msh *msh, char *value, t_token_type type,
 		if (type == T_WORD)
 			free(value);
 		free(token);
-		msh_exit(msh, "tokenizer: create token->value malloc failed", 1);
+		msh_quit(msh, "tokenizer: create token->value malloc failed", 1);
 	}
 	token->type = type;
 	token->quoted = quoted_adjacent[0];
@@ -87,7 +87,7 @@ void	fill_token_list(t_msh *msh, char *value, t_token_type type,
 			free(value);
 		free(token->value);
 		free(token);
-		msh_exit(msh, "tokenizer: node malloc failed", 1);
+		msh_quit(msh, "tokenizer: node malloc failed", 1);
 	}
 	ft_lstadd_back(&msh->tokens, cur_node);
 }
@@ -197,7 +197,7 @@ char	*create_word_token(t_msh *msh)
 		start = handle_unquoted(msh, &len);
 	word = ft_calloc(len + 1, sizeof(char));
 	if (!word)
-		msh_exit(msh, "tokenizer: word malloc failed", 1);
+		msh_quit(msh, "tokenizer: word malloc failed", 1);
 	ft_memcpy(word, start, len);
 	word[len] = '\0';
 	return (word);
@@ -271,7 +271,7 @@ void	join_token_content(t_token *previous, t_token *current, t_msh *msh)
 
 	joined = ft_strjoin(previous->value, current->value);
 	if (!joined)
-		msh_exit(msh, "token value merging ft_strjoin malloc failed", 1);
+		msh_quit(msh, "token value merging ft_strjoin malloc failed", 1);
 	free(previous->value);
 	previous->value = joined;
 	previous->quoted = merge_quote_types(previous->quoted, current->quoted);

@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 02:39:40 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/06 19:20:16 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/08 14:36:19 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,11 @@ static char	*create_envp_entry(char *name, char *value, t_msh *msh)
 		return (NULL);
 	tmp = ft_strjoin(name, "=");
 	if (!tmp)
-		msh_exit(msh, "(re)building envp entry 1st strjoin malloc failed", 1);
+		msh_quit(msh, "(re)building envp entry 1st strjoin malloc failed", 1);
 	result = ft_strjoin(tmp, value);
 	free(tmp);
 	if (!result)
-		msh_exit(msh, "(re)building envp entry 2nd strjoin malloc failed", 1);
+		msh_quit(msh, "(re)building envp entry 2nd strjoin malloc failed", 1);
 	return (result);
 }
 
@@ -50,7 +50,7 @@ void	build_envp_array(t_msh *msh)
 	size = ft_lstsize(msh->env_vars);
 	msh->envp = ft_calloc(size + 1, sizeof(char *));
 	if (!msh->envp)
-		msh_exit(msh, "(re)building envp array malloc failed", 1);
+		msh_quit(msh, "(re)building envp array malloc failed", 1);
 	cur_node = msh->env_vars;
 	i = -1;
 	while (++i < size && cur_node)
