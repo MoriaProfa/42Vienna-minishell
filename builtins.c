@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/07 12:22:31 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/08 13:57:20 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ void	msh_pwd(t_msh *msh) //if !pwd, get value of PWD in env_var, if there is no 
 	{
 		ft_putstr_fd("pwd: error retrieving ", STDERR_FILENO);
 		ft_putstr_fd("current directory: ", STDERR_FILENO);
-		msh_exit(msh, "getcwd: cannot access parent directories", 1);
+		msh_quit(msh, "getcwd: cannot access parent directories", 1);
 	}
 	ft_putendl_fd(pwd, msh->fd_out);
 	free(pwd);
@@ -88,7 +88,7 @@ int	msh_cd(t_msh *msh, int i) // also needs to change the value in OLDPWD to
 		msh->status = chdir("/home/edarmaev/");
 	(void)len;
 	/*stat(((t_cmd *)msh->cmd_table[i])->args[1], &stats);
-	//	msh_exit(msh, "cd: stat failed");
+	//	msh_quit(msh, "cd: stat failed");
 	if (!S_ISDIR(stats.st_mode))
 		printf("cd: %s: not a directory\n", array[1]);
 	if (stats.st_mode & F_OK)
@@ -117,7 +117,7 @@ void	populate_names_array(t_msh *msh, char **names_array, size_t size)
 			if (!names_array[i])
 			{
 				ft_array_free(names_array, i);
-				msh_exit(msh, "env names array strdup malloc failed", 1);
+				msh_quit(msh, "env names array strdup malloc failed", 1);
 			}
 //			printf("names_array[%li] = %s\n", i, names_array[i]);//for testing
 			i++;
@@ -204,7 +204,7 @@ void	handle_export_wo_args(t_msh *msh)
 	size = ft_lstsize(msh->env_vars);
 	names_array = ft_calloc(size + 1, sizeof(char *));
 	if (!names_array)
-		msh_exit(msh, "env names array init malloc failed", 1);
+		msh_quit(msh, "env names array init malloc failed", 1);
 	populate_names_array(msh, names_array, size);
 	sort_names_array(names_array, size);
 	i = -1;
@@ -281,10 +281,10 @@ void	msh_export(t_msh *msh, char **args)
 		name_len = 0;
 		name = get_env_name(args[i], &name_len);
 		if (!name)
-			msh_exit(msh, "export: name init malloc failed", 1);
+			msh_quit(msh, "export: name init malloc failed", 1);
 		value = get_env_value(args[i], name_len + 1);
 		if (!value)
-			(free(name), msh_exit(msh, "export: value init malloc failed", 1));
+			(free(name), msh_quit(msh, "export: value init malloc failed", 1));
 		if (!check_and_update_env_var_value(msh, name, value))
 			(add_to_env_vars(msh, name, value), free(value));
 		free(name);
@@ -392,7 +392,7 @@ void	msh_builtins(t_msh *msh, int i)
 		build_envp_array(msh);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_EXIT)
-		msh_exit(msh, "exit", 0); // if there are more entries in the args-array than just "exit" it should print an error (only cares for args[1], args[1+] are ignored) and change msh->status to 2 before ending
+		msh_quit(msh, "exit", 0); // if there are more entries in the args-array than just "exit" it should print an error (only cares for args[1], args[1+] are ignored) and change msh->status to 2 before ending
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_ENV)
 		ft_printenv(msh->env_vars);
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_EXPORT)

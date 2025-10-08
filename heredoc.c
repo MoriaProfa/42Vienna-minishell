@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/07 20:08:34 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/08 13:57:20 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void	expand_heredoc_input(t_msh *msh, char **value)
 
 	result = ft_strdup("");
 	if (!result)
-		msh_exit(msh, "heredoc expansion malloc failed", 1);
+		msh_quit(msh, "heredoc expansion malloc failed", 1);
 	result = expand_value(*value, result, msh);
 	free(*value);
 	*value = result;
@@ -79,7 +79,7 @@ void	collect_all_heredocs(t_msh *msh, int i)
 		while (((t_cmd *)msh->cmd_table[i])->heredocs[++j].delimiter)
 		{
 			if (pipe(fd) == -1)
-				msh_exit(msh, "heredoc pipe failed", 1);
+				msh_quit(msh, "heredoc pipe failed", 1);
 			collect_one_heredoc(msh, (t_cmd *)msh->cmd_table[i], j, fd[1]);
 			if (fd[1] != -1)
 				close(fd[1]);

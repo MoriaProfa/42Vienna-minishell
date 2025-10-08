@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/07 19:50:30 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/08 13:57:20 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ void	msh_free(t_msh *msh)
 	msh->pid = NULL;
 }
 
-void	msh_exit(t_msh *msh, char *msg, int status)
+void	msh_quit(t_msh *msh, char *msg, int status)
 {
 	int	fd;
 
@@ -163,7 +163,7 @@ int	main(int argc, char **argv, char **envp)
 	{
 		msh.in_str = readline("minishell> ");
 		if (!msh.in_str) //by pressing CTRL+D
-			break ;//msh_exit(&msh, "exit", 0);//didnt work as intended for not yet known reason?!
+			break ;//msh_quit(&msh, "exit", 0);//didnt work as intended for not yet known reason?!
 		if (msh.in_str[0] == '\0')
 		{
 			free(msh.in_str);
@@ -201,6 +201,6 @@ int	main(int argc, char **argv, char **envp)
 			run_command(&msh, -1);
 		msh_free(&msh);
 	}
-	msh_exit(&msh, NULL, msh.status);
+	msh_quit(&msh, NULL, msh.status);
 	return (0);
 }

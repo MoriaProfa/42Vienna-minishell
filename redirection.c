@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/07 19:53:30 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/08 13:57:20 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,12 +41,12 @@ static void	set_infile(t_msh *msh, t_cmd *cmd, int j)
 		if (msh->fd_in != -1)
 			close(msh->fd_in);
 		if (check_access_read(cmd->infiles[j]) == 0)
-			msh_exit(msh, NULL, 1);
+			msh_quit(msh, NULL, 1);
 		msh->fd_in = open(cmd->infiles[j], O_RDONLY);
 		if (msh->fd_in == -1)
 		{
 			perror(cmd->infiles[j]);
-			msh_exit(msh, NULL, 1); // msh_print(msh, NULL, 1);
+			msh_quit(msh, NULL, 1); // msh_print(msh, NULL, 1);
 				// or should we exit?
 		}
 		dup2(msh->fd_in, STDIN_FILENO);
@@ -61,7 +61,7 @@ void	set_outfile(t_msh *msh, t_cmd *cmd, int j)
 		if (msh->fd_out != -1)
 			close(msh->fd_out);
 		if (check_access_write(cmd->outfiles[j].filename) == 0)
-			msh_exit(msh, NULL, 1);
+			msh_quit(msh, NULL, 1);
 		if (cmd->outfiles[j].append == false)
 			msh->fd_out = open(cmd->outfiles[j].filename,
 					O_RDWR | O_CREAT | O_TRUNC, 0644);
@@ -71,7 +71,7 @@ void	set_outfile(t_msh *msh, t_cmd *cmd, int j)
 		if (msh->fd_out == -1)
 		{
 			perror(cmd->outfiles[j].filename);
-			msh_exit(msh, NULL, 1); // msh_print(msh, NULL, 1); // maybe exit?
+			msh_quit(msh, NULL, 1); // msh_print(msh, NULL, 1); // maybe exit?
 		}
 		dup2(msh->fd_out, STDOUT_FILENO);
 		close(msh->fd_out);

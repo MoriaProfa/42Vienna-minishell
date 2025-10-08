@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/07 20:52:55 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/08 13:57:20 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	msh_pid(t_msh *msh)
 	i = -1;
 	msh->pid = (pid_t *)ft_calloc(msh->n_cmds + 1, sizeof(pid_t));
 	if (!msh->pid)
-		msh_exit(msh, "pid malloc error", 1);
+		msh_quit(msh, "pid malloc error", 1);
 	while (++i < msh->n_cmds)
 		msh->pid[i] = -1;
 }
@@ -34,20 +34,20 @@ void	msh_execute(t_msh *msh, int i)
 		msh->status = 127;
 		ft_putstr_fd(((t_cmd *)msh->cmd_table[i])->args[0], STDERR_FILENO);
 		ft_putstr_fd(": ", STDERR_FILENO);
-		msh_exit(msh, "Command not found", 1);
+		msh_quit(msh, "Command not found", 1);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->pathname
 		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == -1)
 	{
 		msh->status = 126;
 		perror(((t_cmd *)msh->cmd_table[i])->args[0]);
-		msh_exit(msh, NULL, 1);
+		msh_quit(msh, NULL, 1);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->pathname
 		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == 0)
 		execve(((t_cmd *)msh->cmd_table[i])->pathname,
 			((t_cmd *)msh->cmd_table[i])->args, msh->envp);
-	msh_exit(msh, "execve failed", 1);
+	msh_quit(msh, "execve failed", 1);
 }
 
 void	close_fds(t_msh *msh)
@@ -70,7 +70,7 @@ void	msh_fork(t_msh *msh, int i)
 {
 	msh->pid[i] = fork();
 	if (msh->pid[i] == -1)
-		msh_exit(msh, "fork failed", 1);
+		msh_quit(msh, "fork failed", 1);
 	if (msh->pid[i] == 0)
 	{
 		set_redirections(msh, i);
@@ -112,7 +112,7 @@ void	run_command(t_msh *msh, int i)
 			if (i < msh->n_cmds - 1)
 			{
 				if (pipe(msh->fd) == -1)
-					msh_exit(msh, "pipe failed", 1);
+					msh_quit(msh, "pipe failed", 1);
 			}
 			msh_fork(msh, i);
 		}
