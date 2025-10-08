@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/08 13:57:20 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/08 16:37:33 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -349,8 +349,8 @@ void	print_echo_args(t_msh *msh, char **args, int start)
 	while (args[++start])
 	{
 		if (!begin)
-			ft_putchar_fd(' ', msh->fd_out);
-		ft_putstr_fd(args[start], msh->fd_out);
+			ft_putchar_fd(' ', STDOUT_FILENO);
+		ft_putstr_fd(args[start], STDOUT_FILENO);
 		msh->status = 0;
 		begin = false;
 	}
@@ -362,7 +362,7 @@ void	msh_echo(t_msh *msh, char **args)
 
 	if (!args[1])
 	{
-		ft_putchar_fd('\n', msh->fd_out);
+		ft_putchar_fd('\n', STDOUT_FILENO);
 		return ;
 	}
 	skip_newline = check_newline_skipping(args[1]);
@@ -378,8 +378,8 @@ void	msh_echo(t_msh *msh, char **args)
 		start--;
 	print_echo_args(msh, args, start);	
 	if (!skip_newline)
-		ft_putchar_fd('\n', msh->fd_out);
-	//ft_putstr_fd("\tnewline for better visibility\n", msh->fd_out);//just for testing
+		ft_putchar_fd('\n', STDOUT_FILENO);
+	//ft_putstr_fd("\tnewline for better visibility\n", STDOUT_FILENO);//just for testing
 }
 
 void	msh_builtins(t_msh *msh, int i)

@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/08 13:57:20 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/08 15:15:36 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,17 +31,17 @@ void	msh_execute(t_msh *msh, int i)
 {
 	if (!((t_cmd *)msh->cmd_table[i])->pathname)
 	{
-		msh->status = 127;
 		ft_putstr_fd(((t_cmd *)msh->cmd_table[i])->args[0], STDERR_FILENO);
 		ft_putstr_fd(": ", STDERR_FILENO);
-		msh_quit(msh, "Command not found", 1);
+		msh_quit(msh, "Command not found", 127);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->pathname
 		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == -1)
 	{
-		msh->status = 126;
+		printf("cmd_table[%d]\n", i);
 		perror(((t_cmd *)msh->cmd_table[i])->args[0]);
-		msh_quit(msh, NULL, 1);
+		msh_quit(msh, "why are we checking executable permission?\n", 126);
+		msh_quit(msh, NULL, 126);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->pathname
 		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == 0)
@@ -96,6 +96,29 @@ void	msh_fork(t_msh *msh, int i)
 	}
 }
 
+void	save_stdin_stdout(t_msh *msh, int i)
+{
+	if (((t_cmd *)msh->cmd_table[i])->n_outf > 0)
+		msh->saved_stdout = dup(STDOUT_FILENO);
+	if (((t_cmd *)msh->cmd_table[i])->n_inf > 0
+			|| ((t_cmd *)msh->cmd_table[i])->n_hd > 0)
+		msh->saved_stdin = dup(STDIN_FILENO);
+}
+
+void	restore_stdin_stdout(t_msh *msh)
+{
+	if (msh->saved_stdin != -1)
+	{
+		dup2(msh->saved_stdin, STDIN_FILENO);
+		close(msh->saved_stdin);
+	}
+	if (msh->saved_stdout != -1)
+	{
+		dup2(msh->saved_stdout, STDOUT_FILENO);
+		close(msh->saved_stdout);
+	}
+}
+
 void	run_command(t_msh *msh, int i)
 {
 	// need to add signal handling in the child
@@ -104,8 +127,10 @@ void	run_command(t_msh *msh, int i)
 		if (((t_cmd *)msh->cmd_table[i])->args[0]
 			&& ((t_cmd *)msh->cmd_table[i])->builtin.builtin == true)
 		{
+			save_stdin_stdout(msh, i);
 			set_redirections(msh, i);
 			msh_builtins(msh, i);
+			restore_stdin_stdout(msh);
 		}
 		else if (((t_cmd *)msh->cmd_table[i])->args[0])
 		{
