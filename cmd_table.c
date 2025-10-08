@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/08 23:47:36 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/09 00:00:11 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -268,11 +268,13 @@ char	*resolve_cmd_pathname(t_msh *msh, char **paths, char *cmd)
 	{
 		tmp = ft_strjoin(paths[j], "/");
 		if (!tmp)
-			msh_quit(msh, "pathname tmp ft_strjoin malloc failed", 1);
+			(ft_array_free(paths, ft_array_size(paths)),
+				msh_quit(msh, "pathname tmp ft_strjoin malloc failed", 1));
 		pathname = ft_strjoin(tmp, cmd);
 		free(tmp);
 		if (!pathname)
-			msh_quit(msh, "pathname ft_strjoin malloc failed", 1);
+			(ft_array_free(paths, ft_array_size(paths)),
+				msh_quit(msh, "pathname tmp ft_strjoin malloc failed", 1));
 		if (access(pathname, F_OK) == 0)
 			return (pathname);
 		free(pathname);
@@ -307,6 +309,7 @@ char	*create_cmd_pathname(t_msh *msh, char *cmd)
 	}
 	return (pathname);
 }
+
 t_cmd	*init_cmd_data(t_msh *msh, t_cmd *cmd)
 {
 	cmd->capacity_args = 4;
