@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/08 15:15:36 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/08 16:50:18 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ void	msh_pid(t_msh *msh)
 	i = -1;
 	msh->pid = (pid_t *)ft_calloc(msh->n_cmds + 1, sizeof(pid_t));
 	if (!msh->pid)
+		msh_quit(msh, "pid malloc error", 1);
 		msh_quit(msh, "pid malloc error", 1);
 	while (++i < msh->n_cmds)
 		msh->pid[i] = -1;
@@ -48,6 +49,7 @@ void	msh_execute(t_msh *msh, int i)
 		execve(((t_cmd *)msh->cmd_table[i])->pathname,
 			((t_cmd *)msh->cmd_table[i])->args, msh->envp);
 	msh_quit(msh, "execve failed", 1);
+	msh_quit(msh, "execve failed", 1);
 }
 
 void	close_fds(t_msh *msh)
@@ -70,6 +72,7 @@ void	msh_fork(t_msh *msh, int i)
 {
 	msh->pid[i] = fork();
 	if (msh->pid[i] == -1)
+		msh_quit(msh, "fork failed", 1);
 		msh_quit(msh, "fork failed", 1);
 	if (msh->pid[i] == 0)
 	{

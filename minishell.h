@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/08 14:55:01 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/08 16:49:10 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,7 +166,7 @@ typedef struct s_msh
 }					t_msh;
 
 void	free_token(void *content);
-void	msh_quit(t_msh *msh, char *msg, int status);
+__attribute__((noreturn)) void	msh_quit(t_msh *msh, char *msg, int status);
 void	msh_print(t_msh *msh, char *msg, int status);
 
 // redirection.c
