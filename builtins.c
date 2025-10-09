@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/10 01:07:37 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/10 01:49:15 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,16 +77,35 @@ bool	check_for_whitespace_end(char *str, int start)
 {
 	while(str[start])
 	{
-		if (!ft_strchr(" \t", str[start]))
+		if (str[start] != ' ')
 			return (false);
 		start++;
 	}
 	return (true);
 }
 
+void	check_exit_code_validity(t_msh *msh, char *str)
+{
+	int	i;
+
+	if (str[0] == '\0')
+		print_num_error_exit(msh, str);
+	i = 0;
+	while (str[i] == ' ')
+		i++;
+	if (str[i] != '+' && str[i] != '-')
+		i--;
+	while (str[++i])
+	{
+		if (str[i] == ' ' && check_for_whitespace_end(str, i))
+			break ;
+		if (!ft_isdigit(str[i]))
+			print_num_error_exit(msh, str);
+	}
+}
+
 void	msh_exit(t_msh *msh, char **args)
 {
-	int		i;
 	long	code;
 
 	if (!args[1])
@@ -94,21 +113,7 @@ void	msh_exit(t_msh *msh, char **args)
 		ft_putendl_fd("exit", STDERR_FILENO);
 		msh_quit(msh, NULL, 0);
 	}
-	if (args[1][0] == '\0')
-		print_num_error_exit(msh, args[1]);
-	i = 0;
-	while ((args[1][i] >= 9 && args[1][i] <= 13) || args[1][i] == 32)
-		i++;
-	if (args[1][i] != '+' && args[1][i] != '-')
-		i--;
-	while (args[1][++i])
-	{
-		if (ft_strchr(" \t", args[1][i]) && check_for_whitespace_end(args[1], 
-				i))
-			break ;
-		if (!ft_isdigit(args[1][i]))
-			print_num_error_exit(msh, args[1]);
-	}
+	check_exit_code_validity(msh, args[1]);	
 	code = msh_atol(msh, args[1]);
 	if (args[2])
 	{
