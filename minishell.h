@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/08 17:18:56 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/09 21:50:18 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,6 +168,7 @@ typedef struct s_msh
 void	free_token(void *content);
 __attribute__((noreturn)) void	msh_quit(t_msh *msh, char *msg, int status);
 void	msh_print(t_msh *msh, char *msg, int status);
+void	print_num_error_exit(t_msh *msh, char *str);
 
 // redirection.c
 int	set_redirections(t_msh *msh, int i);

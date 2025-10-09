@@ -6,12 +6,12 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/09 01:29:25 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/09 22:42:02 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 //valgrind command:
-//valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes --trace-children=yes --suppressions=minishell.supp ./minishell
+//valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=all --trace-children=yes --suppressions=minishell.supp ./minishell
 //pwd test < file1 > file2 >> file3 test2 << file4 << "file5" | cd hello | ls test3 test4 test5 test6 test7
 
 #include "minishell.h"
@@ -125,7 +125,7 @@ char	*msh_read(ssize_t rr)
 }
 */
 
-/*void	msh_initialize(t_msh *msh)
+void	msh_initialize(t_msh *msh)
 {
 	msh->error_check = false;
 	msh->cpy_in_str = msh->in_str;
@@ -138,23 +138,7 @@ char	*msh_read(ssize_t rr)
 	msh->fd_hd[1] = -1;
 	msh->saved_stdin = -1;
 	msh->saved_stdout = -1;
-}*/
-
-void    msh_initialize(t_msh *msh)
-{
-        msh->error_check = false;
-        msh->cpy_in_str = msh->in_str;
-		msh->fd_pipe_read = -1;
-        msh->fd_in = STDIN_FILENO;
-        msh->fd_out = STDOUT_FILENO;
-        msh->fd[0] = -1;
-        msh->fd[1] = -1;
-        msh->fd_hd[0] = -1;
-        msh->fd_hd[1] = -1;
-		msh->saved_stdin = -1;
-		msh->saved_stdout = -1;
 }
-
 
 void	handle_signal(int signal)
 {
@@ -212,13 +196,13 @@ int	main(int argc, char **argv, char **envp)
 		if (!msh.error_check)
 			collect_all_heredocs(&msh, -1);
 		//print_heredoc_fd(&msh);
-		if (!msh.error_check)
+/*		if (!msh.error_check)
 		{
 			if (((t_cmd *)msh.cmd_table[0])->builtin.builtin == true && msh.n_cmds == 1)//why only if n_cmds is 1?
 			msh_builtins(&msh, 0);
 		}
-		//if (!msh.error_check)
-		//	run_command(&msh, -1);
+*/		if (!msh.error_check)
+			run_command(&msh, -1);
 		msh_free(&msh);
 	}
 	msh_quit(&msh, NULL, msh.status);

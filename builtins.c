@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/09 02:43:29 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/10 01:07:37 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@ void	add_to_env_vars(t_msh *msh, char *name, char *value);
 void	build_envp_array(t_msh *msh);
 void	free_env_var(void *content);
 void	msh_free(t_msh *msh);
+void    free_envp(t_msh *msh);
+long	msh_atol(t_msh *msh, char *nptr);
 
 void	msh_pwd(t_msh *msh)
 {
@@ -63,9 +65,58 @@ void	msh_cd(t_msh *msh, char **args) // also needs to change the value in OLDPWD
 	//}
 }
 
-void	msh_exit(t_msh *msh)
+void	print_num_error_exit(t_msh *msh, char *str)
 {
-	(void)msh;
+	//ft_putendl_fd("exit", STDERR_FILENO);//tester doesnt accept "exit"
+	ft_putstr_fd("exit: ", STDERR_FILENO);
+	ft_putstr_fd(str, STDERR_FILENO);
+	msh_quit(msh, ": numeric argument required", 2);
+}
+
+bool	check_for_whitespace_end(char *str, int start)
+{
+	while(str[start])
+	{
+		if (!ft_strchr(" \t", str[start]))
+			return (false);
+		start++;
+	}
+	return (true);
+}
+
+void	msh_exit(t_msh *msh, char **args)
+{
+	int		i;
+	long	code;
+
+	if (!args[1])
+	{
+		ft_putendl_fd("exit", STDERR_FILENO);
+		msh_quit(msh, NULL, 0);
+	}
+	if (args[1][0] == '\0')
+		print_num_error_exit(msh, args[1]);
+	i = 0;
+	while ((args[1][i] >= 9 && args[1][i] <= 13) || args[1][i] == 32)
+		i++;
+	if (args[1][i] != '+' && args[1][i] != '-')
+		i--;
+	while (args[1][++i])
+	{
+		if (ft_strchr(" \t", args[1][i]) && check_for_whitespace_end(args[1], 
+				i))
+			break ;
+		if (!ft_isdigit(args[1][i]))
+			print_num_error_exit(msh, args[1]);
+	}
+	code = msh_atol(msh, args[1]);
+	if (args[2])
+	{
+		//ft_putendl_fd("exit", STDERR_FILENO);//tester doesnt accept "exit"
+		msh_print(msh, "exit: too many arguments", 1);
+	}
+	else
+		msh_quit(msh, NULL/*"exit"*/, code);//tester doesnt accept "exit"
 }
 
 void	populate_names_array(t_msh *msh, char **names_array, size_t size)
@@ -337,19 +388,24 @@ void	msh_builtins(t_msh *msh, int i)
 	if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_PWD)
 		msh_pwd(msh);
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_CD)
-		(msh_cd(msh, msh->cmd_table[i]->args), build_envp_array(msh));
-	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_EXIT)
-	{		
-		msh_exit(msh);
-		msh_quit(msh, "exit", 0);//just for now so exit exits
+	{
+		msh_cd(msh, msh->cmd_table[i]->args);
+		build_envp_array(msh);
 	}
-	// if there are more entries in the args-array than just "exit" it should print an error (only cares for args[1], args[1+] are ignored) and change msh->status to 2 before ending
+	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_EXIT)
+		msh_exit(msh, msh->cmd_table[i]->args);
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_ENV)
 		ft_printenv(msh->env_vars);
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_EXPORT)
-		(msh_export(msh, msh->cmd_table[i]->args), build_envp_array(msh));
+	{
+		msh_export(msh, msh->cmd_table[i]->args);
+		build_envp_array(msh);
+	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_UNSET)
-		(msh_unset(msh, msh->cmd_table[i]->args), build_envp_array(msh));
+	{
+		msh_unset(msh, msh->cmd_table[i]->args);
+		build_envp_array(msh);
+	}
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_ECHO)
 		msh_echo(msh, msh->cmd_table[i]->args);
 	return ;
