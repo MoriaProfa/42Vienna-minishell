@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/08 13:57:20 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/09 13:06:44 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,14 +34,15 @@ void	print_heredoc_fd(t_msh *msh)
 
 void	expand_heredoc_input(t_msh *msh, char **value)
 {
-	char	*result;
+	char	*tmp;
+	char	*expanded;
 
-	result = ft_strdup("");
-	if (!result)
+	tmp = ft_strdup("");
+	if (!tmp)
 		msh_quit(msh, "heredoc expansion malloc failed", 1);
-	result = expand_value(*value, result, msh);
+	expanded = expand_value(*value, tmp, msh);
 	free(*value);
-	*value = result;
+	*value = expanded;
 }
 
 void	collect_one_heredoc(t_msh *msh, t_cmd *cmd, int j, int fd)

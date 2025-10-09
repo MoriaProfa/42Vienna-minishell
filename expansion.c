@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expansion.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 16:29:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/08 16:49:57 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/09 13:27:52 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,10 @@ static void	add_to_result(char *tmp, char **result, size_t *i, t_msh *msh)
 	char	*new_result;
 
 	if (!tmp)
+	{
+		free(*result);
 		msh_quit(msh, "expander: tmp substr/itoa malloc failed", 1);
+	}
 	new_result = ft_strjoin(*result, tmp);
 	free(*result);
 	free(tmp);
@@ -34,8 +37,8 @@ static void	exp_getenv(char *var_name, size_t len, char ***result, t_msh *msh)
 	char	*tmp;
 
 	env_value = NULL;
-	j = 0;
-	while (msh->envp[j])
+	j = -1;
+	while (msh->envp[++j])
 	{
 		if (ft_strncmp(msh->envp[j], var_name, len) == 0
 			&& msh->envp[j][len] == '=')
@@ -43,7 +46,6 @@ static void	exp_getenv(char *var_name, size_t len, char ***result, t_msh *msh)
 			env_value = msh->envp[j] + len + 1;
 			break ;
 		}
-		j++;
 	}
 	free(var_name);
 	if (env_value)
@@ -110,7 +112,8 @@ void	expand_word_tokens(t_list *tokens, t_msh *msh)
 {
 	t_list	*cur_node;
 	t_token	*cur_token;
-	char	*result;
+	char	*tmp;
+	char	*expanded;
 
 	cur_node = tokens;
 	while (cur_node)
@@ -119,12 +122,12 @@ void	expand_word_tokens(t_list *tokens, t_msh *msh)
 		if (cur_token->type == T_WORD && cur_token->quoted != Q_SINGLE
 			&& ft_strchr(cur_token->value, '$'))
 		{
-			result = ft_strdup("");
-			if (!result)
-				msh_quit(msh, "expander: result init malloc failed", 1);
-			result = expand_value(cur_token->value, result, msh);
+			tmp = ft_strdup("");
+			if (!tmp)
+				msh_quit(msh, "expander: tmp init malloc failed", 1);
+			expanded = expand_value(cur_token->value, tmp, msh);
 			free(cur_token->value);
-			cur_token->value = result;
+			cur_token->value = expanded;
 		}
 		cur_node = cur_node->next;
 	}
