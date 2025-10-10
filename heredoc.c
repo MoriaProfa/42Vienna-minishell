@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/10 20:53:02 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/10 21:06:34 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,8 +73,8 @@ void	collect_all_heredocs(t_msh *msh, int i)
 {
 	int		j;
 	int		fd[2];
-	char	*temp;
 	char	*name;
+	char	*temp;
 	char	*index;
 
 	while ((t_cmd *)msh->cmd_table[++i])
@@ -96,8 +96,8 @@ void	collect_all_heredocs(t_msh *msh, int i)
 // temporary heredoc file
 char	*create_filename(int i, int j)
 {
-	char	*name;
 	char	*temp;
+	char	*name;
 	char	*index;
 
 	index = ft_itoa(i);
@@ -155,7 +155,8 @@ void	collect_all_heredocs(t_msh *msh, int i)
 		j = -1;
 		while (((t_cmd *)msh->cmd_table[i])->heredocs[++j].delimiter)
 		{
-			((t_cmd *)msh->cmd_table[i])->heredocs[j].filename = create_filename(i, j);
+			((t_cmd *)msh->cmd_table[i])->heredocs[j].filename = create_filename(i,
+					j);
 			if (!((t_cmd *)msh->cmd_table[i])->heredocs[j].filename)
 				msh_quit(msh, "failed to create temporary filename", 1);
 			fd = open(((t_cmd *)msh->cmd_table[i])->heredocs[j].filename,
