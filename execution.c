@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/10 20:36:43 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/10 20:48:12 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void	msh_execute(t_msh *msh, int i)
 	{
 		ft_putstr_fd(((t_cmd *)msh->cmd_table[i])->args[0], STDERR_FILENO);
 		ft_putstr_fd(": ", STDERR_FILENO);
-		msh_quit(msh, "Command not found", 127);
+		msh_quit(msh, "command not found", 127);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->pathname
 		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == -1)
