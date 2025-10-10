@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/10 20:17:38 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/10 21:40:14 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,34 +97,46 @@ void	redirect_pipes(t_msh *msh, int i)
 {
 	if (i < msh->n_cmds - 1)
 	{
-		close(msh->fd[0]);
-		dup2(msh->fd[1], STDOUT_FILENO);
-		close(msh->fd[1]);
+		if (msh->fd[0] != -1)
+			close(msh->fd[0]);
+		if (msh->fd[1] != -1)
+		{
+			dup2(msh->fd[1], STDOUT_FILENO);
+			close(msh->fd[1]);
+		}
 	}
 	if (i > 0)
 	{
-		dup2(msh->fd_pipe_read, STDIN_FILENO);
-		close(msh->fd_pipe_read);
+		if (msh->fd_pipe_read != -1)
+		{
+			dup2(msh->fd_pipe_read, STDIN_FILENO);
+			close(msh->fd_pipe_read);
+		}
 	}
 }
 
-int	set_redirections(t_msh *msh, int i)
+void	redirect_input(t_msh *msh, int i)
 {
-	redirect_pipes(msh, i);
-	if (((t_cmd *)msh->cmd_table[i])->last_input == T_HEREDOC_REDIRECT)
-		dup2(((t_cmd *)msh->cmd_table[i])->heredoc_read, STDIN_FILENO);
-	else if (((t_cmd *)msh->cmd_table[i])->last_input == T_IN_REDIRECT)
+	if (((t_cmd *)msh->cmd_table[i])->last_input == T_IN_REDIRECT)
 	{
 		msh->fd_in = set_infile(((t_cmd *)msh->cmd_table[i]), -1);
 		if (msh->fd_in != -1)
 		{
-			dup2(msh->fd_in, STDOUT_FILENO);
+			dup2(msh->fd_in, STDIN_FILENO);
 			close(msh->fd_in);
 		}
 		else
 			msh->status += 1;
 	}
+	else if (((t_cmd *)msh->cmd_table[i])->last_input == T_HEREDOC_REDIRECT)
+		dup2(((t_cmd *)msh->cmd_table[i])->heredoc_read, STDIN_FILENO);
 	close_heredoc_fds(msh);
+}
+
+int	set_redirections(t_msh *msh, int i)
+{
+	redirect_pipes(msh, i);
+	redirect_input(msh, i);
 	if (((t_cmd *)msh->cmd_table[i])->n_outf > 0)
 	{
 		msh->fd_out = set_outfile(((t_cmd *)msh->cmd_table[i]), -1);

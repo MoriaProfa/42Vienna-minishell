@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/10 21:06:34 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/10 21:07:34 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,9 +73,6 @@ void	collect_all_heredocs(t_msh *msh, int i)
 {
 	int		j;
 	int		fd[2];
-	char	*name;
-	char	*temp;
-	char	*index;
 
 	while ((t_cmd *)msh->cmd_table[++i])
 	{
@@ -94,6 +91,7 @@ void	collect_all_heredocs(t_msh *msh, int i)
 	}
 }*/
 // temporary heredoc file
+
 char	*create_filename(int i, int j)
 {
 	char	*temp;
