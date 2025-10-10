@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/10 22:48:05 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/10 23:02:18 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,7 @@ void	run_command(t_msh *msh, int i)
 		if (msh->n_cmds == 1 && ((t_cmd *)msh->cmd_table[i])->args[0]
 			&& ((t_cmd *)msh->cmd_table[i])->builtin.builtin == true)
 			run_builtins(msh, i);
-		else if (msh->n_cmds > 1 && ((t_cmd *)msh->cmd_table[i])->args[0])
+		else if (((t_cmd *)msh->cmd_table[i])->args[0])
 		{
 			if (i < msh->n_cmds - 1)
 			{
@@ -147,5 +147,5 @@ void	run_command(t_msh *msh, int i)
 	}
 	i = -1;
 	while (++i < msh->n_cmds && msh->pid[i] != -1)
-		waitpid(msh->pid[i], &msh->status, 0);
+		waitpid(msh->pid[i], &msh->status, 0); // wexitstatus handler depending on type of exit
 }
