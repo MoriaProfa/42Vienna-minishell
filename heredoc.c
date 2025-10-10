@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/09 13:06:44 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/10 03:10:19 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,82 @@ void	expand_heredoc_input(t_msh *msh, char **value)
 	free(*value);
 	*value = expanded;
 }
+/*
+void	collect_one_heredoc(t_msh *msh, t_cmd *cmd, int j, int fd)
+{
+	while (1)
+	{
+		cmd->heredocs[j].buffer = readline("> ");
+		if (!cmd->heredocs[j].buffer)
+			break ;
+		if (cmd->heredocs[j].expand == true)
+			expand_heredoc_input(msh, &cmd->heredocs[j].buffer);
+		if (ft_strlen(cmd->heredocs[j].buffer) == ft_strlen(cmd->heredocs[j].delimiter)
+			&& ft_strncmp(cmd->heredocs[j].buffer, cmd->heredocs[j].delimiter,
+				ft_strlen(cmd->heredocs[j].buffer)) == 0)
+		{
+			free(cmd->heredocs[j].buffer);
+			cmd->heredocs[j].buffer = NULL;
+			break ;
+		}
+		write(fd, cmd->heredocs[j].buffer, ft_strlen(cmd->heredocs[j].buffer));
+		write(fd, "\n", 1);
+		free(cmd->heredocs[j].buffer);
+		cmd->heredocs[j].buffer = NULL;
+	}
+}
+
+void	collect_all_heredocs(t_msh *msh, int i)
+{
+	int		j;
+	int		fd[2];
+	char	*temp;
+	char	*name;
+	char	*index;
+
+	while ((t_cmd *)msh->cmd_table[++i])
+	{
+		j = -1;
+		while (((t_cmd *)msh->cmd_table[i])->heredocs[++j].delimiter)
+		{
+			if (pipe(fd) == -1)
+				msh_quit(msh, "heredoc pipe failed", 1);
+			collect_one_heredoc(msh, (t_cmd *)msh->cmd_table[i], j, fd[1]);
+			if (fd[1] != -1)
+				close(fd[1]);
+			if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
+				close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
+			((t_cmd *)msh->cmd_table[i])->heredoc_read = fd[0];
+		}
+	}
+}*/
+// temporary heredoc file
+char	*create_filename(int i, int j)
+{
+	char	*name;
+	char	*temp;
+	char	*index;
+
+	index = ft_itoa(i);
+	if (!index)
+		return (NULL);
+	temp = ft_strjoin("/tmp/.msh_thd_", index);
+	free(index);
+	if (!temp)
+		return (NULL);
+	index = ft_itoa(j);
+	if (!index)
+	{
+		free(temp);
+		return (NULL);
+	}
+	name = ft_strjoin(temp, index);
+	free(temp);
+	free(index);
+	if (!name)
+		return (NULL);
+	return (name);
+}
 
 void	collect_one_heredoc(t_msh *msh, t_cmd *cmd, int j, int fd)
 {
@@ -72,21 +148,29 @@ void	collect_one_heredoc(t_msh *msh, t_cmd *cmd, int j, int fd)
 void	collect_all_heredocs(t_msh *msh, int i)
 {
 	int	j;
-	int	fd[2];
+	int	fd;
 
 	while ((t_cmd *)msh->cmd_table[++i])
 	{
 		j = -1;
 		while (((t_cmd *)msh->cmd_table[i])->heredocs[++j].delimiter)
 		{
-			if (pipe(fd) == -1)
-				msh_quit(msh, "heredoc pipe failed", 1);
-			collect_one_heredoc(msh, (t_cmd *)msh->cmd_table[i], j, fd[1]);
-			if (fd[1] != -1)
-				close(fd[1]);
+			((t_cmd *)msh->cmd_table[i])->heredocs[j].filename = create_filename(i, j);
+			if (!((t_cmd *)msh->cmd_table[i])->heredocs[j].filename)
+				msh_quit(msh, "failed to create temporary filename", 1);
+			fd = open(((t_cmd *)msh->cmd_table[i])->heredocs[j].filename,
+					O_RDWR | O_CREAT | O_TRUNC, 0600);
+			if (fd == -1)
+				msh_quit(msh, "failed to create temporary heredoc file", 1);
+			collect_one_heredoc(msh, (t_cmd *)msh->cmd_table[i], j, fd);
+			close(fd);
 			if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
 				close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
-			((t_cmd *)msh->cmd_table[i])->heredoc_read = fd[0];
+			((t_cmd *)msh->cmd_table[i])->heredoc_read = open(((t_cmd *)msh->cmd_table[i])->heredocs[j].filename,
+					O_RDONLY);
+			if (((t_cmd *)msh->cmd_table[i])->heredoc_read == -1)
+				msh_quit(msh, "failed to open temporary heredoc file", 1);
+			unlink(((t_cmd *)msh->cmd_table[i])->heredocs[j].filename);
 		}
 	}
 }

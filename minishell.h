@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/09 21:50:18 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/10 02:39:55 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,6 +121,7 @@ typedef struct s_heredoc
 {
 	char	*delimiter;
 	char	*buffer;
+	char	*filename; // temp hd file
 	bool	expand;// true if delimiter is unquoted = expansion happens in buffer
 }			t_heredoc;
 
