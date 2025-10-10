@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/10 21:40:14 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/10 22:08:29 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ static int	set_infile(t_cmd *cmd, int j)
 		if (fd != -1)
 			close(fd);
 		if (check_access_read(cmd->infiles[j]) == 0)
-			return (fd);
+			return (-1);
 		fd = open(cmd->infiles[j], O_RDONLY);
 		if (fd == -1)
 		{
@@ -65,7 +65,7 @@ static int	set_outfile(t_cmd *cmd, int j)
 		if (fd != -1)
 			close(fd);
 		if (check_access_write(cmd->outfiles[j].filename) == 0)
-			return (fd);
+			return (-1);
 		if (cmd->outfiles[j].append == false)
 			fd = open(cmd->outfiles[j].filename, O_RDWR | O_CREAT | O_TRUNC,
 					0644);
