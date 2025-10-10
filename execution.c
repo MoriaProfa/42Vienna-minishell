@@ -6,13 +6,14 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/10 20:48:12 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/10 22:17:30 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 void	msh_builtins(t_msh *msh, int i);
+void	close_heredoc_fds(t_msh *msh);
 
 void	msh_pid(t_msh *msh) // could be put in cmd_table
 {
@@ -58,10 +59,9 @@ void	close_fds(t_msh *msh)
 		close(msh->fd[0]);
 	if (msh->fd[1] != -1)
 		close(msh->fd[1]);
-	if (msh->fd_hd[0] != -1)
-		close(msh->fd_hd[0]);
-	if (msh->fd_hd[1] != -1)
-		close(msh->fd_hd[1]);
+	if (msh->fd_pipe_read != -1)
+		close(msh->fd_pipe_read);
+	close_heredoc_fds(msh);
 }
 
 void	save_stdin_stdout(t_msh *msh, int i)
@@ -96,13 +96,14 @@ void	msh_fork(t_msh *msh, int i)
 	{
 		if (set_redirections(msh, i) != 0)
 			msh_quit(msh, NULL, 1);
-		if (msh->fd[0] != -1)
-			close(msh->fd[0]);
+		// if (msh->fd[0] != -1)
+		// 	close(msh->fd[0]);
 		if (((t_cmd *)msh->cmd_table[i])->builtin.builtin == false)
 			msh_execute(msh, i);
 		else
 		{
 			msh_builtins(msh, i);
+			close_fds(msh);
 			exit(0); // close everything fds
 		}
 	}
@@ -131,10 +132,10 @@ void	run_command(t_msh *msh, int i)
 	// need to add signal handling in the child
 	while (++i < msh->n_cmds)
 	{
-		if (((t_cmd *)msh->cmd_table[i])->args[0]
+		if (msh->n_cmds == 1 && ((t_cmd *)msh->cmd_table[i])->args[0]
 			&& ((t_cmd *)msh->cmd_table[i])->builtin.builtin == true)
 			run_builtins(msh, i);
-		else if (((t_cmd *)msh->cmd_table[i])->args[0])
+		else if (msh->n_cmds > 1 && ((t_cmd *)msh->cmd_table[i])->args[0])
 		{
 			if (i < msh->n_cmds - 1)
 			{
