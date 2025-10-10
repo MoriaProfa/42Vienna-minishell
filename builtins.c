@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/10 01:49:15 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/10 02:31:10 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,7 @@ void	msh_pwd(t_msh *msh)
 	free(pwd);
 }
 
-void	msh_cd(t_msh *msh, char **args) // also needs to change the value in OLDPWD to
-// what has been the value of PWD before
+void	msh_cd(t_msh *msh, char **args) // also needs to change the value in OLDPWD to what has been the value of PWD before
 {
 	char	*path;
 	char	*oldpwd;
@@ -121,7 +120,7 @@ void	msh_exit(t_msh *msh, char **args)
 		msh_print(msh, "exit: too many arguments", 1);
 	}
 	else
-		msh_quit(msh, NULL/*"exit"*/, code);//tester doesnt accept "exit"
+		msh_quit(msh, NULL/*"exit"*/, (code % 256 + 256) % 256);//tester doesnt accept "exit"
 }
 
 void	populate_names_array(t_msh *msh, char **names_array, size_t size)
@@ -332,6 +331,7 @@ void	msh_unset(t_msh *msh, char **args)
 	while (args[++i])
 		check_and_delete_env_var(msh, args[i]);
 }
+
 bool	check_newline_skipping(char *str)
 {
 	int	i;
