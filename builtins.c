@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/10 01:07:37 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/10 22:51:27 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,10 @@ void	msh_cd(t_msh *msh, char **args) // also needs to change the value in OLDPWD
 		path = oldpwd;
 	msh->status = chdir(path);
 	if (msh->status != 0)
+	{
+		ft_putstr_fd("cd: ", STDERR_FILENO);
 		perror(path);
+	}
 	//else
 	//{
 	//	if (!check_and_update_env_var_value(msh, "OLDPWD", oldpwd))
