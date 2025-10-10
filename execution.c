@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/10 02:17:34 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/10 20:36:43 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ void	msh_execute(t_msh *msh, int i)
 	{
 		printf("cmd_table[%d]\n", i);
 		perror(((t_cmd *)msh->cmd_table[i])->args[0]);
-		msh_quit(msh, "why are we checking executable permission?\n", 126);
 		msh_quit(msh, NULL, 126);
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->pathname
@@ -95,7 +94,7 @@ void	msh_fork(t_msh *msh, int i)
 		msh_quit(msh, "fork failed", 1);
 	if (msh->pid[i] == 0)
 	{
-		if (set_redirections(msh, i) == 1)
+		if (set_redirections(msh, i) != 0)
 			msh_quit(msh, NULL, 1);
 		if (msh->fd[0] != -1)
 			close(msh->fd[0]);
