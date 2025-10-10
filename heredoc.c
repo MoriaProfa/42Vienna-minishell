@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/10 03:10:19 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/10 20:53:02 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ char	*create_filename(int i, int j)
 	index = ft_itoa(i);
 	if (!index)
 		return (NULL);
-	temp = ft_strjoin("/tmp/.msh_thd_", index);
+	temp = ft_strjoin("/tmp/.msh_temporary_hd_", index);
 	free(index);
 	if (!temp)
 		return (NULL);
