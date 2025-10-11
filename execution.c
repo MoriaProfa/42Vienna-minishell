@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/10 23:02:18 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/11 21:12:04 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,20 +33,22 @@ void	msh_execute(t_msh *msh, int i)
 	{
 		ft_putstr_fd(((t_cmd *)msh->cmd_table[i])->args[0], STDERR_FILENO);
 		ft_putstr_fd(": ", STDERR_FILENO);
-		msh_quit(msh, "command not found", 127);
+		msh_print(msh, "command not found", 127);
+		return ;
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->pathname
 		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == -1)
 	{
 		printf("cmd_table[%d]\n", i);
 		perror(((t_cmd *)msh->cmd_table[i])->args[0]);
-		msh_quit(msh, NULL, 126);
+		msh_print(msh, NULL, 126);
+		return ;
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->pathname
 		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == 0)
 		execve(((t_cmd *)msh->cmd_table[i])->pathname,
 			((t_cmd *)msh->cmd_table[i])->args, msh->envp);
-	msh_quit(msh, "execve failed", 1);
+	msh_print(msh, "execve failed", 1);
 }
 
 void	close_fds(t_msh *msh)
@@ -87,7 +89,7 @@ void	restore_stdin_stdout(t_msh *msh)
 	}
 }
 
-void	msh_fork(t_msh *msh, int i)
+void	 msh_fork(t_msh *msh, int i)
 {
 	msh->pid[i] = fork();
 	if (msh->pid[i] == -1)
@@ -98,14 +100,12 @@ void	msh_fork(t_msh *msh, int i)
 			msh_quit(msh, NULL, 1);
 		if (msh->fd[0] != -1)
 			close(msh->fd[0]);
-		if (((t_cmd *)msh->cmd_table[i])->builtin.builtin == false)
+		if (((t_cmd *)msh->cmd_table[i])->args[0] && ((t_cmd *)msh->cmd_table[i])->builtin.builtin == false)
 			msh_execute(msh, i);
-		else
-		{
+		else if (((t_cmd *)msh->cmd_table[i])->args[0] && ((t_cmd *)msh->cmd_table[i])->builtin.builtin == true)
 			msh_builtins(msh, i);
-			close_fds(msh);
-			exit(0); // close everything fds
-		}
+		close_fds(msh);
+		msh_quit(msh, NULL, 0);
 	}
 	if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
 		close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
@@ -135,7 +135,7 @@ void	run_command(t_msh *msh, int i)
 		if (msh->n_cmds == 1 && ((t_cmd *)msh->cmd_table[i])->args[0]
 			&& ((t_cmd *)msh->cmd_table[i])->builtin.builtin == true)
 			run_builtins(msh, i);
-		else if (((t_cmd *)msh->cmd_table[i])->args[0])
+		else// if (((t_cmd *)msh->cmd_table[i])->args[0])
 		{
 			if (i < msh->n_cmds - 1)
 			{
@@ -146,6 +146,8 @@ void	run_command(t_msh *msh, int i)
 		}
 	}
 	i = -1;
-	while (++i < msh->n_cmds && msh->pid[i] != -1)
+	while (++i < msh->n_cmds && msh->pid && msh->pid[i] != -1)
+	{
 		waitpid(msh->pid[i], &msh->status, 0); // wexitstatus handler depending on type of exit
+	}
 }
