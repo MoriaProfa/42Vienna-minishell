@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/10 02:39:03 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/11 03:05:19 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,8 @@ void	free_single_cmd_structs_data(t_cmd *cmd)
 		free(cmd->heredocs[j].delimiter);
 		if (cmd->heredocs[j].buffer)
 			free(cmd->heredocs[j].buffer);
-		free(cmd->heredocs[j].filename); // added heredoc filename to struct
+		if (cmd->heredocs[j].filename)
+			free(cmd->heredocs[j].filename); // added heredoc filename to struct
 	}
 }
 
