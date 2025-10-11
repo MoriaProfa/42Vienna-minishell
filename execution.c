@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/11 21:12:04 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/12 01:11:44 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ void	msh_execute(t_msh *msh, int i)
 	else if (((t_cmd *)msh->cmd_table[i])->pathname
 		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == -1)
 	{
-		printf("cmd_table[%d]\n", i);
 		perror(((t_cmd *)msh->cmd_table[i])->args[0]);
 		msh_print(msh, NULL, 126);
 		return ;
@@ -48,7 +47,7 @@ void	msh_execute(t_msh *msh, int i)
 		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == 0)
 		execve(((t_cmd *)msh->cmd_table[i])->pathname,
 			((t_cmd *)msh->cmd_table[i])->args, msh->envp);
-	msh_print(msh, "execve failed", 1);
+	msh_print(msh, "execve failed", 1); 
 }
 
 void	close_fds(t_msh *msh)
@@ -105,7 +104,7 @@ void	 msh_fork(t_msh *msh, int i)
 		else if (((t_cmd *)msh->cmd_table[i])->args[0] && ((t_cmd *)msh->cmd_table[i])->builtin.builtin == true)
 			msh_builtins(msh, i);
 		close_fds(msh);
-		msh_quit(msh, NULL, 0);
+		msh_quit(msh, NULL, msh->status);
 	}
 	if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
 		close(((t_cmd *)msh->cmd_table[i])->heredoc_read);

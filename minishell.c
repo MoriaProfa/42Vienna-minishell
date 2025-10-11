@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/11 16:34:12 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/12 00:47:18 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,9 +76,9 @@ void	msh_quit(t_msh *msh, char *msg, int status)
 		fd = STDOUT_FILENO;
 	if (msg)
 		ft_putendl_fd(msg, fd);
-	//close(fd);
 	close(STDIN_FILENO);
 	close(STDOUT_FILENO);
+	close(STDERR_FILENO);
 	ft_lstclear(&msh->env_vars, free_env_var);
 	free_envp(msh);
 	msh_free(msh);

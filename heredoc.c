@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/10 21:07:34 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/11 21:50:57 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,6 +141,7 @@ void	collect_one_heredoc(t_msh *msh, t_cmd *cmd, int j, int fd)
 		free(cmd->heredocs[j].buffer);
 		cmd->heredocs[j].buffer = NULL;
 	}
+	close(fd);
 }
 
 void	collect_all_heredocs(t_msh *msh, int i)
@@ -162,7 +163,6 @@ void	collect_all_heredocs(t_msh *msh, int i)
 			if (fd == -1)
 				msh_quit(msh, "failed to create temporary heredoc file", 1);
 			collect_one_heredoc(msh, (t_cmd *)msh->cmd_table[i], j, fd);
-			close(fd);
 			if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
 				close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
 			((t_cmd *)msh->cmd_table[i])->heredoc_read = open(((t_cmd *)msh->cmd_table[i])->heredocs[j].filename,

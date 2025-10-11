@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/11 03:05:19 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/12 01:23:25 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -292,7 +292,7 @@ char	*create_cmd_pathname(t_msh *msh, char *cmd)
 
 	j = 0;
 	pathname = NULL;
-	if (access(cmd, F_OK) == 0)
+	if (ft_strchr(cmd, '/'))
 	{
 		pathname = ft_strdup(cmd);
 		if (!pathname)
