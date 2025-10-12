@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 21:20:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/13 00:37:57 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/13 01:42:02 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,8 +112,8 @@ void	create_env(t_msh *msh)
 		}
 		prepare_name_and_add_to_env_vars(msh, "PWD", cwd);
 	}
-	if (!check_and_update_env_var_value(msh, "OLDPWD", NULL))
-		prepare_and_add_to_env_vars(msh, "OLDPWD", "");
+//	if (!check_and_update_env_var_value(msh, "OLDPWD", NULL))
+//		prepare_and_add_to_env_vars(msh, "OLDPWD", "");//gets init in cd, if we do it here, cd - doesnt work always
 }
 
 char	*extract_env_value(char *str, size_t name_len)
