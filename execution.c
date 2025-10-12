@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/12 01:11:44 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/12 18:46:08 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ void	msh_pid(t_msh *msh) // could be put in cmd_table
 
 void	msh_execute(t_msh *msh, int i)
 {
+	//printf("%s\n", "in execution");
 	if (!((t_cmd *)msh->cmd_table[i])->pathname)
 	{
 		ft_putstr_fd(((t_cmd *)msh->cmd_table[i])->args[0], STDERR_FILENO);
@@ -48,6 +49,19 @@ void	msh_execute(t_msh *msh, int i)
 		execve(((t_cmd *)msh->cmd_table[i])->pathname,
 			((t_cmd *)msh->cmd_table[i])->args, msh->envp);
 	msh_print(msh, "execve failed", 1); 
+}
+
+void	print_heredoc_fd(t_msh *msh);
+
+void	print_fds(t_msh *msh, int i)
+{
+	// printf("child[%d]\n", i);
+	printf("child[%d] msh->fd_in = %d\n", i, msh->fd_in);
+	printf("child[%d] msh->fd_out = %d\n", i, msh->fd_out);
+	printf("child[%d] msh->fd[0] = %d\n", i, msh->fd[0]);
+	printf("child[%d] msh->fd[1] = %d\n", i, msh->fd[1]);
+	printf("child[%d] msh->fd_pipe_read = %d\n", i, msh->fd_pipe_read);
+	print_heredoc_fd(msh);
 }
 
 void	close_fds(t_msh *msh)
@@ -88,6 +102,12 @@ void	restore_stdin_stdout(t_msh *msh)
 	}
 }
 
+void	handle_child_signal(void)
+{
+	signal(SIGINT, SIG_DFL);
+	signal(SIGQUIT, SIG_DFL);
+}
+
 void	 msh_fork(t_msh *msh, int i)
 {
 	msh->pid[i] = fork();
@@ -95,6 +115,9 @@ void	 msh_fork(t_msh *msh, int i)
 		msh_quit(msh, "fork failed", 1);
 	if (msh->pid[i] == 0)
 	{
+		signal(SIGINT, SIG_DFL);
+		signal(SIGQUIT, SIG_DFL);
+		//print_fds(msh, i);
 		if (set_redirections(msh, i) != 0)
 			msh_quit(msh, NULL, 1);
 		if (msh->fd[0] != -1)
@@ -128,7 +151,9 @@ void	run_builtins(t_msh *msh, int i)
 
 void	run_command(t_msh *msh, int i)
 {
-	// need to add signal handling in the child
+	int	status;
+	int	sig;
+
 	while (++i < msh->n_cmds)
 	{
 		if (msh->n_cmds == 1 && ((t_cmd *)msh->cmd_table[i])->args[0]
@@ -147,6 +172,17 @@ void	run_command(t_msh *msh, int i)
 	i = -1;
 	while (++i < msh->n_cmds && msh->pid && msh->pid[i] != -1)
 	{
-		waitpid(msh->pid[i], &msh->status, 0); // wexitstatus handler depending on type of exit
+		waitpid(msh->pid[i], &status, 0); // wexitstatus handler depending on type of exit
+		if (WIFEXITED(status))
+			msh->status = WEXITSTATUS(status);
+		else if (WIFSIGNALED(status))
+		{
+			sig = WTERMSIG(status);
+			msh->status = 128 + sig;
+			if (sig == SIGINT)
+				write(STDOUT_FILENO, "\n", 1);
+			else if (sig == SIGQUIT)
+				write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
+		}
 	}
 }
