@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/12 21:44:47 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/12 22:37:51 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,7 @@ char	*create_filename(int i, int j)
 	return (name);
 }
 
-void	print_heredoc_warning(t_cmd *cmd, int j)
+static void	print_heredoc_warning(t_cmd *cmd, int j)
 {
 	ft_putstr_fd("minishell: warning: here-document delimeted by EOF (wanted ",
 		STDERR_FILENO);
@@ -124,7 +124,7 @@ void	print_heredoc_warning(t_cmd *cmd, int j)
 	ft_putstr_fd(")\n", STDERR_FILENO);
 }
 
-void	collect_one_heredoc(t_msh *msh, t_cmd *cmd, int j, int fd)
+static void	collect_one_heredoc(t_msh *msh, t_cmd *cmd, int j, int fd)
 {
 	while (1)
 	{
@@ -150,12 +150,6 @@ void	collect_one_heredoc(t_msh *msh, t_cmd *cmd, int j, int fd)
 		cmd->heredocs[j].buffer = NULL;
 	}
 	close(fd);
-}
-
-void	handle_heredoc_signal(void)
-{
-	signal(SIGINT, SIG_DFL);  // allow Ctrl+C to terminate heredoc
-	signal(SIGQUIT, SIG_IGN); // ignore Ctrl+\ during heredoc
 }
 
 void	collect_heredocs_in_child(t_msh *msh, int i, int j, int fd)

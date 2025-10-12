@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/12 21:13:35 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/12 22:36:20 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ static int	set_outfile(t_cmd *cmd, int j)
 	return (fd);
 }
 
-void	close_heredoc_fds(t_msh *msh)
+void	close_heredocs(t_msh *msh)
 {
 	int	i;
 
@@ -93,7 +93,7 @@ void	close_heredoc_fds(t_msh *msh)
 	}
 }
 
-void	redirect_pipes(t_msh *msh, int i)
+static void	redirect_pipes(t_msh *msh, int i)
 {
 	if (i < msh->n_cmds - 1)
 	{
@@ -115,6 +115,33 @@ void	redirect_pipes(t_msh *msh, int i)
 	}
 }
 
+static int	set_heredocs(t_msh *msh, int i, int j)
+{
+	int	return_value;
+
+	return_value = 0;
+	while (((t_cmd *)msh->cmd_table[i])->heredocs[++j].delimiter)
+	{
+		if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
+			close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
+		((t_cmd *)msh->cmd_table[i])->heredoc_read = open(((t_cmd *)msh->cmd_table[i])->heredocs[j].filename,
+				O_RDONLY);
+		if (((t_cmd *)msh->cmd_table[i])->heredoc_read == -1)
+		{
+			msh_print(msh, "failed to open temporary heredoc file", 1);
+			return_value = 1; // do we break or continue collecting other heredocs?
+		}
+		else
+			unlink(((t_cmd *)msh->cmd_table[i])->heredocs[j].filename);
+	}
+	if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
+	{
+		dup2(((t_cmd *)msh->cmd_table[i])->heredoc_read, STDIN_FILENO);
+		close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
+	}
+	return (return_value);
+}
+
 static int	redirect_input(t_msh *msh, int i, int j)
 {
 	int	return_value;
@@ -133,27 +160,9 @@ static int	redirect_input(t_msh *msh, int i, int j)
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->last_input == T_HEREDOC_REDIRECT)
 	{
-		while (((t_cmd *)msh->cmd_table[i])->heredocs[++j].delimiter)
-		{
-			if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
-				close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
-			((t_cmd *)msh->cmd_table[i])->heredoc_read = open(((t_cmd *)msh->cmd_table[i])->heredocs[j].filename,
-					O_RDONLY);
-			if (((t_cmd *)msh->cmd_table[i])->heredoc_read == -1)
-			{
-				msh_print(msh, "failed to open temporary heredoc file", 1);
-				return_value += 1;
-			}
-			else
-				unlink(((t_cmd *)msh->cmd_table[i])->heredocs[j].filename);
-		}
-		if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
-		{
-			dup2(((t_cmd *)msh->cmd_table[i])->heredoc_read, STDIN_FILENO);
-			close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
-		}
+		return_value = set_heredocs(msh, i,-1);
 	}
-	close_heredoc_fds(msh);
+	close_heredocs(msh);
 	return (return_value);
 }
 
