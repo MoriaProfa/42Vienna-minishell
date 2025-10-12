@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/12 18:31:28 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/12 21:21:19 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,7 +172,7 @@ void	collect_heredocs_in_child(t_msh *msh, int i, int j, int fd)
 		signal(SIGQUIT, SIG_IGN); // ignore Ctrl+\ during heredoc
 		collect_one_heredoc(msh, (t_cmd *)msh->cmd_table[i], j, fd);
 		close(fd);
-		exit(0);
+		msh_quit(msh, NULL, 0);
 	}
 	else
 	{
@@ -206,13 +206,7 @@ void	collect_all_heredocs(t_msh *msh, int i)
 			if (fd == -1)
 				msh_quit(msh, "failed to create temporary heredoc file", 1);
 			collect_heredocs_in_child(msh, i, j, fd);
-			if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
-				close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
-			((t_cmd *)msh->cmd_table[i])->heredoc_read = open(((t_cmd *)msh->cmd_table[i])->heredocs[j].filename,
-					O_RDONLY);
-			if (((t_cmd *)msh->cmd_table[i])->heredoc_read == -1)
-				msh_quit(msh, "failed to open temporary heredoc file", 1);
-			unlink(((t_cmd *)msh->cmd_table[i])->heredocs[j].filename);
+			close(fd);
 		}
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/12 03:56:03 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/12 21:13:35 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,14 +115,14 @@ void	redirect_pipes(t_msh *msh, int i)
 	}
 }
 
-static int	redirect_input(t_msh *msh, int i)
+static int	redirect_input(t_msh *msh, int i, int j)
 {
 	int	return_value;
 
 	return_value = 0;
 	if (((t_cmd *)msh->cmd_table[i])->last_input == T_IN_REDIRECT)
 	{
-		msh->fd_in = set_infile(((t_cmd *)msh->cmd_table[i]), -1);
+		msh->fd_in = set_infile(((t_cmd *)msh->cmd_table[i]), j);
 		if (msh->fd_in != -1)
 		{
 			dup2(msh->fd_in, STDIN_FILENO);
@@ -132,7 +132,27 @@ static int	redirect_input(t_msh *msh, int i)
 			return_value = 1;
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->last_input == T_HEREDOC_REDIRECT)
-		dup2(((t_cmd *)msh->cmd_table[i])->heredoc_read, STDIN_FILENO);
+	{
+		while (((t_cmd *)msh->cmd_table[i])->heredocs[++j].delimiter)
+		{
+			if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
+				close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
+			((t_cmd *)msh->cmd_table[i])->heredoc_read = open(((t_cmd *)msh->cmd_table[i])->heredocs[j].filename,
+					O_RDONLY);
+			if (((t_cmd *)msh->cmd_table[i])->heredoc_read == -1)
+			{
+				msh_print(msh, "failed to open temporary heredoc file", 1);
+				return_value += 1;
+			}
+			else
+				unlink(((t_cmd *)msh->cmd_table[i])->heredocs[j].filename);
+		}
+		if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
+		{
+			dup2(((t_cmd *)msh->cmd_table[i])->heredoc_read, STDIN_FILENO);
+			close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
+		}
+	}
 	close_heredoc_fds(msh);
 	return (return_value);
 }
@@ -140,7 +160,7 @@ static int	redirect_input(t_msh *msh, int i)
 int	set_redirections(t_msh *msh, int i)
 {
 	redirect_pipes(msh, i);
-	if (redirect_input(msh, i) == 1)
+	if (redirect_input(msh, i, -1) == 1)
 		return (1);
 	if (((t_cmd *)msh->cmd_table[i])->n_outf > 0)
 	{
