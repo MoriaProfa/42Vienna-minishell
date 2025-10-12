@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/12 21:21:19 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/12 21:44:47 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,7 +132,7 @@ void	collect_one_heredoc(t_msh *msh, t_cmd *cmd, int j, int fd)
 		if (!cmd->heredocs[j].buffer)
 		{
 			print_heredoc_warning(cmd, j);
-			break ;
+			return ;
 		}
 		if (cmd->heredocs[j].expand == true)
 			expand_heredoc_input(msh, &cmd->heredocs[j].buffer);
