@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/12 23:52:08 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/13 00:18:35 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,7 +162,7 @@ void	collect_heredocs_in_child(t_msh *msh, int i, int j, int fd)
 		msh_quit(msh, "heredoc fork failed", 1);
 	else if (pid == 0)
 	{
-		signal(SIGINT, SIG_DFL);  // allow Ctrl+C to terminate heredoc
+		signal(SIGINT, SIG_DFL);  // need to add msh_free before terminatig heredoc
 		signal(SIGQUIT, SIG_IGN); // ignore Ctrl+\ during heredoc
 		collect_one_heredoc(msh, (t_cmd *)msh->cmd_table[i], j, fd);
 		close(fd);
@@ -176,7 +176,7 @@ void	collect_heredocs_in_child(t_msh *msh, int i, int j, int fd)
 		{
 			msh->status = 130;
 			write(1, "\n", 1);
-			msh_quit(msh, NULL, msh->status); // trying stuff
+			//msh_quit(msh, NULL, msh->status); // trying stuff
 			return ; // stop heredoc collection & skip execution
 		}
 	}
