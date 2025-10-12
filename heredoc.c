@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/13 00:18:35 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/13 00:47:57 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,6 +124,9 @@ static void	print_heredoc_warning(t_cmd *cmd, int j)
 	ft_putstr_fd(")\n", STDERR_FILENO);
 }
 
+void	close_fds(t_msh *msh);
+void	close_heredocs(t_msh *msh);
+
 static void	collect_one_heredoc(t_msh *msh, t_cmd *cmd, int j, int fd)
 {
 	while (1)
@@ -132,7 +135,8 @@ static void	collect_one_heredoc(t_msh *msh, t_cmd *cmd, int j, int fd)
 		if (!cmd->heredocs[j].buffer)
 		{
 			print_heredoc_warning(cmd, j);
-			return ;
+			close(fd);
+			msh_quit(msh, NULL, 0); // return ;
 		}
 		if (cmd->heredocs[j].expand == true)
 			expand_heredoc_input(msh, &cmd->heredocs[j].buffer);
