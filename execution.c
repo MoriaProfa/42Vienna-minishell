@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/12 18:46:08 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/12 20:23:24 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,7 @@ void	 msh_fork(t_msh *msh, int i)
 	{
 		signal(SIGINT, SIG_DFL);
 		signal(SIGQUIT, SIG_DFL);
-		//print_fds(msh, i);
+		//int_fds(msh, i);
 		if (set_redirections(msh, i) != 0)
 			msh_quit(msh, NULL, 1);
 		if (msh->fd[0] != -1)
