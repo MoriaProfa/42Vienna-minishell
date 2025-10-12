@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/12 00:47:18 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/13 01:06:17 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	msh_execute(t_msh *msh, int i);
 void	collect_all_heredocs(t_msh *msh, int i);
 void	init_env_vars(t_msh *msh, char **envp);
 void	free_env_var(void *content);
-void	ft_printenv(t_list *env_vars);
+void	print_env_vars(t_list *env_vars);
 void    build_envp_array(t_msh *msh);
 void    free_envp(t_msh *msh);
 void	msh_builtins(t_msh *msh, int i);
@@ -162,7 +162,7 @@ int	main(int argc, char **argv, char **envp)
 	signal(SIGQUIT, SIG_IGN);
 	ft_bzero(&msh, sizeof(t_msh));
 	init_env_vars(&msh, envp); //envp is also accessible with __environ (=global env variable)
-	//ft_printenv(msh.env_vars);//just for testing if init_env_var worked correctly
+	//print_env_vars(msh.env_vars);//just for testing if init_env_var worked correctly
 	while (1)
 	{
 		msh.in_str = readline("minishell> ");

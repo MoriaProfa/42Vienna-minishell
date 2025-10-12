@@ -6,15 +6,17 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/11 20:44:18 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/13 01:07:48 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	ft_printenv(t_list *env_vars);
-char	*get_env_name(char *str, size_t *name_len);
-char	*get_env_value(char *str, size_t name_len);
+void	print_env_vars(t_list *env_vars);
+char	*extract_env_name(char *str, size_t *name_len);
+char	*extract_env_value(char *str, size_t name_len);
+bool	check_and_update_env_var_value(t_msh *msh, char *name, char *value);
+void	prepare_name_and_add_to_env_vars(t_msh *msh, char *name, char *m_value);
 void	add_to_env_vars(t_msh *msh, char *name, char *value);
 void	build_envp_array(t_msh *msh);
 void	free_env_var(void *content);
@@ -22,50 +24,153 @@ void	msh_free(t_msh *msh);
 void    free_envp(t_msh *msh);
 long	msh_atol(t_msh *msh, char *nptr);
 
+char	*get_env_var_value(t_msh *msh, char *name)
+{
+	t_list		*cur_node;
+	t_env_var	*cur_env_var;
+
+	cur_node = msh->env_vars;
+	while (cur_node)
+	{
+		cur_env_var = (t_env_var *)(cur_node->content);
+		if (cur_env_var && cur_env_var->name && 
+				!ft_strncmp(name, cur_env_var->name, ft_strlen(name) + 1))
+			return (ft_strdup(cur_env_var->value));
+		cur_node = cur_node->next;
+	}
+	return (NULL);
+}
+
+void	print_getcwd_error(t_msh *msh, char *builtin_name)
+{
+	ft_putstr_fd(builtin_name, STDERR_FILENO);
+	ft_putstr_fd(": error retrieving current directory: ", STDERR_FILENO);
+	ft_putstr_fd("getcwd: cannot access parent directories: ", STDERR_FILENO);
+	perror("");
+	if (!ft_strncmp(builtin_name, "cd", ft_strlen("cd") + 1))
+		msh_print(msh, NULL, 1);
+	else
+		msh_quit(msh, NULL, 1);
+}
+
+/*bool	check_pwd_validity(const char *pwd)
+{
+	int	len;
+
+	if (!pwd || pwd[0] != '/')
+		return (false);
+	len = ft_strlen(pwd);
+	if (len >= PATH_MAX)//PATH_MAX is included in limits.h even if vs code doesnt recognize this
+		return (false);
+	if (ft_strnstr(pwd, "/./", len) || ft_strnstr(pwd, "/../", len))
+		return (false);
+	if (len >= 2 && !ft_strncmp(pwd + (len - 2), "/.", 2))
+		return (false);
+	if (len >= 3 && !ft_strncmp(pwd + (len - 3), "/..", 3))
+		return (false);
+	return (true);
+}*/
+
+/*void	msh_pwd(t_msh *msh)
+{
+	char	*pwd;
+
+	pwd = get_env_var_value(msh, "PWD");
+	if (check_pwd_validity(pwd))
+	{
+		ft_putendl_fd(pwd, STDOUT_FILENO);
+		free(pwd);
+		return ;
+	}
+	if (pwd)
+		free(pwd);
+	pwd = getcwd(NULL, 0);
+	if (!pwd)
+	{
+		print_getcwd_error(msh, "pwd");
+		msh->status = 1;
+		return ;
+	}
+	ft_putendl_fd(pwd, STDOUT_FILENO);
+	free(pwd);
+}*/
+
 void	msh_pwd(t_msh *msh)
 {
 	char	*pwd;
 
 	pwd = getcwd(NULL, 0);
 	if (!pwd)
-	{
-		ft_putstr_fd("pwd: error retrieving ", STDERR_FILENO);
-		ft_putstr_fd("current directory: ", STDERR_FILENO);
-		msh_quit(msh, "getcwd: cannot access parent directories", 1);
-		return ;
-	}
+		print_getcwd_error(msh, "pwd");
 	ft_putendl_fd(pwd, STDOUT_FILENO);
 	free(pwd);
 }
 
-void	msh_cd(t_msh *msh, char **args) // also needs to change the value in OLDPWD to
-// what has been the value of PWD before
+char	*get_cd_path(t_msh *msh, char **args)
+{
+	char	*path;
+
+	if (!args[1])
+	{
+		path = get_env_var_value(msh, "HOME");
+		if (!path)
+			msh_print(msh, "cd: HOME not set", 1);
+	}
+	else if (args[1][0] == '-' && args[1][1] == '\0')
+	{
+		path = get_env_var_value(msh, "OLDPWD");
+		if (!path)
+			msh_print(msh, "cd: OLDPWD not set", 1);
+		else
+			ft_putendl_fd(path, STDOUT_FILENO);
+	}
+	else
+	{
+		path = ft_strdup(args[1]);
+		if (!path)
+			msh_print(msh, "cd: path malloc failed", 1);
+	}
+	return (path);
+}
+
+void	handle_cd_env_var_update(t_msh *msh, char *oldpwd)
+{
+	char	*newpwd;
+
+	if (!check_and_update_env_var_value(msh, "OLDPWD", oldpwd))
+		prepare_name_and_add_to_env_vars(msh, "OLDPWD", oldpwd);
+	newpwd = getcwd(NULL, 0);
+	if (!newpwd)
+		return (print_getcwd_error(msh, "cd"));
+	if (!check_and_update_env_var_value(msh, "PWD", newpwd))
+		prepare_name_and_add_to_env_vars(msh, "PWD", newpwd);
+}
+
+void	msh_cd(t_msh *msh, char **args)
 {
 	char	*path;
 	char	*oldpwd;
 	
 	if (args[2])
-	{
-		msh_print(msh, "cd: too many arguments", 1);
-		return ;
-	}
-	path = args[1];
-	oldpwd = "current working directory"; //should get it from env PWD //get_env_value function?
+		return (msh_print(msh, "cd: too many arguments", 1));
+	path = get_cd_path(msh, args);
 	if (!path)
-		path = "/home/edarmaev"; //should get it from env HOME //get_env_value function?
-	if (path[0] == '-' && path[1] == '\0')
-		path = oldpwd;
-	msh->status = chdir(path);
-	if (msh->status != 0)
+		return ;
+	oldpwd = get_env_var_value(msh, "PWD");
+	if (!oldpwd)
 	{
-		ft_putstr_fd("cd: ", STDERR_FILENO);
-		perror(path);
+		oldpwd = getcwd(NULL, 0);
+		if (!oldpwd)
+			return (free(path), print_getcwd_error(msh, "cd"));
 	}
-	//else
-	//{
-	//	if (!check_and_update_env_var_value(msh, "OLDPWD", oldpwd))
-	//		add_to_env_vars(msh, "OLDPWD", oldpwd); //needs to be mallocd...
-	//}
+	msh->status = chdir(path);
+	if (msh->status != 0 && path[0] != '\0')
+		return (perror(path), free(path));
+	else
+	{
+		free(path);
+		handle_cd_env_var_update(msh, oldpwd);
+	}
 }
 
 void	print_num_error_exit(t_msh *msh, char *str)
@@ -87,9 +192,28 @@ bool	check_for_whitespace_end(char *str, int start)
 	return (true);
 }
 
+void	check_exit_code_validity(t_msh *msh, char *str)
+{
+	int	i;
+
+	if (str[0] == '\0')
+		print_num_error_exit(msh, str);
+	i = 0;
+	while (ft_strchr(" \t", str[i]))
+		i++;
+	if (str[i] != '+' && str[i] != '-')
+		i--;
+	while (str[++i])
+	{
+		if (ft_strchr(" \t", str[i]) && check_for_whitespace_end(str, i))
+			break ;
+		if (!ft_isdigit(str[i]))
+			print_num_error_exit(msh, str);
+	}
+}
+
 void	msh_exit(t_msh *msh, char **args)
 {
-	int		i;
 	long	code;
 
 	if (!args[1])
@@ -97,21 +221,7 @@ void	msh_exit(t_msh *msh, char **args)
 		ft_putendl_fd("exit", STDERR_FILENO);
 		msh_quit(msh, NULL, 0);
 	}
-	if (args[1][0] == '\0')
-		print_num_error_exit(msh, args[1]);
-	i = 0;
-	while ((args[1][i] >= 9 && args[1][i] <= 13) || args[1][i] == 32)
-		i++;
-	if (args[1][i] != '+' && args[1][i] != '-')
-		i--;
-	while (args[1][++i])
-	{
-		if (ft_strchr(" \t", args[1][i]) && check_for_whitespace_end(args[1], 
-				i))
-			break ;
-		if (!ft_isdigit(args[1][i]))
-			print_num_error_exit(msh, args[1]);
-	}
+	check_exit_code_validity(msh, args[1]);	
 	code = msh_atol(msh, args[1]);
 	if (args[2])
 	{
@@ -119,7 +229,7 @@ void	msh_exit(t_msh *msh, char **args)
 		msh_print(msh, "exit: too many arguments", 1);
 	}
 	else
-		msh_quit(msh, NULL/*"exit"*/, code);//tester doesnt accept "exit"
+		msh_quit(msh, NULL/*"exit"*/, (code % 256 + 256) % 256);//tester doesnt accept "exit"
 }
 
 void	populate_names_array(t_msh *msh, char **names_array, size_t size)
@@ -283,10 +393,10 @@ void	msh_export(t_msh *msh, char **args)
 		if (!check_name_validity(msh, args[i]) || !ft_strchr(args[i], '='))
 			continue ;
 		name_len = 0;
-		name = get_env_name(args[i], &name_len);
+		name = extract_env_name(args[i], &name_len);
 		if (!name)
 			msh_quit(msh, "export: name init malloc failed", 1);
-		value = get_env_value(args[i], name_len + 1);
+		value = extract_env_value(args[i], name_len + 1);
 		if (!value)
 			(free(name), msh_quit(msh, "export: value init malloc failed", 1));
 		if (check_and_update_env_var_value(msh, name, value))
@@ -330,6 +440,7 @@ void	msh_unset(t_msh *msh, char **args)
 	while (args[++i])
 		check_and_delete_env_var(msh, args[i]);
 }
+
 bool	check_newline_skipping(char *str)
 {
 	int	i;
@@ -398,7 +509,7 @@ void	msh_builtins(t_msh *msh, int i)
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_EXIT)
 		msh_exit(msh, msh->cmd_table[i]->args);
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_ENV)
-		ft_printenv(msh->env_vars);
+		print_env_vars(msh->env_vars);
 	else if (((t_cmd *)msh->cmd_table[i])->builtin.type == B_EXPORT)
 	{
 		msh_export(msh, msh->cmd_table[i]->args);
