@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/10 02:19:01 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/13 01:00:13 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@
 # include <fcntl.h>
 //open
 # include <limits.h>
-//INT_MAX, INT_MIN
+//INT_MAX, INT_MIN, LONG_MAX, LONG_MIN
 # include <readline/readline.h>
 //readline, rl_clear_history, rl_on_new_line, rl_replace_line, 
 //rl_redisplay, add_history
