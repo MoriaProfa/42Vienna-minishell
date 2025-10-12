@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/11 21:50:57 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/12 18:31:28 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,10 @@ void	print_heredoc_fd(t_msh *msh)
 	i = 0;
 	if (!msh->cmd_table)
 		return ;
-	printf("\n=== Command Table (n = %i) ===\n", msh->n_cmds);
 	while (msh->cmd_table[i] && i < msh->n_cmds)
 	{
 		cmd = msh->cmd_table[i];
-		printf("Command %i:\n", i);
-		printf("\theredoc_read: %d\n", cmd->heredoc_read);
+		printf("cmd [%d] heredoc_read = %d\n", i, cmd->heredoc_read);
 		i++;
 	}
 }
@@ -91,7 +89,6 @@ void	collect_all_heredocs(t_msh *msh, int i)
 	}
 }*/
 // temporary heredoc file
-
 char	*create_filename(int i, int j)
 {
 	char	*temp;
@@ -119,13 +116,24 @@ char	*create_filename(int i, int j)
 	return (name);
 }
 
+void	print_heredoc_warning(t_cmd *cmd, int j)
+{
+	ft_putstr_fd("minishell: warning: here-document delimeted by EOF (wanted ",
+		STDERR_FILENO);
+	ft_putstr_fd(cmd->heredocs[j].delimiter, STDERR_FILENO);
+	ft_putstr_fd(")\n", STDERR_FILENO);
+}
+
 void	collect_one_heredoc(t_msh *msh, t_cmd *cmd, int j, int fd)
 {
 	while (1)
 	{
 		cmd->heredocs[j].buffer = readline("> ");
 		if (!cmd->heredocs[j].buffer)
+		{
+			print_heredoc_warning(cmd, j);
 			break ;
+		}
 		if (cmd->heredocs[j].expand == true)
 			expand_heredoc_input(msh, &cmd->heredocs[j].buffer);
 		if (ft_strlen(cmd->heredocs[j].buffer) == ft_strlen(cmd->heredocs[j].delimiter)
@@ -144,10 +152,45 @@ void	collect_one_heredoc(t_msh *msh, t_cmd *cmd, int j, int fd)
 	close(fd);
 }
 
+void	handle_heredoc_signal(void)
+{
+	signal(SIGINT, SIG_DFL);  // allow Ctrl+C to terminate heredoc
+	signal(SIGQUIT, SIG_IGN); // ignore Ctrl+\ during heredoc
+}
+
+void	collect_heredocs_in_child(t_msh *msh, int i, int j, int fd)
+{
+	pid_t	pid;
+	int		status;
+
+	pid = fork();
+	if (pid == -1)
+		msh_quit(msh, "heredoc fork failed", 1);
+	else if (pid == 0)
+	{
+		signal(SIGINT, SIG_DFL);  // allow Ctrl+C to terminate heredoc
+		signal(SIGQUIT, SIG_IGN); // ignore Ctrl+\ during heredoc
+		collect_one_heredoc(msh, (t_cmd *)msh->cmd_table[i], j, fd);
+		close(fd);
+		exit(0);
+	}
+	else
+	{
+		close(fd);
+		waitpid(pid, &status, 0);
+		if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
+		{
+			msh->status = 130;
+			write(1, "\n", 1);
+			return ; // stop heredoc collection & skip execution
+		}
+	}
+}
+
 void	collect_all_heredocs(t_msh *msh, int i)
 {
-	int	j;
-	int	fd;
+	int		j;
+	int		fd;
 
 	while ((t_cmd *)msh->cmd_table[++i])
 	{
@@ -162,7 +205,7 @@ void	collect_all_heredocs(t_msh *msh, int i)
 					O_RDWR | O_CREAT | O_TRUNC, 0600);
 			if (fd == -1)
 				msh_quit(msh, "failed to create temporary heredoc file", 1);
-			collect_one_heredoc(msh, (t_cmd *)msh->cmd_table[i], j, fd);
+			collect_heredocs_in_child(msh, i, j, fd);
 			if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
 				close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
 			((t_cmd *)msh->cmd_table[i])->heredoc_read = open(((t_cmd *)msh->cmd_table[i])->heredocs[j].filename,
