@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/12 22:37:51 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/12 23:52:08 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,6 +176,7 @@ void	collect_heredocs_in_child(t_msh *msh, int i, int j, int fd)
 		{
 			msh->status = 130;
 			write(1, "\n", 1);
+			msh_quit(msh, NULL, msh->status); // trying stuff
 			return ; // stop heredoc collection & skip execution
 		}
 	}
