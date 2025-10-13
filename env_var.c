@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 21:20:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/13 01:42:02 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/13 02:54:01 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,12 @@ void	print_env_vars(t_list *env_vars)
 	{
 		cur_env_var = (t_env_var *)(cur_node->content);
 		if (cur_env_var)
-			printf("%s=%s\n", cur_env_var->name, cur_env_var->value);
+		{
+			ft_putstr_fd(cur_env_var->name, STDOUT_FILENO);
+			ft_putchar_fd('=', STDOUT_FILENO);
+			ft_putendl_fd(cur_env_var->value, STDOUT_FILENO);
+		}
+//			printf("%s=%s\n", cur_env_var->name, cur_env_var->value);
 		cur_node = cur_node->next;
 	}
 }
