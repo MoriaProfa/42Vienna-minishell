@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/13 18:21:26 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/13 23:40:21 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,7 @@ void	collect_heredocs_in_child(t_msh *msh, int i, int j, int fd)
 	else if (pid == 0)
 	{
 		signal(SIGINT, SIG_DFL);
-		// need to add msh_free before terminatig heredoc
+		// need to add msh_free before terminatig heredoc?
 		signal(SIGQUIT, SIG_IGN); // ignore Ctrl+\ during heredoc
 		collect_one_heredoc(msh, (t_cmd *)msh->cmd_table[i], j, fd);
 		close(fd);
@@ -140,7 +140,8 @@ void	collect_heredocs_in_child(t_msh *msh, int i, int j, int fd)
 	else
 	{
 		close(fd);
-		waitpid(pid, &status, 0);
+		if (waitpid(pid, &status, 0) == -1) // protect from failing
+			msh_quit(msh, "waitpid failed while collecting heredoc", 1);
 		if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
 		{
 			msh->status = 130;
