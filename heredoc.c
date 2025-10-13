@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/13 00:47:57 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/13 13:16:03 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,7 +179,7 @@ void	collect_heredocs_in_child(t_msh *msh, int i, int j, int fd)
 		if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
 		{
 			msh->status = 130;
-			write(1, "\n", 1);
+			write(1, "\n", STDOUT_FILENO);
 			//msh_quit(msh, NULL, msh->status); // trying stuff
 			return ; // stop heredoc collection & skip execution
 		}
