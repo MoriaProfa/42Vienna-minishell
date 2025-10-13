@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/13 13:43:07 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/13 21:01:41 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,10 +127,8 @@ void	msh_fork(t_msh *msh, int i)
 		msh_quit(msh, "fork failed", 1);
 	if (msh->pid[i] == 0)
 	{
-		// print_fds(msh, i);
 		child_process(msh, i);
 	}
-	// print_fds(msh, i);
 	if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
 		close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
 	if (msh->fd_pipe_read != -1)
