@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 16:29:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/09 13:27:52 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/13 17:22:21 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,12 +122,16 @@ void	expand_word_tokens(t_list *tokens, t_msh *msh)
 		if (cur_token->type == T_WORD && cur_token->quoted != Q_SINGLE
 			&& ft_strchr(cur_token->value, '$'))
 		{
-			tmp = ft_strdup("");
-			if (!tmp)
-				msh_quit(msh, "expander: tmp init malloc failed", 1);
-			expanded = expand_value(cur_token->value, tmp, msh);
-			free(cur_token->value);
-			cur_token->value = expanded;
+			if (!cur_node->prev || (cur_node->prev && 
+				((t_token *)cur_node->prev->content)->type != T_HEREDOC_REDIRECT))
+			{
+				tmp = ft_strdup("");
+				if (!tmp)
+					msh_quit(msh, "expander: tmp init malloc failed", 1);
+				expanded = expand_value(cur_token->value, tmp, msh);
+				free(cur_token->value);
+				cur_token->value = expanded;
+			}
 		}
 		cur_node = cur_node->next;
 	}

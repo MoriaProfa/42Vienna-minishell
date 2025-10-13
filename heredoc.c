@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/13 00:47:57 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/13 17:31:48 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,7 +138,9 @@ static void	collect_one_heredoc(t_msh *msh, t_cmd *cmd, int j, int fd)
 			close(fd);
 			msh_quit(msh, NULL, 0); // return ;
 		}
-		if (cmd->heredocs[j].expand == true)
+		if (cmd->heredocs[j].expand == true && !(ft_strlen(cmd->heredocs[j].buffer) == ft_strlen(cmd->heredocs[j].delimiter)
+			&& ft_strncmp(cmd->heredocs[j].buffer, cmd->heredocs[j].delimiter,
+				ft_strlen(cmd->heredocs[j].buffer)) == 0))
 			expand_heredoc_input(msh, &cmd->heredocs[j].buffer);
 		if (ft_strlen(cmd->heredocs[j].buffer) == ft_strlen(cmd->heredocs[j].delimiter)
 			&& ft_strncmp(cmd->heredocs[j].buffer, cmd->heredocs[j].delimiter,
