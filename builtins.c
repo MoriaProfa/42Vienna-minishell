@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/13 06:10:18 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/13 19:14:23 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -447,13 +447,12 @@ void	msh_unset(t_msh *msh, char **args)
 bool	check_newline_skipping(char *str)
 {
 	int	i;
-
 	if (str[0] != '-')
 		return (false);
 	i = 0;
 	while (str[++i])
 	{
-		if (str[i] != 'n')
+		if (str[i] != 'n' && !check_for_whitespace_end(str, i))
 			return (false);
 	}
 	return (true);
