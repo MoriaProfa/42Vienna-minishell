@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_table.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/12 01:23:25 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/13 17:34:45 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -266,7 +266,7 @@ char	*resolve_cmd_pathname(t_msh *msh, char **paths, char *cmd)
 
 	j = -1;
 	pathname = NULL;
-	while (paths[++j])
+	while (paths[++j] && cmd[0] != '\0')
 	{
 		tmp = ft_strjoin(paths[j], "/");
 		if (!tmp)
