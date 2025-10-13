@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/13 05:52:08 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/13 06:10:18 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,7 +166,8 @@ void	msh_cd(t_msh *msh, char **args)
 	}
 	msh->status = chdir(path);
 	if (msh->status != 0)
-		return (ft_putstr_fd("minishell: cd: ", STDERR_FILENO), 
+		return (msh_print(msh, NULL, 1), 
+			ft_putstr_fd("minishell: cd: ", STDERR_FILENO), 
 			perror(path), free(oldpwd), free(path));
 	else
 	{
