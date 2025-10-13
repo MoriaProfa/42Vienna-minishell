@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/13 21:10:49 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/13 23:35:56 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,30 +139,38 @@ static int	set_heredocs(t_msh *msh, int i, int j)
 
 static int	redirect_input(t_msh *msh, int i, int j)
 {
-	
-	msh->fd_in = set_infile(((t_cmd *)msh->cmd_table[i]), j);
-	if (msh->fd_in == -1)
-		return (1);
-	((t_cmd *)msh->cmd_table[i])->heredoc_read = set_heredocs(msh, i,-1);
-	if (((t_cmd *)msh->cmd_table[i])->heredoc_read == -1)
+	if (((t_cmd *)msh->cmd_table[i])->infiles)
 	{
-		if (msh->fd_in != -1)
-			close(msh->fd_in);
-		return (1);
+		msh->fd_in = set_infile(((t_cmd *)msh->cmd_table[i]), j);
+		if (msh->fd_in == -1)
+			return (1);
+	}
+	if (((t_cmd *)msh->cmd_table[i])->heredocs->delimiter)
+	{
+		((t_cmd *)msh->cmd_table[i])->heredoc_read = set_heredocs(msh, i,-1);
+		if (((t_cmd *)msh->cmd_table[i])->heredoc_read == -1)
+		{
+			if (msh->fd_in != -1)
+				close(msh->fd_in);
+			return (1);
+		}
 	}
 	if (((t_cmd *)msh->cmd_table[i])->last_input == T_IN_REDIRECT)
 		dup2(msh->fd_in, STDIN_FILENO);
 	else if (((t_cmd *)msh->cmd_table[i])->last_input == T_HEREDOC_REDIRECT)
 		dup2(((t_cmd *)msh->cmd_table[i])->heredoc_read, STDIN_FILENO);
-	close(msh->fd_in);
-	close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
+	if (msh->fd_in != -1)
+		close(msh->fd_in);
+	if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
+		close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
 	return (0);
 }
 
 int	set_redirections(t_msh *msh, int i)
 {
-	redirect_pipes(msh, i);
-	if (((t_cmd *)msh->cmd_table[i])->last_input != T_NONE)
+	if (msh->n_cmds > 0)
+		redirect_pipes(msh, i);
+	if (((t_cmd *)msh->cmd_table[i])->infiles || ((t_cmd *)msh->cmd_table[i])->heredocs)
 	{
 		if (redirect_input(msh, i, -1) == 1)
 			return (1);
