@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/13 22:18:47 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/13 23:18:02 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -478,10 +478,9 @@ void	msh_echo(t_msh *msh, char **args)
 	bool	skip_newline;
 
 	if (!args[1])
-	{
-		ft_putchar_fd('\n', STDOUT_FILENO);
-		return ;
-	}
+		return (ft_putchar_fd('\n', STDOUT_FILENO));
+	if (!ft_strncmp(args[1], "-", ft_strlen("-") + 1))
+		return (ft_putendl_fd("-", STDOUT_FILENO));
 	skip_newline = check_newline_skipping(args[1]);
 	start = 1;
 	while (skip_newline && args[++start])
