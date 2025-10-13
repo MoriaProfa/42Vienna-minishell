@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/13 01:07:48 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/13 02:26:37 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,7 @@ void	msh_pwd(t_msh *msh)
 	if (!pwd)
 		print_getcwd_error(msh, "pwd");
 	ft_putendl_fd(pwd, STDOUT_FILENO);
+	msh->status = 0;
 	free(pwd);
 }
 
@@ -164,8 +165,9 @@ void	msh_cd(t_msh *msh, char **args)
 			return (free(path), print_getcwd_error(msh, "cd"));
 	}
 	msh->status = chdir(path);
-	if (msh->status != 0 && path[0] != '\0')
-		return (perror(path), free(path));
+	if (msh->status != 0)
+		return (msh_print(msh, "cd: ", 1), perror(path), 
+			free(oldpwd), free(path));
 	else
 	{
 		free(path);
