@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/13 23:18:02 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/13 23:49:34 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -442,6 +442,7 @@ void	msh_unset(t_msh *msh, char **args)
 	i = 0;
 	while (args[++i])
 		check_and_delete_env_var(msh, args[i]);
+	msh->status = 0;
 }
 
 bool	check_newline_skipping(char *str)
