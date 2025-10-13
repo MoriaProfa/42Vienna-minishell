@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/13 22:15:17 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/14 00:44:44 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,6 +153,8 @@ void	run_builtins(t_msh *msh, int i)
 	save_stdin_stdout(msh, i);
 	if (set_redirections(msh, i) == 0)
 		msh_builtins(msh, i);
+	else
+		msh->status = 1;
 	restore_stdin_stdout(msh);
 }
 
