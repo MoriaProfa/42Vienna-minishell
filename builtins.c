@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/13 19:14:23 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/13 22:18:47 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -452,7 +452,7 @@ bool	check_newline_skipping(char *str)
 	i = 0;
 	while (str[++i])
 	{
-		if (str[i] != 'n' && !check_for_whitespace_end(str, i))
+		if (str[i] != 'n')
 			return (false);
 	}
 	return (true);
