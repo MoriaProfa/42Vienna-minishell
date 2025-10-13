@@ -6,13 +6,13 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/13 13:16:03 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/13 16:38:38 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	*expand_value(char *value, char *result, t_msh *msh);
+char		*expand_value(char *value, char *result, t_msh *msh);
 
 void	print_heredoc_fd(t_msh *msh)
 {
@@ -42,53 +42,7 @@ void	expand_heredoc_input(t_msh *msh, char **value)
 	free(*value);
 	*value = expanded;
 }
-/*
-void	collect_one_heredoc(t_msh *msh, t_cmd *cmd, int j, int fd)
-{
-	while (1)
-	{
-		cmd->heredocs[j].buffer = readline("> ");
-		if (!cmd->heredocs[j].buffer)
-			break ;
-		if (cmd->heredocs[j].expand == true)
-			expand_heredoc_input(msh, &cmd->heredocs[j].buffer);
-		if (ft_strlen(cmd->heredocs[j].buffer) == ft_strlen(cmd->heredocs[j].delimiter)
-			&& ft_strncmp(cmd->heredocs[j].buffer, cmd->heredocs[j].delimiter,
-				ft_strlen(cmd->heredocs[j].buffer)) == 0)
-		{
-			free(cmd->heredocs[j].buffer);
-			cmd->heredocs[j].buffer = NULL;
-			break ;
-		}
-		write(fd, cmd->heredocs[j].buffer, ft_strlen(cmd->heredocs[j].buffer));
-		write(fd, "\n", 1);
-		free(cmd->heredocs[j].buffer);
-		cmd->heredocs[j].buffer = NULL;
-	}
-}
 
-void	collect_all_heredocs(t_msh *msh, int i)
-{
-	int		j;
-	int		fd[2];
-
-	while ((t_cmd *)msh->cmd_table[++i])
-	{
-		j = -1;
-		while (((t_cmd *)msh->cmd_table[i])->heredocs[++j].delimiter)
-		{
-			if (pipe(fd) == -1)
-				msh_quit(msh, "heredoc pipe failed", 1);
-			collect_one_heredoc(msh, (t_cmd *)msh->cmd_table[i], j, fd[1]);
-			if (fd[1] != -1)
-				close(fd[1]);
-			if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
-				close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
-			((t_cmd *)msh->cmd_table[i])->heredoc_read = fd[0];
-		}
-	}
-}*/
-// temporary heredoc file
 char	*create_filename(int i, int j)
 {
 	char	*temp;
@@ -124,25 +78,35 @@ static void	print_heredoc_warning(t_cmd *cmd, int j)
 	ft_putstr_fd(")\n", STDERR_FILENO);
 }
 
-void	close_fds(t_msh *msh);
-void	close_heredocs(t_msh *msh);
+void		close_fds(t_msh *msh);
+void		close_heredocs(t_msh *msh);
+
+static bool	compare_strings(char *s1, char *s2)
+{
+	if (ft_strlen(s1) == ft_strlen(s2) && ft_strncmp(s1, s2,
+			ft_strlen(s1)) == 0)
+		return (true);
+	else
+		return (false);
+}
 
 static void	collect_one_heredoc(t_msh *msh, t_cmd *cmd, int j, int fd)
 {
 	while (1)
 	{
+		printf("%s\n", cmd->heredocs[j].delimiter);
 		cmd->heredocs[j].buffer = readline("> ");
 		if (!cmd->heredocs[j].buffer)
 		{
 			print_heredoc_warning(cmd, j);
-			close(fd);
-			msh_quit(msh, NULL, 0); // return ;
+			return ;
 		}
-		if (cmd->heredocs[j].expand == true)
+		if (cmd->heredocs[j].expand == true
+			&& compare_strings(cmd->heredocs[j].buffer,
+				cmd->heredocs[j].delimiter) == false)
 			expand_heredoc_input(msh, &cmd->heredocs[j].buffer);
-		if (ft_strlen(cmd->heredocs[j].buffer) == ft_strlen(cmd->heredocs[j].delimiter)
-			&& ft_strncmp(cmd->heredocs[j].buffer, cmd->heredocs[j].delimiter,
-				ft_strlen(cmd->heredocs[j].buffer)) == 0)
+		if (compare_strings(cmd->heredocs[j].buffer,
+				cmd->heredocs[j].delimiter) == true)
 		{
 			free(cmd->heredocs[j].buffer);
 			cmd->heredocs[j].buffer = NULL;
@@ -166,7 +130,8 @@ void	collect_heredocs_in_child(t_msh *msh, int i, int j, int fd)
 		msh_quit(msh, "heredoc fork failed", 1);
 	else if (pid == 0)
 	{
-		signal(SIGINT, SIG_DFL);  // need to add msh_free before terminatig heredoc
+		signal(SIGINT, SIG_DFL);
+		// need to add msh_free before terminatig heredoc
 		signal(SIGQUIT, SIG_IGN); // ignore Ctrl+\ during heredoc
 		collect_one_heredoc(msh, (t_cmd *)msh->cmd_table[i], j, fd);
 		close(fd);
@@ -180,7 +145,7 @@ void	collect_heredocs_in_child(t_msh *msh, int i, int j, int fd)
 		{
 			msh->status = 130;
 			write(1, "\n", STDOUT_FILENO);
-			//msh_quit(msh, NULL, msh->status); // trying stuff
+			// msh_quit(msh, NULL, msh->status); // trying stuff
 			return ; // stop heredoc collection & skip execution
 		}
 	}
@@ -188,8 +153,8 @@ void	collect_heredocs_in_child(t_msh *msh, int i, int j, int fd)
 
 void	collect_all_heredocs(t_msh *msh, int i)
 {
-	int		j;
-	int		fd;
+	int	j;
+	int	fd;
 
 	while ((t_cmd *)msh->cmd_table[++i])
 	{
