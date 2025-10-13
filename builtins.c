@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/13 02:26:37 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/13 05:26:45 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,8 +166,8 @@ void	msh_cd(t_msh *msh, char **args)
 	}
 	msh->status = chdir(path);
 	if (msh->status != 0)
-		return (msh_print(msh, "cd: ", 1), perror(path), 
-			free(oldpwd), free(path));
+		return (ft_putstr_fd("cd: ", STDERR_FILENO), 
+			perror(path), free(oldpwd), free(path));
 	else
 	{
 		free(path);
