@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenizer.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/08 16:48:00 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/13 22:32:58 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -326,12 +326,14 @@ void	msh_tokenizer(t_msh *msh)
 	char	*word;
 	int		quoted_adjacent[2];
 	int		i;
+	int		skipped;
 
 	i = -1;
 	while (*msh->cpy_in_str)
 	{
 		ft_memset(quoted_adjacent, 0, sizeof(quoted_adjacent));
-		if (++i != 0 && !skip_whitespaces(msh))
+		skipped = skip_whitespaces(msh);
+		if (++i != 0 && !skipped)
 			quoted_adjacent[1] = check_adjacency(msh->tokens);
 		if (!*msh->cpy_in_str)
 			break ;
