@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/13 21:01:41 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/13 22:15:17 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,13 +29,20 @@ void	msh_pid(t_msh *msh) // could be put in cmd_table
 
 void	msh_execute(t_msh *msh, int i)
 {
-	if (!((t_cmd *)msh->cmd_table[i])->pathname
-		|| (((t_cmd *)msh->cmd_table[i])->pathname
-			&& access(((t_cmd *)msh->cmd_table[i])->pathname, F_OK) == -1))
+	// printf("cmd = %s\n", ((t_cmd *)msh->cmd_table[i])->args[0]);
+	// printf("path = %s\n", ((t_cmd *)msh->cmd_table[i])->pathname);
+	if (!((t_cmd *)msh->cmd_table[i])->pathname)
 	{
 		ft_putstr_fd(((t_cmd *)msh->cmd_table[i])->args[0], STDERR_FILENO);
 		ft_putstr_fd(": ", STDERR_FILENO);
 		msh_print(msh, "command not found", 127);
+		return ;
+	}
+	else if ((((t_cmd *)msh->cmd_table[i])->pathname
+			&& access(((t_cmd *)msh->cmd_table[i])->pathname, F_OK) == -1))
+	{
+		perror(((t_cmd *)msh->cmd_table[i])->args[0]);
+		msh_print(msh, NULL, 127);
 		return ;
 	}
 	else if (((t_cmd *)msh->cmd_table[i])->pathname
