@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/14 15:08:45 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/14 15:22:26 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,9 @@
 void	msh_builtins(t_msh *msh, int i);
 void	close_heredocs(t_msh *msh);
 void	print_heredoc_fd(t_msh *msh);
+void	save_stdin_stdout(t_msh *msh, int i);
+void	restore_stdin_stdout(t_msh *msh);
+void	close_fds(t_msh *msh);
 
 void	print_fds(t_msh *msh, int i)
 {
@@ -127,7 +130,7 @@ void	msh_waitpid(t_msh *msh, int i)
 	int	wstatus;
 	int	sig;
 
-	if (waitpid(msh->pid[i], &wstatus, 0) ==-1)
+	if (waitpid(msh->pid[i], &wstatus, 0) == -1)
 		msh_quit(msh, "child waitpid failed", 1);
 	if (WIFEXITED(wstatus))
 		msh->status = WEXITSTATUS(wstatus);
