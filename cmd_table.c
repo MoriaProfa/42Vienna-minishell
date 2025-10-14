@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/13 18:21:54 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/14 03:45:02 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -293,7 +293,7 @@ char	*create_cmd_pathname(t_msh *msh, char *cmd)
 	j = 0;
 	pathname = NULL;
 	
-	if (ft_strchr(cmd, '/'))
+	if (ft_strchr(cmd, '/') || access(cmd, F_OK) == 0) // added access check for unset PATH; cd /bin; ls case - works in this case, need to check with other cases in the tester
 	{
 		pathname = ft_strdup(cmd);
 		if (!pathname)
