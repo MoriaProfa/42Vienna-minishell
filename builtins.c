@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/13 23:49:34 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/14 23:52:04 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -289,7 +289,7 @@ void	sort_names_array(char **array, size_t size)
 	}
 }
 
-void	print_env_var(t_msh *msh, char *name)
+void	print_export_wo_args(t_msh *msh, char *name)
 {
 	t_list		*cur_node;
 	t_env_var	*cur_env_var;
@@ -302,7 +302,7 @@ void	print_env_var(t_msh *msh, char *name)
 		{
 			if (!ft_strncmp(name, cur_env_var->name, ft_strlen(name) + 1))
 			{
-				if (cur_env_var->value && ft_strlen(cur_env_var->value))
+				if (cur_env_var->value)
 					printf("declare -x %s=\"%s\"\n", cur_env_var->name,
 						cur_env_var->value);
 				else
@@ -328,7 +328,7 @@ void	handle_export_wo_args(t_msh *msh)
 	sort_names_array(names_array, size);
 	i = -1;
 	while (names_array[++i])
-		print_env_var(msh, names_array[i]);
+		print_export_wo_args(msh, names_array[i]);
 	ft_array_free(names_array, size);
 }
 
@@ -390,25 +390,38 @@ void	msh_export(t_msh *msh, char **args)
 	size_t	name_len;
 	int		i;
 
+	if (!args[1])
+		return(handle_export_wo_args(msh));
 	i = 0;
 	while (args[++i])
 	{
-		if (!check_name_validity(msh, args[i]) || !ft_strchr(args[i], '='))
+		if (!check_name_validity(msh, args[i])/* || !ft_strchr(args[i], '=')*/)
 			continue ;
-		name_len = 0;
-		name = extract_env_name(args[i], &name_len);
-		if (!name)
-			msh_quit(msh, "export: name init malloc failed", 1);
-		value = extract_env_value(args[i], name_len + 1);
-		if (!value)
-			(free(name), msh_quit(msh, "export: value init malloc failed", 1));
-		if (check_and_update_env_var_value(msh, name, value))
-			free(name);
+		if (ft_strchr(args[i], '='))
+		{
+			name_len = 0;
+			name = extract_env_name(args[i], &name_len);
+			if (!name)
+				msh_quit(msh, "export: name init malloc failed", 1);
+			value = extract_env_value(args[i], name_len + 1);
+			if (!value)
+				(free(name), msh_quit(msh, "export: value init malloc failed", 1));
+			if (check_and_update_env_var_value(msh, name, value))
+				free(name);
+			else
+				add_to_env_vars(msh, name, value);
+		}
 		else
-			add_to_env_vars(msh, name, value);
+		{
+			name = ft_strdup(args[i]);
+			if (!name)
+				msh_quit(msh, "export: name only init malloc failed", 1);
+			if (!check_and_update_env_var_value(msh, name, NULL))
+				add_to_env_vars(msh, name, NULL);
+			else
+				free(name);
+		}
 	}
-	if (!args[1])
-		handle_export_wo_args(msh);
 }
 
 void	check_and_delete_env_var(t_msh *msh, char *name)
@@ -479,9 +492,9 @@ void	msh_echo(t_msh *msh, char **args)
 	bool	skip_newline;
 
 	if (!args[1])
-		return (ft_putchar_fd('\n', STDOUT_FILENO));
+		return (msh_print(msh, "", 0));
 	if (!ft_strncmp(args[1], "-", ft_strlen("-") + 1))
-		return (ft_putendl_fd("-", STDOUT_FILENO));
+		return (msh_print(msh, "-", 0));
 	skip_newline = check_newline_skipping(args[1]);
 	start = 1;
 	while (skip_newline && args[++start])
@@ -495,7 +508,7 @@ void	msh_echo(t_msh *msh, char **args)
 		start--;
 	print_echo_args(msh, args, start);	
 	if (!skip_newline)
-		ft_putchar_fd('\n', STDOUT_FILENO);
+		msh_print(msh, "", 0);
 	//ft_putstr_fd("\tnewline for better visibility\n", STDOUT_FILENO);//just for testing
 }
 

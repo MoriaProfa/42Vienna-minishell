@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/13 22:32:58 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/14 23:28:27 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -269,10 +269,20 @@ void	join_token_content(t_token *previous, t_token *current, t_msh *msh)
 {
 	char	*joined;
 
-	joined = ft_strjoin(previous->value, current->value);
-	if (!joined)
-		msh_quit(msh, "token value merging ft_strjoin malloc failed", 1);
-	free(previous->value);
+	joined = NULL;
+	if (previous->value && current->value)
+	{
+		joined = ft_strjoin(previous->value, current->value);
+		if (!joined)
+			msh_quit(msh, "token value merging ft_strjoin malloc failed", 1);
+		free(previous->value);
+	}
+	else if (!previous->value && current->value)
+	{
+		joined = ft_strdup(current->value);
+		if (!joined)
+			msh_quit(msh, "token value merging ft_strjoin malloc failed", 1);
+	}
 	previous->value = joined;
 	previous->quoted = merge_quote_types(previous->quoted, current->quoted);
 }
@@ -347,14 +357,14 @@ void	msh_tokenizer(t_msh *msh)
 			free(word);
 		}
 	}
-	//	printf("\nraw tokens:");
-	//	print_tokens(msh->tokens);
+//	printf("\nraw tokens:");
+//	print_tokens(msh->tokens);
 	remove_quotationmarks_in_tokens(msh->tokens);
-	//	printf("\nafter quote removal:");
-	//	print_tokens(msh->tokens);
+//	printf("\nafter quote removal:");
+//	print_tokens(msh->tokens);
 	expand_word_tokens(msh->tokens, msh);
-	//	printf("\nafter expansion:");
-	//	print_tokens(msh->tokens);
+//	printf("\nafter expansion:");
+//	print_tokens(msh->tokens);
 	merge_adjacent_tokens(&msh->tokens, msh);
-	//	printf("\nafter adjacency handling:");
+//	printf("\nafter adjacency handling:");
 }

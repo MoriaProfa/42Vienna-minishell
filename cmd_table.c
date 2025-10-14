@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_table.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/14 03:45:02 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/14 23:00:34 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,6 +215,8 @@ void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens,
 	word_token = get_next_token(tokens);
 	if (!word_token)
 		return ;
+	if (!word_token->value || word_token->value[0] == '\0')
+		return (msh_print(msh, "minishell: ambiguous redirect", 1));
 	word = ft_strdup(word_token->value);
 	if (!word)
 		msh_quit(msh, "word_token->value ft_strdup malloc failed", 1);
@@ -244,9 +246,12 @@ void	parse_single_cmd_tokens(t_cmd *cmd, t_list **tokens, t_msh *msh)
 		token = (*tokens)->content;
 		if (token->type == T_WORD)
 		{
-			cmd->args[cmd->n_args] = ft_strdup(token->value);
-			if (!cmd->args[cmd->n_args++])
-				msh_quit(msh, "cmd args ft_strdup malloc failed", 1);
+			if (token->value/* && token->value[0] != '\0'*/)
+			{
+				cmd->args[cmd->n_args] = ft_strdup(token->value);
+				if (!cmd->args[cmd->n_args++])
+					msh_quit(msh, "cmd args ft_strdup malloc failed", 1);
+			}
 		}
 		else
 			parse_redirection_token(cmd, token, tokens, msh);

@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 16:29:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/13 17:22:21 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/14 23:27:52 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,15 +18,21 @@ static void	add_to_result(char *tmp, char **result, size_t *i, t_msh *msh)
 
 	if (!tmp)
 	{
-		free(*result);
+		if (*result)
+			free(*result);
 		msh_quit(msh, "expander: tmp substr/itoa malloc failed", 1);
 	}
-	new_result = ft_strjoin(*result, tmp);
-	free(*result);
-	free(tmp);
-	if (!new_result)
-		msh_quit(msh, "expander: new_result strjoin malloc failed", 1);
-	*result = new_result;
+	if (*result)
+	{
+		new_result = ft_strjoin(*result, tmp);
+		free(*result);
+		free(tmp);
+		if (!new_result)
+			msh_quit(msh, "expander: new_result strjoin malloc failed", 1);
+		*result = new_result;
+	}
+	else
+		*result = tmp;
 	(*i)++;
 }
 
@@ -50,11 +56,21 @@ static void	exp_getenv(char *var_name, size_t len, char ***result, t_msh *msh)
 	free(var_name);
 	if (env_value)
 	{
-		tmp = ft_strjoin(**result, env_value);
+		if (**result)
+			tmp = ft_strjoin(**result, env_value);
+		else
+			tmp = ft_strdup(env_value);
 		free(**result);
 		if (!tmp)
 			msh_quit(msh, "expander: env_value join malloc failed", 1);
 		**result = tmp;
+	}
+	else
+	{
+		if (**result[0] != '\0')
+			return ;
+		free(**result);
+		**result = NULL;
 	}
 }
 
