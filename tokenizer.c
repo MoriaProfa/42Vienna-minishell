@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/14 23:28:27 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/15 01:15:11 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -275,7 +275,6 @@ void	join_token_content(t_token *previous, t_token *current, t_msh *msh)
 		joined = ft_strjoin(previous->value, current->value);
 		if (!joined)
 			msh_quit(msh, "token value merging ft_strjoin malloc failed", 1);
-		free(previous->value);
 	}
 	else if (!previous->value && current->value)
 	{
@@ -283,6 +282,7 @@ void	join_token_content(t_token *previous, t_token *current, t_msh *msh)
 		if (!joined)
 			msh_quit(msh, "token value merging ft_strjoin malloc failed", 1);
 	}
+	free(previous->value);
 	previous->value = joined;
 	previous->quoted = merge_quote_types(previous->quoted, current->quoted);
 }
@@ -307,7 +307,7 @@ void	merge_adjacent_tokens(t_list **tokens, t_msh *msh)
 			join_token_content(prev_token, cur_token, msh);
 			prev_node->next = cur_node->next;
 			if (cur_node->next)
-				cur_node->next->prev = prev_node;
+				cur_node->next->prev = prev_node;			
 			ft_lstdelone(cur_node, free_token);
 			cur_node = prev_node->next;
 		}
