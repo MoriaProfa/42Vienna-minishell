@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/14 15:22:26 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/14 20:47:42 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ void	print_heredoc_fd(t_msh *msh);
 void	save_stdin_stdout(t_msh *msh, int i);
 void	restore_stdin_stdout(t_msh *msh);
 void	close_fds(t_msh *msh);
+int		check_if_directory(char *path);
+void	print_execution_error(t_msh *msh, char *cmd, int option, int code);
 
 void	print_fds(t_msh *msh, int i)
 {
@@ -44,26 +46,20 @@ void	msh_pid(t_msh *msh) // could be put in cmd_table
 void	msh_execute(t_msh *msh, int i)
 {
 	if (!((t_cmd *)msh->cmd_table[i])->pathname)
-	{
-		ft_putstr_fd(((t_cmd *)msh->cmd_table[i])->args[0], STDERR_FILENO);
-		ft_putstr_fd(": ", STDERR_FILENO);
-		msh_print(msh, "command not found", 127);
-		return ;
-	}
+		return (print_execution_error(msh,
+				((t_cmd *)msh->cmd_table[i])->args[0], 1, 127));
 	else if ((((t_cmd *)msh->cmd_table[i])->pathname
 			&& access(((t_cmd *)msh->cmd_table[i])->pathname, F_OK) == -1))
-	{
-		perror(((t_cmd *)msh->cmd_table[i])->args[0]);
-		msh_print(msh, NULL, 127);
-		return ;
-	}
+		return (print_execution_error(msh,
+				((t_cmd *)msh->cmd_table[i])->args[0], 2, 127));
+	else if ((((t_cmd *)msh->cmd_table[i])->pathname)
+		&& check_if_directory(((t_cmd *)msh->cmd_table[i])->pathname))
+		return (print_execution_error(msh,
+				((t_cmd *)msh->cmd_table[i])->args[0], 3, 126));
 	else if (((t_cmd *)msh->cmd_table[i])->pathname
 		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == -1)
-	{
-		perror(((t_cmd *)msh->cmd_table[i])->args[0]);
-		msh_print(msh, NULL, 126);
-		return ;
-	}
+		return (print_execution_error(msh,
+				((t_cmd *)msh->cmd_table[i])->args[0], 4, 126));
 	else if (((t_cmd *)msh->cmd_table[i])->pathname
 		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == 0)
 		execve(((t_cmd *)msh->cmd_table[i])->pathname,
@@ -75,7 +71,7 @@ void	msh_execute(t_msh *msh, int i)
 
 void	child_process(t_msh *msh, int i)
 {
-	signal(SIGINT, SIG_DFL);
+	signal(SIGINT, SIG_DFL); // need to check signal handling in a child
 	signal(SIGQUIT, SIG_DFL);
 	if (set_redirections(msh, i) != 0)
 		msh_quit(msh, NULL, 1);
@@ -100,9 +96,7 @@ void	msh_fork(t_msh *msh, int i)
 	if (msh->pid[i] == -1)
 		msh_quit(msh, "fork failed", 1);
 	if (msh->pid[i] == 0)
-	{
 		child_process(msh, i);
-	}
 	if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
 		close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
 	if (msh->fd_pipe_read != -1)
@@ -113,16 +107,6 @@ void	msh_fork(t_msh *msh, int i)
 			close(msh->fd[1]);
 		msh->fd_pipe_read = msh->fd[0];
 	}
-}
-
-void	run_builtins(t_msh *msh, int i)
-{
-	save_stdin_stdout(msh, i);
-	if (set_redirections(msh, i) == 0)
-		msh_builtins(msh, i);
-	else
-		msh->status = 1;
-	restore_stdin_stdout(msh);
 }
 
 void	msh_waitpid(t_msh *msh, int i)
@@ -145,6 +129,16 @@ void	msh_waitpid(t_msh *msh, int i)
 	}
 }
 
+void	run_builtins(t_msh *msh, int i)
+{
+	save_stdin_stdout(msh, i);
+	if (set_redirections(msh, i) == 0)
+		msh_builtins(msh, i);
+	else
+		msh->status = 1;
+	restore_stdin_stdout(msh);
+}
+
 void	run_command(t_msh *msh, int i)
 {
 	while (++i < msh->n_cmds)
@@ -164,7 +158,5 @@ void	run_command(t_msh *msh, int i)
 	}
 	i = -1;
 	while (++i < msh->n_cmds && msh->pid && msh->pid[i] != -1)
-	{
 		msh_waitpid(msh, i);
-	}
 }
