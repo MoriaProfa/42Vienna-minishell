@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/14 05:15:55 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/14 15:08:53 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,44 @@
 int	redirect_infile(t_msh *msh, int i, int j);
 int	redirect_outfile(t_msh *msh, int i, int j);
 int	redirect_heredoc(t_msh *msh, int i, int j);
+
+void	close_fds(t_msh *msh)
+{
+	if (msh->fd_in != -1)
+		close(msh->fd_in);
+	if (msh->fd_out != -1)
+		close(msh->fd_out);
+	if (msh->fd[0] != -1)
+		close(msh->fd[0]);
+	if (msh->fd[1] != -1)
+		close(msh->fd[1]);
+	if (msh->fd_pipe_read != -1)
+		close(msh->fd_pipe_read);
+	close_heredocs(msh);
+}
+
+void	save_stdin_stdout(t_msh *msh, int i)
+{
+	if (((t_cmd *)msh->cmd_table[i])->n_outf > 0)
+		msh->saved_stdout = dup(STDOUT_FILENO);
+	if (((t_cmd *)msh->cmd_table[i])->n_inf > 0
+		|| ((t_cmd *)msh->cmd_table[i])->n_hd > 0)
+		msh->saved_stdin = dup(STDIN_FILENO);
+}
+
+void	restore_stdin_stdout(t_msh *msh)
+{
+	if (msh->saved_stdin != -1)
+	{
+		dup2(msh->saved_stdin, STDIN_FILENO);
+		close(msh->saved_stdin);
+	}
+	if (msh->saved_stdout != -1)
+	{
+		dup2(msh->saved_stdout, STDOUT_FILENO);
+		close(msh->saved_stdout);
+	}
+}
 
 static void	redirect_pipes(t_msh *msh, int i)
 {
