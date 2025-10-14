@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/14 05:27:22 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/14 05:29:03 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,7 +173,7 @@ void	msh_waitpid(t_msh *msh, int i)
 		sig = WTERMSIG(wstatus);
 		msh->status = 128 + sig;
 		if (sig == SIGINT)
-			write(STDOUT_FILENO, "\n", STDOUT_FILENO);
+			write(STDOUT_FILENO, "\n", 1);
 		else if (sig == SIGQUIT)
 			write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
 	}
