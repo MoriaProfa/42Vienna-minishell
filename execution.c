@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/14 04:30:07 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/14 05:27:22 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,54 +14,6 @@
 
 void	msh_builtins(t_msh *msh, int i);
 void	close_heredocs(t_msh *msh);
-
-void	msh_pid(t_msh *msh) // could be put in cmd_table
-{
-	int i;
-
-	i = -1;
-	msh->pid = (pid_t *)ft_calloc(msh->n_cmds + 1, sizeof(pid_t));
-	if (!msh->pid)
-		msh_quit(msh, "pid malloc error", 1);
-	while (++i < msh->n_cmds)
-		msh->pid[i] = -1;
-}
-
-void	msh_execute(t_msh *msh, int i)
-{
-	// printf("cmd = %s\n", ((t_cmd *)msh->cmd_table[i])->args[0]);
-	// printf("path = %s\n", ((t_cmd *)msh->cmd_table[i])->pathname);
-	if (!((t_cmd *)msh->cmd_table[i])->pathname)
-	{
-		ft_putstr_fd(((t_cmd *)msh->cmd_table[i])->args[0], STDERR_FILENO);
-		ft_putstr_fd(": ", STDERR_FILENO);
-		msh_print(msh, "command not found", 127);
-		return ;
-	}
-	else if ((((t_cmd *)msh->cmd_table[i])->pathname
-			&& access(((t_cmd *)msh->cmd_table[i])->pathname, F_OK) == -1))
-	{
-		perror(((t_cmd *)msh->cmd_table[i])->args[0]);
-		msh_print(msh, NULL, 127);
-		return ;
-	}
-	else if (((t_cmd *)msh->cmd_table[i])->pathname
-		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == -1)
-	{
-		perror(((t_cmd *)msh->cmd_table[i])->args[0]);
-		msh_print(msh, NULL, 126);
-		return ;
-	}
-	else if (((t_cmd *)msh->cmd_table[i])->pathname
-		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == 0)
-		execve(((t_cmd *)msh->cmd_table[i])->pathname,
-			((t_cmd *)msh->cmd_table[i])->args, msh->envp);
-	// msh_print(msh, "execve failed", 1);
-	perror(((t_cmd *)msh->cmd_table[i])->args[0]);
-	msh_print(msh, NULL, 1);
-	return ;
-}
-
 void	print_heredoc_fd(t_msh *msh);
 
 void	print_fds(t_msh *msh, int i)
@@ -87,6 +39,50 @@ void	close_fds(t_msh *msh)
 	if (msh->fd_pipe_read != -1)
 		close(msh->fd_pipe_read);
 	close_heredocs(msh);
+}
+
+void	msh_pid(t_msh *msh) // could be put in cmd_table
+{
+	int i;
+
+	i = -1;
+	msh->pid = (pid_t *)ft_calloc(msh->n_cmds + 1, sizeof(pid_t));
+	if (!msh->pid)
+		msh_quit(msh, "pid malloc error", 1);
+	while (++i < msh->n_cmds)
+		msh->pid[i] = -1;
+}
+
+void	msh_execute(t_msh *msh, int i)
+{
+	if (!((t_cmd *)msh->cmd_table[i])->pathname)
+	{
+		ft_putstr_fd(((t_cmd *)msh->cmd_table[i])->args[0], STDERR_FILENO);
+		ft_putstr_fd(": ", STDERR_FILENO);
+		msh_print(msh, "command not found", 127);
+		return ;
+	}
+	else if ((((t_cmd *)msh->cmd_table[i])->pathname
+			&& access(((t_cmd *)msh->cmd_table[i])->pathname, F_OK) == -1))
+	{
+		perror(((t_cmd *)msh->cmd_table[i])->args[0]);
+		msh_print(msh, NULL, 127);
+		return ;
+	}
+	else if (((t_cmd *)msh->cmd_table[i])->pathname
+		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == -1)
+	{
+		perror(((t_cmd *)msh->cmd_table[i])->args[0]);
+		msh_print(msh, NULL, 126);
+		return ;
+	}
+	else if (((t_cmd *)msh->cmd_table[i])->pathname
+		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == 0)
+		execve(((t_cmd *)msh->cmd_table[i])->pathname,
+			((t_cmd *)msh->cmd_table[i])->args, msh->envp);
+	perror(((t_cmd *)msh->cmd_table[i])->args[0]);
+	msh_print(msh, NULL, 1);
+	return ;
 }
 
 void	save_stdin_stdout(t_msh *msh, int i)
@@ -177,7 +173,7 @@ void	msh_waitpid(t_msh *msh, int i)
 		sig = WTERMSIG(wstatus);
 		msh->status = 128 + sig;
 		if (sig == SIGINT)
-			write(STDOUT_FILENO, "\n", 1);
+			write(STDOUT_FILENO, "\n", STDOUT_FILENO);
 		else if (sig == SIGQUIT)
 			write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
 	}
