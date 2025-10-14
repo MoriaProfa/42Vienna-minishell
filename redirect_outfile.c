@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 00:52:04 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/14 00:53:07 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/14 05:07:08 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ static int	set_outfile(t_cmd *cmd, int j)
 	return (fd);
 }
 
-static int	redirect_outfile(t_msh *msh, int i, int j)
+int	redirect_outfile(t_msh *msh, int i, int j)
 {
 	msh->fd_out = set_outfile(((t_cmd *)msh->cmd_table[i]), j);
 	if (msh->fd_out == -1)
