@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/14 05:08:38 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/14 05:15:55 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ static void	redirect_pipes(t_msh *msh, int i)
 int	set_redirections(t_msh *msh, int i)
 {
 	int	return_value;
-	
+
 	return_value = 0;
 	if (msh->n_cmds > 0)
 		redirect_pipes(msh, i);
