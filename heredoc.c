@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/13 23:40:21 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/14 02:49:03 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ char	*create_filename(int i, int j)
 
 static void	print_heredoc_warning(t_cmd *cmd, int j)
 {
-	ft_putstr_fd("minishell: warning: here-document delimeted by EOF (wanted ",
+	ft_putstr_fd("minishell: warning: here-document delimeted by end-of-file (wanted ",
 		STDERR_FILENO);
 	ft_putstr_fd(cmd->heredocs[j].delimiter, STDERR_FILENO);
 	ft_putstr_fd(")\n", STDERR_FILENO);
@@ -94,7 +94,6 @@ static void	collect_one_heredoc(t_msh *msh, t_cmd *cmd, int j, int fd)
 {
 	while (1)
 	{
-		printf("%s\n", cmd->heredocs[j].delimiter);
 		cmd->heredocs[j].buffer = readline("> ");
 		if (!cmd->heredocs[j].buffer)
 		{
