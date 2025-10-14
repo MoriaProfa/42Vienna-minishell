@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/13 01:06:17 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/14 14:10:03 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ void	print_env_vars(t_list *env_vars);
 void    build_envp_array(t_msh *msh);
 void    free_envp(t_msh *msh);
 void	msh_builtins(t_msh *msh, int i);
+bool	check_for_whitespace_end(char *str, int start);
 
 volatile sig_atomic_t   g_signal_flag;
 
@@ -168,7 +169,7 @@ int	main(int argc, char **argv, char **envp)
 		msh.in_str = readline("minishell> ");
 		if (!msh.in_str) //by pressing CTRL+D
 			break ;//msh_quit(&msh, "exit", 0);//didnt work as intended for not yet known reason?!
-		if (msh.in_str[0] == '\0')
+		if (msh.in_str[0] == '\0' || check_for_whitespace_end(msh.in_str, 0))
 		{
 			free(msh.in_str);
 			continue ;
