@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/14 05:29:03 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/14 15:08:45 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,21 +24,6 @@ void	print_fds(t_msh *msh, int i)
 	printf("child[%d] msh->fd[1] = %d\n", i, msh->fd[1]);
 	printf("child[%d] msh->fd_pipe_read = %d\n", i, msh->fd_pipe_read);
 	print_heredoc_fd(msh);
-}
-
-void	close_fds(t_msh *msh)
-{
-	if (msh->fd_in != -1)
-		close(msh->fd_in);
-	if (msh->fd_out != -1)
-		close(msh->fd_out);
-	if (msh->fd[0] != -1)
-		close(msh->fd[0]);
-	if (msh->fd[1] != -1)
-		close(msh->fd[1]);
-	if (msh->fd_pipe_read != -1)
-		close(msh->fd_pipe_read);
-	close_heredocs(msh);
 }
 
 void	msh_pid(t_msh *msh) // could be put in cmd_table
@@ -83,29 +68,6 @@ void	msh_execute(t_msh *msh, int i)
 	perror(((t_cmd *)msh->cmd_table[i])->args[0]);
 	msh_print(msh, NULL, 1);
 	return ;
-}
-
-void	save_stdin_stdout(t_msh *msh, int i)
-{
-	if (((t_cmd *)msh->cmd_table[i])->n_outf > 0)
-		msh->saved_stdout = dup(STDOUT_FILENO);
-	if (((t_cmd *)msh->cmd_table[i])->n_inf > 0
-		|| ((t_cmd *)msh->cmd_table[i])->n_hd > 0)
-		msh->saved_stdin = dup(STDIN_FILENO);
-}
-
-void	restore_stdin_stdout(t_msh *msh)
-{
-	if (msh->saved_stdin != -1)
-	{
-		dup2(msh->saved_stdin, STDIN_FILENO);
-		close(msh->saved_stdin);
-	}
-	if (msh->saved_stdout != -1)
-	{
-		dup2(msh->saved_stdout, STDOUT_FILENO);
-		close(msh->saved_stdout);
-	}
 }
 
 void	child_process(t_msh *msh, int i)
@@ -165,7 +127,8 @@ void	msh_waitpid(t_msh *msh, int i)
 	int	wstatus;
 	int	sig;
 
-	waitpid(msh->pid[i], &wstatus, 0);
+	if (waitpid(msh->pid[i], &wstatus, 0) ==-1)
+		msh_quit(msh, "child waitpid failed", 1);
 	if (WIFEXITED(wstatus))
 		msh->status = WEXITSTATUS(wstatus);
 	else if (WIFSIGNALED(wstatus))
