@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/14 00:44:44 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/14 04:30:07 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,10 @@ void	msh_execute(t_msh *msh, int i)
 		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == 0)
 		execve(((t_cmd *)msh->cmd_table[i])->pathname,
 			((t_cmd *)msh->cmd_table[i])->args, msh->envp);
-	msh_print(msh, "execve failed", 1);
+	// msh_print(msh, "execve failed", 1);
+	perror(((t_cmd *)msh->cmd_table[i])->args[0]);
+	msh_print(msh, NULL, 1);
+	return ;
 }
 
 void	print_heredoc_fd(t_msh *msh);
@@ -122,7 +125,10 @@ void	child_process(t_msh *msh, int i)
 		msh_execute(msh, i);
 	else if (((t_cmd *)msh->cmd_table[i])->args[0]
 		&& ((t_cmd *)msh->cmd_table[i])->builtin.builtin == true)
+	{
+		signal(SIGPIPE, SIG_IGN);
 		msh_builtins(msh, i);
+	}
 	close_fds(msh);
 	msh_quit(msh, NULL, msh->status);
 }
