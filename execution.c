@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/14 20:47:42 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/15 00:00:57 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,25 +48,26 @@ void	msh_execute(t_msh *msh, int i)
 	if (!((t_cmd *)msh->cmd_table[i])->pathname)
 		return (print_execution_error(msh,
 				((t_cmd *)msh->cmd_table[i])->args[0], 1, 127));
-	else if ((((t_cmd *)msh->cmd_table[i])->pathname
-			&& access(((t_cmd *)msh->cmd_table[i])->pathname, F_OK) == -1))
+	execve(((t_cmd *)msh->cmd_table[i])->pathname,
+		((t_cmd *)msh->cmd_table[i])->args, msh->envp);
+	if (errno == ENOENT)
 		return (print_execution_error(msh,
 				((t_cmd *)msh->cmd_table[i])->args[0], 2, 127));
-	else if ((((t_cmd *)msh->cmd_table[i])->pathname)
-		&& check_if_directory(((t_cmd *)msh->cmd_table[i])->pathname))
-		return (print_execution_error(msh,
-				((t_cmd *)msh->cmd_table[i])->args[0], 3, 126));
-	else if (((t_cmd *)msh->cmd_table[i])->pathname
-		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == -1)
-		return (print_execution_error(msh,
-				((t_cmd *)msh->cmd_table[i])->args[0], 4, 126));
-	else if (((t_cmd *)msh->cmd_table[i])->pathname
-		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == 0)
-		execve(((t_cmd *)msh->cmd_table[i])->pathname,
-			((t_cmd *)msh->cmd_table[i])->args, msh->envp);
-	perror(((t_cmd *)msh->cmd_table[i])->args[0]);
-	msh_print(msh, NULL, 1);
-	return ;
+	else if (errno == EACCES)
+	{
+		if (check_if_directory(((t_cmd *)msh->cmd_table[i])->pathname))
+			return (print_execution_error(msh,
+					((t_cmd *)msh->cmd_table[i])->args[0], 3, 126));
+		else if (access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == -1)
+			return (print_execution_error(msh,
+					((t_cmd *)msh->cmd_table[i])->args[0], 4, 126));
+	}
+	else
+	{
+		perror(((t_cmd *)msh->cmd_table[i])->args[0]);
+		msh_print(msh, NULL, 126);
+		return ;
+	}
 }
 
 void	child_process(t_msh *msh, int i)

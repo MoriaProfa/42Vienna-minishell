@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 20:44:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/14 20:47:08 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/14 21:59:47 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ void	print_execution_error(t_msh *msh, char *cmd, int option, int code)
 	}
 	if (option == 2)
 	{
+		ft_putstr_fd("minishell: ", STDOUT_FILENO);
 		perror(cmd);
 		return (msh_print(msh, NULL, code));
 	}
@@ -43,6 +44,7 @@ void	print_execution_error(t_msh *msh, char *cmd, int option, int code)
 	}
 	if (option == 4)
 	{
+		ft_putstr_fd("minishell: ", STDOUT_FILENO);
 		perror(cmd);
 		return ((msh_print(msh, NULL, code)));
 	}
