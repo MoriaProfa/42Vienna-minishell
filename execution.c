@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/14 05:29:03 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/15 14:39:27 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,11 @@
 void	msh_builtins(t_msh *msh, int i);
 void	close_heredocs(t_msh *msh);
 void	print_heredoc_fd(t_msh *msh);
+void	save_stdin_stdout(t_msh *msh, int i);
+void	restore_stdin_stdout(t_msh *msh);
+void	close_fds(t_msh *msh);
+int		check_if_directory(char *path);
+void	print_execution_error(t_msh *msh, char *cmd, int option, int code);
 
 void	print_fds(t_msh *msh, int i)
 {
@@ -24,21 +29,6 @@ void	print_fds(t_msh *msh, int i)
 	printf("child[%d] msh->fd[1] = %d\n", i, msh->fd[1]);
 	printf("child[%d] msh->fd_pipe_read = %d\n", i, msh->fd_pipe_read);
 	print_heredoc_fd(msh);
-}
-
-void	close_fds(t_msh *msh)
-{
-	if (msh->fd_in != -1)
-		close(msh->fd_in);
-	if (msh->fd_out != -1)
-		close(msh->fd_out);
-	if (msh->fd[0] != -1)
-		close(msh->fd[0]);
-	if (msh->fd[1] != -1)
-		close(msh->fd[1]);
-	if (msh->fd_pipe_read != -1)
-		close(msh->fd_pipe_read);
-	close_heredocs(msh);
 }
 
 void	msh_pid(t_msh *msh) // could be put in cmd_table
@@ -56,61 +46,34 @@ void	msh_pid(t_msh *msh) // could be put in cmd_table
 void	msh_execute(t_msh *msh, int i)
 {
 	if (!((t_cmd *)msh->cmd_table[i])->pathname)
+		return (print_execution_error(msh,
+				((t_cmd *)msh->cmd_table[i])->args[0], 1, 127));
+	execve(((t_cmd *)msh->cmd_table[i])->pathname,
+		((t_cmd *)msh->cmd_table[i])->args, msh->envp);
+	if (errno == ENOENT)
+		return (print_execution_error(msh,
+				((t_cmd *)msh->cmd_table[i])->args[0], 2, 127));
+	else if (errno == EACCES)
 	{
-		ft_putstr_fd(((t_cmd *)msh->cmd_table[i])->args[0], STDERR_FILENO);
-		ft_putstr_fd(": ", STDERR_FILENO);
-		msh_print(msh, "command not found", 127);
-		return ;
+		if (check_if_directory(((t_cmd *)msh->cmd_table[i])->pathname))
+			return (print_execution_error(msh,
+					((t_cmd *)msh->cmd_table[i])->args[0], 3, 126));
+		else if (access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == -1)
+			return (print_execution_error(msh,
+					((t_cmd *)msh->cmd_table[i])->args[0], 4, 126));
 	}
-	else if ((((t_cmd *)msh->cmd_table[i])->pathname
-			&& access(((t_cmd *)msh->cmd_table[i])->pathname, F_OK) == -1))
+	else
 	{
-		perror(((t_cmd *)msh->cmd_table[i])->args[0]);
-		msh_print(msh, NULL, 127);
-		return ;
-	}
-	else if (((t_cmd *)msh->cmd_table[i])->pathname
-		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == -1)
-	{
+		ft_putstr_fd("minishell: ", STDERR_FILENO);
 		perror(((t_cmd *)msh->cmd_table[i])->args[0]);
 		msh_print(msh, NULL, 126);
 		return ;
-	}
-	else if (((t_cmd *)msh->cmd_table[i])->pathname
-		&& access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == 0)
-		execve(((t_cmd *)msh->cmd_table[i])->pathname,
-			((t_cmd *)msh->cmd_table[i])->args, msh->envp);
-	perror(((t_cmd *)msh->cmd_table[i])->args[0]);
-	msh_print(msh, NULL, 1);
-	return ;
-}
-
-void	save_stdin_stdout(t_msh *msh, int i)
-{
-	if (((t_cmd *)msh->cmd_table[i])->n_outf > 0)
-		msh->saved_stdout = dup(STDOUT_FILENO);
-	if (((t_cmd *)msh->cmd_table[i])->n_inf > 0
-		|| ((t_cmd *)msh->cmd_table[i])->n_hd > 0)
-		msh->saved_stdin = dup(STDIN_FILENO);
-}
-
-void	restore_stdin_stdout(t_msh *msh)
-{
-	if (msh->saved_stdin != -1)
-	{
-		dup2(msh->saved_stdin, STDIN_FILENO);
-		close(msh->saved_stdin);
-	}
-	if (msh->saved_stdout != -1)
-	{
-		dup2(msh->saved_stdout, STDOUT_FILENO);
-		close(msh->saved_stdout);
 	}
 }
 
 void	child_process(t_msh *msh, int i)
 {
-	signal(SIGINT, SIG_DFL);
+	signal(SIGINT, SIG_DFL); // need to check signal handling in a child
 	signal(SIGQUIT, SIG_DFL);
 	if (set_redirections(msh, i) != 0)
 		msh_quit(msh, NULL, 1);
@@ -135,9 +98,7 @@ void	msh_fork(t_msh *msh, int i)
 	if (msh->pid[i] == -1)
 		msh_quit(msh, "fork failed", 1);
 	if (msh->pid[i] == 0)
-	{
 		child_process(msh, i);
-	}
 	if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
 		close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
 	if (msh->fd_pipe_read != -1)
@@ -150,22 +111,13 @@ void	msh_fork(t_msh *msh, int i)
 	}
 }
 
-void	run_builtins(t_msh *msh, int i)
-{
-	save_stdin_stdout(msh, i);
-	if (set_redirections(msh, i) == 0)
-		msh_builtins(msh, i);
-	else
-		msh->status = 1;
-	restore_stdin_stdout(msh);
-}
-
 void	msh_waitpid(t_msh *msh, int i)
 {
 	int	wstatus;
 	int	sig;
 
-	waitpid(msh->pid[i], &wstatus, 0);
+	if (waitpid(msh->pid[i], &wstatus, 0) == -1)
+		msh_quit(msh, "child waitpid failed", 1);
 	if (WIFEXITED(wstatus))
 		msh->status = WEXITSTATUS(wstatus);
 	else if (WIFSIGNALED(wstatus))
@@ -177,6 +129,16 @@ void	msh_waitpid(t_msh *msh, int i)
 		else if (sig == SIGQUIT)
 			write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
 	}
+}
+
+void	run_builtins(t_msh *msh, int i)
+{
+	save_stdin_stdout(msh, i);
+	if (set_redirections(msh, i) == 0)
+		msh_builtins(msh, i);
+	else
+		msh->status = 1;
+	restore_stdin_stdout(msh);
 }
 
 void	run_command(t_msh *msh, int i)
@@ -198,7 +160,5 @@ void	run_command(t_msh *msh, int i)
 	}
 	i = -1;
 	while (++i < msh->n_cmds && msh->pid && msh->pid[i] != -1)
-	{
 		msh_waitpid(msh, i);
-	}
 }

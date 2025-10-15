@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_table.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/15 16:19:35 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/15 17:06:00 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -292,16 +292,40 @@ char	*resolve_cmd_pathname(t_msh *msh, char **paths, char *cmd)
 	return (NULL);
 }
 
-char	*create_cmd_pathname(t_msh *msh, char *cmd)
+static char	*search_cmd_pathname(t_msh *msh, char *cmd, char *env)
 {
 	char	**paths;
+	char	*pathname;
+
+	pathname = NULL;
+	if (env && env[5] != '\0')
+	{
+		paths = ft_split(env + 5, ':');
+		if (!paths)
+			msh_quit(msh, "paths ft_split malloc failed", 1);
+		pathname = resolve_cmd_pathname(msh, paths, cmd);
+		ft_array_free(paths, ft_array_size(paths));
+	}
+	else
+	{
+		if (access(cmd, F_OK) == 0)
+			pathname = ft_strdup(cmd);
+		else
+			pathname = ft_strjoin("/", cmd);
+		if (!pathname)
+			msh_quit(msh, "pathname malloc failed", 1);
+	}
+	return (pathname);
+}
+
+char	*create_cmd_pathname(t_msh *msh, char *cmd)
+{
 	char	*pathname;
 	int		j;
 
 	j = 0;
 	pathname = NULL;
-	
-	if (ft_strchr(cmd, '/') || access(cmd, F_OK) == 0) // added access check for unset PATH; cd /bin; ls case - works in this case, need to check with other cases in the tester
+	if (ft_strchr(cmd, '/'))
 	{
 		pathname = ft_strdup(cmd);
 		if (!pathname)
@@ -310,14 +334,7 @@ char	*create_cmd_pathname(t_msh *msh, char *cmd)
 	}
 	while (msh->envp[j] && ft_strncmp(msh->envp[j], "PATH=", 5) != 0)
 		j++;
-	if (msh->envp[j])
-	{
-		paths = ft_split(msh->envp[j] + 5, ':');
-		if (!paths)
-			msh_quit(msh, "paths ft_split malloc failed", 1);
-		pathname = resolve_cmd_pathname(msh, paths, cmd);
-		ft_array_free(paths, ft_array_size(paths));
-	}
+	pathname = search_cmd_pathname(msh, cmd, msh->envp[j]);	
 	return (pathname);
 }
 

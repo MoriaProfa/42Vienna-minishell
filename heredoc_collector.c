@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   heredoc.c                                          :+:      :+:    :+:   */
+/*   heredoc_collector.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/14 05:21:56 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/15 15:42:59 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ char		*expand_value(char *value, char *result, t_msh *msh);
 void		close_fds(t_msh *msh);
 void		close_heredocs(t_msh *msh);
 bool		compare_strings(char *s1, char *s2);
-void		print_heredoc_warning(t_cmd *cmd, int j);
+void		print_heredoc_warning(t_cmd *cmd, int j, size_t ln);
 
 static void	expand_heredoc_input(t_msh *msh, char **value)
 {
@@ -65,7 +65,7 @@ static void	collect_one_heredoc(t_msh *msh, t_cmd *cmd, int j, int fd)
 		cmd->heredocs[j].buffer = readline("> ");
 		if (!cmd->heredocs[j].buffer)
 		{
-			print_heredoc_warning(cmd, j);
+			print_heredoc_warning(cmd, j, msh->line_number);
 			return ;
 		}
 		if (cmd->heredocs[j].expand == true
