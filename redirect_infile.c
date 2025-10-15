@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 05:03:32 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/14 05:10:22 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/15 20:59:04 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,18 +28,15 @@ static int	set_infile(t_cmd *cmd, int j)
 	int	fd;
 
 	fd = -1;
-	while (cmd->infiles[++j])
+	if (fd != -1)
+		close(fd);
+	if (check_access_read(cmd->redirs[j].filename) == 0)
+		return (-1);
+	fd = open(cmd->redirs[j].filename, O_RDONLY);
+	if (fd == -1)
 	{
-		if (fd != -1)
-			close(fd);
-		if (check_access_read(cmd->infiles[j]) == 0)
-			return (-1);
-		fd = open(cmd->infiles[j], O_RDONLY);
-		if (fd == -1)
-		{
-			perror(cmd->infiles[j]);
-			return (fd);
-		}
+		perror(cmd->redirs[j].filename);
+		return (fd);
 	}
 	return (fd);
 }
