@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/15 18:38:06 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/15 18:39:35 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,10 +141,6 @@ void	msh_waitpid(t_msh *msh, int i)
 	int	wstatus;
 	int	sig;
 
-
-bool	special_case_check(t_msh *msh, char *pathname, char *cmd)
-{
-	i
 	if (waitpid(msh->pid[i], &wstatus, 0) == -1)
 		msh_quit(msh, "child waitpid failed", 1);
 	if (WIFEXITED(wstatus))
