@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   envp.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 02:39:40 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/08 16:51:18 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/14 19:17:32 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,15 @@ static char	*create_envp_entry(char *name, char *value, t_msh *msh)
 	tmp = ft_strjoin(name, "=");
 	if (!tmp)
 		msh_quit(msh, "(re)building envp entry 1st strjoin malloc failed", 1);
-	result = ft_strjoin(tmp, value);
-	free(tmp);
-	if (!result)
-		msh_quit(msh, "(re)building envp entry 2nd strjoin malloc failed", 1);
+	if (value)
+	{
+		result = ft_strjoin(tmp, value);
+		free(tmp);
+		if (!result)
+			msh_quit(msh, "(re)building envp entry 2nd strjoin malloc failed", 1);
+	}
+	else
+		result = tmp;	
 	return (result);
 }
 

@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 21:20:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/13 02:54:01 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/14 19:52:46 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,13 +37,12 @@ void	print_env_vars(t_list *env_vars)
 	while (cur_node)
 	{
 		cur_env_var = (t_env_var *)(cur_node->content);
-		if (cur_env_var)
+		if (cur_env_var && cur_env_var->name && cur_env_var->value)
 		{
 			ft_putstr_fd(cur_env_var->name, STDOUT_FILENO);
 			ft_putchar_fd('=', STDOUT_FILENO);
 			ft_putendl_fd(cur_env_var->value, STDOUT_FILENO);
 		}
-//			printf("%s=%s\n", cur_env_var->name, cur_env_var->value);
 		cur_node = cur_node->next;
 	}
 }
@@ -81,12 +80,17 @@ void	prepare_and_add_to_env_vars(t_msh *msh, char *name, char *value)
 	m_name = ft_strdup(name);
 	if (!m_name)
 		msh_quit(msh, "prepare env: m_name malloc failed", 1);
-	m_value = ft_strdup(value);
-	if (!m_value)
+	if (value)
 	{
-		free(m_name);
-		msh_quit(msh, "prepare env: m_value malloc failed", 1);
+		m_value = ft_strdup(value);
+		if (!m_value)
+		{
+			free(m_name);
+			msh_quit(msh, "prepare env: m_value malloc failed", 1);
+		}
 	}
+	else
+		m_value = NULL;
 	add_to_env_vars(msh, m_name, m_value);
 }
 
@@ -117,8 +121,8 @@ void	create_env(t_msh *msh)
 		}
 		prepare_name_and_add_to_env_vars(msh, "PWD", cwd);
 	}
-//	if (!check_and_update_env_var_value(msh, "OLDPWD", NULL))
-//		prepare_and_add_to_env_vars(msh, "OLDPWD", "");//gets init in cd, if we do it here, cd - doesnt work always
+	if (!check_and_update_env_var_value(msh, "OLDPWD", NULL))
+		prepare_and_add_to_env_vars(msh, "OLDPWD", NULL);//gets init in cd, if we do it here, cd - doesnt work always
 }
 
 char	*extract_env_value(char *str, size_t name_len)
@@ -154,17 +158,22 @@ void	init_env_vars(t_msh *msh, char **envp)
 	i = -1;
 	while (envp && envp[++i])
 	{
-		name_len = 0;
-		name = extract_env_name(envp[i], &name_len);
+		if (ft_strchr(envp[i], '='))
+		{
+			name_len = 0;
+			name = extract_env_name(envp[i], &name_len);
+			if (!name)
+				msh_quit(msh, "env: name init malloc failed", 1);
+			value = extract_env_value(envp[i], name_len + 1);
+			if (!value)
+				(free(name), msh_quit(msh, "env: value init malloc failed", 1));
+			add_to_env_vars(msh, name, value);
+			continue ;
+		}
+		name = ft_strdup(envp[i]);
 		if (!name)
 			msh_quit(msh, "env: name init malloc failed", 1);
-		value = extract_env_value(envp[i], name_len + 1);
-		if (!value)
-		{
-			free(name);
-			msh_quit(msh, "env: value init malloc failed", 1);
-		}
-		add_to_env_vars(msh, name, value);
+		add_to_env_vars(msh, name, NULL);
 	}
 	create_env(msh);
 }
