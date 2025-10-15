@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/13 01:06:01 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/15 15:37:48 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,6 +163,7 @@ typedef struct s_msh
 	int				fd_out;
 	int				saved_stdout;
 	int				saved_stdin;
+	size_t			line_number;
 }					t_msh;
 
 void	free_token(void *content);
