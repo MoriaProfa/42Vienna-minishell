@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/15 18:48:45 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/15 18:51:16 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,6 @@
 
 void	heredoc_collector(t_msh *msh, t_cmd **cmds);
 bool	compare_strings(char *s1, char *s2);
-char	*resolve_cmd_pathname(t_msh *msh, char **paths, char *cmd);
-static char	*search_cmd_pathname(t_msh *msh, char *cmd, char *env);
 char	*create_cmd_pathname(t_msh *msh, char *cmd);
 
 // just for testing purposes

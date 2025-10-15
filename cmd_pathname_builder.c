@@ -6,11 +6,13 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 18:40:52 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/15 18:44:32 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/15 18:53:30 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+bool	compare_strings(char *s1, char *s2);
 
 char	*resolve_cmd_pathname(t_msh *msh, char **paths, char *cmd)
 {
