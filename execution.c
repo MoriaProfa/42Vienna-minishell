@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/15 14:39:27 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/15 18:38:06 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ void	restore_stdin_stdout(t_msh *msh);
 void	close_fds(t_msh *msh);
 int		check_if_directory(char *path);
 void	print_execution_error(t_msh *msh, char *cmd, int option, int code);
+void	msh_print(t_msh *msh, char *msg, int status);
+bool	compare_strings(char *s1, char *s2);
 
 void	print_fds(t_msh *msh, int i)
 {
@@ -43,24 +45,47 @@ void	msh_pid(t_msh *msh) // could be put in cmd_table
 		msh->pid[i] = -1;
 }
 
+bool	special_case_check(t_msh *msh, char *pathname, char *cmd)
+{
+	if (!pathname)
+	{
+		print_execution_error(msh, cmd, 1, 127);
+		return (true);
+	}
+	if (compare_strings(cmd, ".") == true)
+	{
+		msh_print(msh,
+			"minishell: .: filename argument required\n.: usage: . filename [arguments]",
+			2);
+		return (true);
+	}
+	if (compare_strings(cmd, "..") == true && compare_strings(pathname,
+			"/..") == false)
+	{
+		print_execution_error(msh, cmd, 1, 127);
+		return (true);
+	}
+	return (false);
+}
+
 void	msh_execute(t_msh *msh, int i)
 {
-	if (!((t_cmd *)msh->cmd_table[i])->pathname)
-		return (print_execution_error(msh,
-				((t_cmd *)msh->cmd_table[i])->args[0], 1, 127));
-	execve(((t_cmd *)msh->cmd_table[i])->pathname,
-		((t_cmd *)msh->cmd_table[i])->args, msh->envp);
+	char	*pathname;
+	char	*cmd;
+
+	pathname = ((t_cmd *)msh->cmd_table[i])->pathname;
+	cmd = ((t_cmd *)msh->cmd_table[i])->args[0];
+	if (special_case_check(msh, pathname, cmd) == true)
+		return ;
+	execve(pathname, ((t_cmd *)msh->cmd_table[i])->args, msh->envp);
 	if (errno == ENOENT)
-		return (print_execution_error(msh,
-				((t_cmd *)msh->cmd_table[i])->args[0], 2, 127));
+		return (print_execution_error(msh, cmd, 2, 127));
 	else if (errno == EACCES)
 	{
-		if (check_if_directory(((t_cmd *)msh->cmd_table[i])->pathname))
-			return (print_execution_error(msh,
-					((t_cmd *)msh->cmd_table[i])->args[0], 3, 126));
-		else if (access(((t_cmd *)msh->cmd_table[i])->pathname, X_OK) == -1)
-			return (print_execution_error(msh,
-					((t_cmd *)msh->cmd_table[i])->args[0], 4, 126));
+		if (check_if_directory(pathname))
+			return (print_execution_error(msh, cmd, 3, 126));
+		else if (access(pathname, X_OK) == -1)
+			return (print_execution_error(msh, cmd, 4, 126));
 	}
 	else
 	{
@@ -116,6 +141,10 @@ void	msh_waitpid(t_msh *msh, int i)
 	int	wstatus;
 	int	sig;
 
+
+bool	special_case_check(t_msh *msh, char *pathname, char *cmd)
+{
+	i
 	if (waitpid(msh->pid[i], &wstatus, 0) == -1)
 		msh_quit(msh, "child waitpid failed", 1);
 	if (WIFEXITED(wstatus))

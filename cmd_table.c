@@ -6,13 +6,14 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/15 17:06:00 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/15 18:27:14 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void		heredoc_collector(t_msh *msh, t_cmd **cmds);
+void	heredoc_collector(t_msh *msh, t_cmd **cmds);
+bool	compare_strings(char *s1, char *s2);
 
 // just for testing purposes
 void	print_cmd_table(t_msh *msh)
@@ -308,7 +309,7 @@ static char	*search_cmd_pathname(t_msh *msh, char *cmd, char *env)
 	}
 	else
 	{
-		if (access(cmd, F_OK) == 0)
+		if (access(cmd, F_OK) == 0 && compare_strings(cmd, "..") == false)
 			pathname = ft_strdup(cmd);
 		else
 			pathname = ft_strjoin("/", cmd);
