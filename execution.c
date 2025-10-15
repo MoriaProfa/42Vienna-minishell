@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/15 20:28:58 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/15 21:29:03 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-/*
+
 void	msh_builtins(t_msh *msh, int i);
 void	close_heredocs(t_msh *msh);
 void	print_heredoc_fd(t_msh *msh);
@@ -186,4 +186,4 @@ void	run_command(t_msh *msh, int i)
 	i = -1;
 	while (++i < msh->n_cmds && msh->pid && msh->pid[i] != -1)
 		msh_waitpid(msh, i);
-}*/
+}

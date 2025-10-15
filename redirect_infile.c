@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 05:03:32 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/15 21:25:22 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/15 21:34:58 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ static int	check_access_read(char *file)
 {
 	if (access(file, F_OK) == 0 && access(file, R_OK) != 0)
 	{
+		ft_putstr_fd("minishell: ", STDERR_FILENO);
 		perror(file);
 		return (0);
 	}
@@ -35,6 +36,7 @@ static int	set_infile(t_cmd *cmd, int j)
 	fd = open(cmd->redirs[j].filename, O_RDONLY);
 	if (fd == -1)
 	{
+		ft_putstr_fd("minishell: ", STDERR_FILENO);
 		perror(cmd->redirs[j].filename);
 		return (fd);
 	}

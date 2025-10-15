@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/15 21:24:51 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/15 21:39:13 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,12 +33,13 @@ void	close_fds(t_msh *msh)
 }
 
 void	save_stdin_stdout(t_msh *msh, int i)
-{
-	if (((t_cmd *)msh->cmd_table[i])->n_outf > 0)
-		msh->saved_stdout = dup(STDOUT_FILENO);
-	if (((t_cmd *)msh->cmd_table[i])->n_inf > 0
+{	
+	if (((t_cmd *)msh->cmd_table[i])->n_redirs > 0
 		|| ((t_cmd *)msh->cmd_table[i])->n_hd > 0)
+	{
+		msh->saved_stdout = dup(STDOUT_FILENO);
 		msh->saved_stdin = dup(STDIN_FILENO);
+	}
 }
 
 void	restore_stdin_stdout(t_msh *msh)
@@ -109,6 +110,8 @@ int	set_redirections(t_msh *msh, int i)
 			return_value += redirect_infile(msh, i, j);
 		else
 			return_value += redirect_outfile(msh, i, j);
+		if (return_value != 0)
+			return (return_value);
 	}
 	if (return_value == 0 && ((t_cmd *)msh->cmd_table[i])->n_hd > 0)
 		return_value += redirect_heredoc(msh, i, -1);
