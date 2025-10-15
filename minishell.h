@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/13 01:06:01 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/15 14:59:36 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,6 +141,7 @@ typedef struct s_cmd
 	int				heredoc_read;
 	int				n_hd;//amount of heredocs
 	int				capacity_hd;//capacity of *heredocs
+	t_token_type	first_redirection;//in- or outfile
 	t_token_type	last_input;//infile or heredoc
 	char			*pathname;//pathname to an executable
 }					t_cmd;
