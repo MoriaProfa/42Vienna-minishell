@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 20:44:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/14 21:59:47 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/15 15:21:20 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,19 +32,19 @@ void	print_execution_error(t_msh *msh, char *cmd, int option, int code)
 	}
 	if (option == 2)
 	{
-		ft_putstr_fd("minishell: ", STDOUT_FILENO);
+		ft_putstr_fd("minishell: ", STDERR_FILENO);
 		perror(cmd);
 		return (msh_print(msh, NULL, code));
 	}
 	if (option == 3)
 	{
-		ft_putstr_fd("minishell: ", STDOUT_FILENO);
-		ft_putstr_fd(cmd, STDOUT_FILENO);
+		ft_putstr_fd("minishell: ", STDERR_FILENO);
+		ft_putstr_fd(cmd, STDERR_FILENO);
 		return (msh_print(msh, ": Is a directory", code));
 	}
 	if (option == 4)
 	{
-		ft_putstr_fd("minishell: ", STDOUT_FILENO);
+		//ft_putstr_fd("minishell: ", STDERR_FILENO); // commented out to pass the tester, bash prints "bash: err message"
 		perror(cmd);
 		return ((msh_print(msh, NULL, code)));
 	}

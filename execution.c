@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/15 00:00:57 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/15 14:39:27 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ void	msh_execute(t_msh *msh, int i)
 	}
 	else
 	{
+		ft_putstr_fd("minishell: ", STDERR_FILENO);
 		perror(((t_cmd *)msh->cmd_table[i])->args[0]);
 		msh_print(msh, NULL, 126);
 		return ;
