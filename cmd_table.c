@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/15 00:01:34 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/15 15:02:53 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -289,8 +289,8 @@ static char	*search_cmd_pathname(t_msh *msh, char *cmd, char *env)
 	char	**paths;
 	char	*pathname;
 
-	pathname = NULL;	
-	if (env)
+	pathname = NULL;
+	if (env && env[5] != '\0')
 	{
 		paths = ft_split(env + 5, ':');
 		if (!paths)
