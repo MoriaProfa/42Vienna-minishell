@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_table.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/15 18:51:16 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/15 20:28:09 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,21 +36,13 @@ void	print_cmd_table(t_msh *msh)
 		while (cmd->args[j] && j < cmd->n_args)
 			printf("[%s] ", cmd->args[j++]);
 		printf("\n\tBuiltin args[0]: %d\n", cmd->builtin.builtin);
-		if (cmd->infiles)
-		{
-			j = 0;
-			printf("\tinfiles (%i): ", cmd->n_inf);
-			while (cmd->infiles[j] && j < cmd->n_inf)
-				printf("[%s] ", cmd->infiles[j++]);
-			printf("\n");
-		}
-		if (cmd->outfiles)
+		if (cmd->redirs)
 		{
 			j = -1;
-			printf("\toutfiles (%i): ", cmd->n_outf);
-			while (cmd->outfiles[++j].filename && j < cmd->n_outf)
-				printf("[%s (append = %d)] ", cmd->outfiles[j].filename,
-					cmd->outfiles[j].append);
+			printf("\tredirs (%i): ", cmd->n_redirs);
+			while (cmd->redirs[++j].filename && j < cmd->n_redirs)
+				printf("[%s (type = %d)] ", cmd->redirs[j].filename,
+					cmd->redirs[j].type);
 			printf("\n");
 		}
 		if (cmd->heredocs)
@@ -62,7 +54,6 @@ void	print_cmd_table(t_msh *msh)
 					cmd->heredocs[j].expand);
 			printf("\n");
 		}
-		printf("\tfirst_redirection: %i\n", cmd->first_redirection);
 		printf("\tlast_input: %i\n", cmd->last_input);
 		// 0 if T_NONE, 3 if T_IN_REDIRECT, 6 if T_HEREDOC_REDIRECT
 		if (cmd->pathname)
@@ -76,8 +67,8 @@ void	free_single_cmd_structs_data(t_cmd *cmd)
 	int	j;
 
 	j = -1;
-	while (cmd->outfiles && ++j < cmd->n_outf)
-		free(cmd->outfiles[j].filename);
+	while (cmd->redirs && ++j < cmd->n_redirs)
+		free(cmd->redirs[j].filename);
 	j = -1;
 	while (cmd->heredocs && ++j < cmd->n_hd)
 	{
@@ -85,7 +76,7 @@ void	free_single_cmd_structs_data(t_cmd *cmd)
 		if (cmd->heredocs[j].buffer)
 			free(cmd->heredocs[j].buffer);
 		if (cmd->heredocs[j].filename)
-			free(cmd->heredocs[j].filename); // added heredoc filename to struct
+			free(cmd->heredocs[j].filename);
 	}
 }
 
@@ -99,10 +90,9 @@ void	free_cmd_table(t_cmd **cmds, int n)
 	while (cmds[++i] && i < n)
 	{
 		ft_array_free(cmds[i]->args, (size_t)cmds[i]->n_args);
-		ft_array_free(cmds[i]->infiles, (size_t)cmds[i]->n_inf);
 		free_single_cmd_structs_data(cmds[i]);
-		if (cmds[i]->outfiles)
-			free(cmds[i]->outfiles);
+		if (cmds[i]->redirs)
+			free(cmds[i]->redirs);
 		if (cmds[i]->heredocs)
 			free(cmds[i]->heredocs);
 		if (cmds[i]->pathname)
@@ -176,12 +166,9 @@ void	cmd_arrays_capacity_check(t_cmd *cmd, t_msh *msh)
 	if (!ensure_capacity((void **)&cmd->args, &cmd->n_args, &cmd->capacity_args,
 			sizeof(char *)))
 		msh_quit(msh, "cmd args array capacity increase malloc failed", 1);
-	if (!ensure_capacity((void **)&cmd->infiles, &cmd->n_inf,
-			&cmd->capacity_inf, sizeof(char *)))
-		msh_quit(msh, "cmd infiles array capacity increase malloc failed", 1);
-	if (!ensure_capacity((void **)&cmd->outfiles, &cmd->n_outf,
-			&cmd->capacity_outf, sizeof(t_outfile)))
-		msh_quit(msh, "cmd outfiles array capacity increase malloc failed", 1);
+	if (!ensure_capacity((void **)&cmd->redirs, &cmd->n_redirs,
+			&cmd->capacity_redirs, sizeof(t_redir)))
+		msh_quit(msh, "cmd redirs array capacity increase malloc failed", 1);
 	if (!ensure_capacity((void **)&cmd->heredocs, &cmd->n_hd, &cmd->capacity_hd,
 			sizeof(t_heredoc)))
 		msh_quit(msh, "cmd heredocs array capacity increase malloc failed", 1);
@@ -201,17 +188,12 @@ t_token	*get_next_token(t_list **tokens)
 	return (NULL);
 }
 
-void	parse_infile_or_heredoc_token(t_cmd *cmd, t_token *word_token, char *word, t_token_type type)
+void	parse_heredoc_token(t_cmd *cmd, t_token *word_token, char *word)
 {
-	if (type == T_IN_REDIRECT)
-		cmd->infiles[cmd->n_inf++] = word;
-	else if (type == T_HEREDOC_REDIRECT)
-	{
-		if (word_token->quoted == Q_NONE)
-			cmd->heredocs[cmd->n_hd].expand = 1;
-		cmd->heredocs[cmd->n_hd++].delimiter = word;
-	}
-	cmd->last_input = type;
+	if (word_token->quoted == Q_NONE)
+		cmd->heredocs[cmd->n_hd].expand = 1;
+	cmd->heredocs[cmd->n_hd++].delimiter = word;
+	cmd->last_input = T_HEREDOC_REDIRECT;
 }
 
 void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens,
@@ -228,17 +210,19 @@ void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens,
 	word = ft_strdup(word_token->value);
 	if (!word)
 		msh_quit(msh, "word_token->value ft_strdup malloc failed", 1);
-	if (token->type == T_OUT_REDIRECT)
-		cmd->outfiles[cmd->n_outf++].filename = word;
-	else if (token->type == T_APPEND_REDIRECT)
+	if (token->type == T_IN_REDIRECT)
 	{
-		cmd->outfiles[cmd->n_outf].filename = word;
-		cmd->outfiles[cmd->n_outf++].append = true;
+		cmd->redirs[cmd->n_redirs].filename = word;
+		cmd->redirs[cmd->n_redirs++].type = T_IN_REDIRECT;
+		cmd->last_input = T_IN_REDIRECT;
 	}
-	else if (token->type == T_IN_REDIRECT || token->type == T_HEREDOC_REDIRECT)
-		parse_infile_or_heredoc_token(cmd, word_token, word, token->type);
-	if (cmd->first_redirection == T_NONE)
-		cmd->first_redirection = token->type;
+	else if (token->type == T_OUT_REDIRECT || token->type == T_APPEND_REDIRECT)
+	{
+		cmd->redirs[cmd->n_redirs].filename = word;
+		cmd->redirs[cmd->n_redirs++].type = token->type;
+	}
+	else if (token->type == T_HEREDOC_REDIRECT)
+		parse_heredoc_token(cmd, word_token, word);
 }
 
 void	parse_single_cmd_tokens(t_cmd *cmd, t_list **tokens, t_msh *msh)
@@ -274,22 +258,16 @@ t_cmd	*init_cmd_data(t_msh *msh, t_cmd *cmd)
 	cmd->args = ft_calloc(cmd->capacity_args, sizeof(char *));
 	if (!cmd->args)
 		(free(cmd), msh_quit(msh, "malloc for cmd->args failed", 1));
-	cmd->capacity_inf = 4;
-	cmd->infiles = ft_calloc(cmd->capacity_inf, sizeof(char *));
-	if (!cmd->infiles)
+	cmd->capacity_redirs = 4;
+	cmd->redirs = ft_calloc(cmd->capacity_redirs, sizeof(t_redir));
+	if (!cmd->redirs)
 		(free(cmd->args), free(cmd), 
-			msh_quit(msh, "malloc for cmd->infiles failed", 1));
-	cmd->capacity_outf = 4;
-	cmd->outfiles = ft_calloc(cmd->capacity_outf, sizeof(t_outfile));
-	if (!cmd->outfiles)
-		(free(cmd->infiles), free(cmd->args), free(cmd), 
-			msh_quit(msh, "malloc for cmd->outfiles failed", 1));
+			msh_quit(msh, "malloc for cmd->redirs failed", 1));
 	cmd->capacity_hd = 4;
 	cmd->heredocs = ft_calloc(cmd->capacity_hd, sizeof(t_heredoc));
 	if (!cmd->heredocs)
-		(free(cmd->outfiles), free(cmd->infiles), free(cmd->args), free(cmd), 
+		(free(cmd->redirs), free(cmd->args), free(cmd), 
 			msh_quit(msh, "malloc for cmd->heredocs failed", 1));
-	cmd->first_redirection = T_NONE;//should be set to that in the beginning already?
 	cmd->last_input = T_NONE;//should be set to that in the beginning already?
 	return (cmd);
 }

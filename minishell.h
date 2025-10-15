@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/15 17:07:16 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/15 19:50:02 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,11 +111,11 @@ typedef struct s_token
 	bool			is_adjacent;
 }					t_token;
 
-typedef struct s_outfile
+typedef struct s_redir
 {
-	char	*filename;
-	bool	append;// true if >>
-}			t_outfile;
+	char			*filename;
+	t_token_type	type;
+}					t_redir;
 
 typedef struct s_heredoc
 {
@@ -131,17 +131,13 @@ typedef struct s_cmd
 	int				n_args;// amount of args
 	int				capacity_args;// capacity of **args
 	t_builtin		builtin;
-	char			**infiles;// list of <
-	int				n_inf;// amount of infiles
-	int				capacity_inf;// capacity of **infiles
-	t_outfile		*outfiles;// list of > or >>
-	int				n_outf;// amount of outfiles
-	int				capacity_outf;// capacity of *outfiles
+	t_redir			*redirs;// list of >, >> and <
+	int				n_redirs;// amount of redirs
+	int				capacity_redirs;// capacity of *redirs
 	t_heredoc		*heredocs;// list of <<
 	int				heredoc_read;
 	int				n_hd;//amount of heredocs
 	int				capacity_hd;//capacity of *heredocs
-	t_token_type	first_redirection;//in- or outfile
 	t_token_type	last_input;//infile or heredoc
 	char			*pathname;//pathname to an executable
 }					t_cmd;
