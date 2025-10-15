@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/15 21:39:13 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/15 21:50:23 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,23 +77,6 @@ static void	redirect_pipes(t_msh *msh, int i)
 		}
 	}
 }
-
-/*
-static int	set_redirect_file(t_msh *msh, int i, int j)
-{
-	int	return_value;
-
-	return_value = 0;
-	while (((t_cmd *)msh->cmd_table[i])->redirs[++j].filename)
-	{
-		if (((t_cmd *)msh->cmd_table[i])->redirs[j].type == T_IN_REDIRECT)
-			return_value += redirect_infile(msh, i, j);
-		else
-			return_value += redirect_outfile(msh, i, j);
-	}
-	return (return_value);
-}
-*/
 
 int	set_redirections(t_msh *msh, int i)
 {
