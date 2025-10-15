@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   redirection.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/14 18:02:05 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/15 20:02:17 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
+/*
 int			redirect_infile(t_msh *msh, int i, int j);
 int			redirect_outfile(t_msh *msh, int i, int j);
 int			redirect_heredoc(t_msh *msh, int i, int j);
@@ -95,4 +95,4 @@ int	set_redirections(t_msh *msh, int i)
 	if (return_value == 0 && ((t_cmd *)msh->cmd_table[i])->n_outf > 0)
 		return_value += redirect_outfile(msh, i, -1);
 	return (return_value);
-}
+}*/

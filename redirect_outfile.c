@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   redirect_outfile.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 00:52:04 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/14 05:07:08 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/15 20:00:50 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
+/*
 static int	check_access_write(char *file)
 {
 	if (access(file, F_OK) == 0 && access(file, W_OK) != 0)
@@ -57,4 +57,4 @@ int	redirect_outfile(t_msh *msh, int i, int j)
 	dup2(msh->fd_out, STDOUT_FILENO);
 	close(msh->fd_out);
 	return (0);
-}
+}*/
