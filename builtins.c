@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/16 00:10:39 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/16 15:05:12 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,6 +117,8 @@ char	*get_cd_path(t_msh *msh, char **args)
 		if (!path)
 			msh_print(msh, "cd: HOME not set", 1);
 	}
+	else if (args[1][0] == '\0')
+		return (NULL);
 	else if (args[1][0] == '-' && args[1][1] == '\0')
 	{
 		path = get_env_var_value(msh, "OLDPWD");
