@@ -6,11 +6,11 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 18:17:55 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/16 20:06:39 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/16 22:16:44 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../../minishell.h"
 
 bool	check_for_whitespace_end(char *str, int start);
 

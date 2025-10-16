@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_pathname_builder.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 18:40:52 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/15 18:53:30 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/16 22:15:56 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../../minishell.h"
 
 bool	compare_strings(char *s1, char *s2);
 

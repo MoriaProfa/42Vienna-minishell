@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   redirect_outfile.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 00:52:04 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/16 19:24:33 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/16 22:16:24 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../../minishell.h"
 
 // static int	check_access_write(char *file)
 // {

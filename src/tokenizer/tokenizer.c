@@ -6,11 +6,11 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/16 16:39:23 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/16 22:16:42 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../../minishell.h"
 
 void			expand_word_tokens(t_list *tokens, t_msh *msh);
 void    split_expanded_tokens(t_list *tokens, t_msh *msh);

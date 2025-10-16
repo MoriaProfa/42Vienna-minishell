@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   redirect_heredoc.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 05:05:23 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/16 19:31:47 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/16 22:16:19 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../../minishell.h"
 
 int	print_heredoc_warning(t_heredoc heredoc, size_t ln)
 {

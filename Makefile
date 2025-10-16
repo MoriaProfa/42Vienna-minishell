@@ -4,7 +4,25 @@ CC = cc
 
 CFLAGS = -Wall -Wextra -Werror -MMD -MP -g
 
-MY_SOURCES = minishell.c env_var.c envp.c lexing.c tokenizer.c expansion.c var_split.c cmd_table.c cmd_pathname_builder.c execution.c execution_utils.c redirection.c builtins.c msh_atol.c heredoc_collector.c heredoc_utils.c redirect_infile.c redirect_outfile.c redirect_heredoc.c
+MY_SOURCES = minishell.c \
+			src/environment/env_var.c \
+			src/environment/envp.c \
+			src/tokenizer/lexing.c \
+			src/tokenizer/tokenizer.c \
+			src/tokenizer/expansion.c \
+			src/tokenizer/var_split.c \
+			src/command_table/cmd_table.c \
+			src/command_table/cmd_pathname_builder.c \
+			src/execution/execution.c \
+			src/execution/execution_utils.c \
+			src/redirection/redirection.c \
+			src/redirection/redirect_infile.c \
+			src/redirection/redirect_outfile.c \
+			src/heredoc/redirect_heredoc.c \
+			src/heredoc/heredoc_collector.c \
+			src/heredoc/heredoc_utils.c \
+			src/builtins/builtins.c \
+			src/builtins/msh_atol.c   
 
 MY_OBJECTS = $(MY_SOURCES:.c=.o)
 

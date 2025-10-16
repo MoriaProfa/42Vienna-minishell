@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/16 20:21:52 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/16 22:00:05 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,7 +179,6 @@ int	main(int argc, char **argv, char **envp)
 		if (!msh.in_str) //by pressing CTRL+D
 			break ;//msh_quit(&msh, "exit", 0);//didnt work as intended for not yet known reason?!
 		msh.line_number++;
-		
 		if (msh.in_str[0] == '\0' || check_for_whitespace_end(msh.in_str, 0))
 		{
 			free(msh.in_str);
@@ -218,17 +217,3 @@ int	main(int argc, char **argv, char **envp)
 	msh_quit(&msh, NULL, msh.status);
 	return (0);
 }
-/* why is there double minishell> ?
-minishell> cat<<lol
-> test^C
-minishell> cat<<lol
-> ^C
-minishell> cat
-ksjkajs
-ksjkajs
-^C
-
-minishell> 
-minishell> cat^C
-minishell> 
-*/

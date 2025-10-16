@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 05:18:53 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/16 17:03:24 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/16 22:16:16 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../../minishell.h"
 
 /*
 void	collect_heredocs_in_child(t_msh *msh, int i, int j, int fd)

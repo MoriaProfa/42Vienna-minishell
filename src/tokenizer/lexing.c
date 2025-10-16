@@ -6,11 +6,11 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 20:48:16 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/14 04:14:29 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/16 22:16:34 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../../minishell.h"
 
 void	handle_quotationmark_error(t_msh *msh, char quotationmark)
 {

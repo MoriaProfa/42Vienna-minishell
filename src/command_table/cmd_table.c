@@ -6,11 +6,11 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/15 20:28:09 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/16 22:16:01 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../../minishell.h"
 
 void	heredoc_collector(t_msh *msh, t_cmd **cmds);
 bool	compare_strings(char *s1, char *s2);
