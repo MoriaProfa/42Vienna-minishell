@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/16 23:19:20 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/16 23:32:16 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 //tcsetattr, tcgetattr)
 # include <errno.h>
 # include <fcntl.h>
+# include <sys/ioctl.h>
 # include <limits.h>
 # include <readline/readline.h>
 # include <readline/history.h>

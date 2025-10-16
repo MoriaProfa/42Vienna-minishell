@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/16 22:00:05 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/16 23:41:24 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@ void	build_cmd_table(t_msh *msh);
 void    free_cmd_table(t_cmd **cmds, int n);
 void	run_command(t_msh *msh, int i);
 void	msh_pid(t_msh *msh);
-void	msh_fork(t_msh *msh, int i, int fd_in, int fd_out);
 void	msh_execute(t_msh *msh, int i);
 int		collect_all_heredocs(t_msh *msh, int i);
 void	init_env_vars(t_msh *msh, char **envp);
@@ -89,44 +88,10 @@ void	msh_quit(t_msh *msh, char *msg, int status)
 
 void	return_prompt(void)
 {
-	write(STDOUT_FILENO, "\n", 1);
-	rl_on_new_line();
 	rl_replace_line("", 0);
-	rl_redisplay();
-	// for heredoc (maybe also child processes?) -> old return_prompt function:
-	// rl_replace_line("", 0);
-	// ioctl(0, TIOCSTI, "\n");
-	// rl_on_new_line();
+	ioctl(0, TIOCSTI, "\n");
+	rl_on_new_line();
 }
-
-/* useless because of use of readline atm
-char	*msh_read(ssize_t rr)
-{
-	char	buf[2];
-	char	*tmp;
-	char	*out;
-
-	out = NULL;
-	while (rr > 0)
-	{
-		rr = read(0, buf, 1);
-		if (rr == -1)
-			return (ft_free(&out), NULL);
-		buf[rr] = 0;
-		if (buf[0] == '\n')
-			return (out);
-		if (!out)
-			out = ft_strcpy(buf);
-		else
-		{
-			tmp = out;
-			out = ft_strjoin(tmp, buf);
-			ft_free(&tmp); 
-		}
-	}
-	return (out);
-}
-*/
 
 void	msh_initialize(t_msh *msh)
 {
@@ -149,8 +114,6 @@ void	handle_signal(int signal)
 		return_prompt();
 	}	
 }
-
-void	print_heredoc_fd(t_msh *msh); // test
 
 int	main(int argc, char **argv, char **envp)
 {
@@ -196,15 +159,6 @@ int	main(int argc, char **argv, char **envp)
 			(build_cmd_table(&msh)/* , print_cmd_table(&msh) */); //print just for testing
 		if (!msh.error_check)
 			msh_pid(&msh); //allocates for msh.pid
-		// if (!msh.error_check)
-		// {	
-		// 	if (collect_all_heredocs(&msh, -1) != 0)
-		// 	{
-		// 		free(msh.in_str);
-		// 		continue ;
-		// 	}
-		// }
-		//print_heredoc_fd(&msh);
 /*		if (!msh.error_check)
 		{
 			if (((t_cmd *)msh.cmd_table[0])->builtin.builtin == true && msh.n_cmds == 1)//why only if n_cmds is 1?
