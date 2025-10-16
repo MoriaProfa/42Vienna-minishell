@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/16 15:17:19 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/16 20:21:52 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,14 +89,14 @@ void	msh_quit(t_msh *msh, char *msg, int status)
 
 void	return_prompt(void)
 {
-	/*printf("\n");
+	write(STDOUT_FILENO, "\n", 1);
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();
-	for heredoc (maybe also child processes?) -> old return_prompt function:*/
-	rl_replace_line("", 0);
-	ioctl(0, TIOCSTI, "\n");
-	rl_on_new_line();
+	// for heredoc (maybe also child processes?) -> old return_prompt function:
+	// rl_replace_line("", 0);
+	// ioctl(0, TIOCSTI, "\n");
+	// rl_on_new_line();
 }
 
 /* useless because of use of readline atm
@@ -167,18 +167,19 @@ int	main(int argc, char **argv, char **envp)
 	msh.line_number = 1;
 	while (1)
 	{
-		msh.in_str = readline("minishell> ");
-		if (!msh.in_str) //by pressing CTRL+D
-			break ;//msh_quit(&msh, "exit", 0);//didnt work as intended for not yet known reason?!
-		msh.line_number++;
 		if (g_signal_flag)
 		{
-			free(msh.in_str);
+			//free(msh.in_str);
 			msh.in_str = NULL;
 			msh.status = 128 + g_signal_flag;
 			g_signal_flag = 0;
 			continue ;
 		}
+		msh.in_str = readline("minishell> ");
+		if (!msh.in_str) //by pressing CTRL+D
+			break ;//msh_quit(&msh, "exit", 0);//didnt work as intended for not yet known reason?!
+		msh.line_number++;
+		
 		if (msh.in_str[0] == '\0' || check_for_whitespace_end(msh.in_str, 0))
 		{
 			free(msh.in_str);

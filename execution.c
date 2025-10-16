@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/16 17:00:42 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/16 21:37:37 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ int		check_if_directory(char *path);
 void	print_execution_error(t_msh *msh, char *cmd, int option, int code);
 void	msh_print(t_msh *msh, char *msg, int status);
 bool	compare_strings(char *s1, char *s2);
+void	handle_signal(int signal);
 
 void	msh_pid(t_msh *msh) // could be put in cmd_table
 {
@@ -85,11 +86,18 @@ void	msh_execute(t_msh *msh, int i)
 		return ;
 	}
 }
+void	handle_signal_child(int sig)
+{
+	if (sig == SIGINT)
+		g_signal_flag = sig;
+	rl_on_new_line();
+	rl_replace_line("", 0);
+}
 
 void	child_process(t_msh *msh, int i)
 {
-	signal(SIGINT, SIG_DFL); // need to check signal handling in a child
-	signal(SIGQUIT, SIG_DFL);
+	signal(SIGINT, handle_signal_child); // need to check signal handling in a child
+	signal(SIGQUIT, handle_signal_child);
 	if (set_redirections(msh, i) != 0)
 		msh_quit(msh, NULL, 1);
 	if (msh->fd[0] != -1)
@@ -112,6 +120,8 @@ void	msh_fork(t_msh *msh, int i)
 	msh->pid[i] = fork();
 	if (msh->pid[i] == -1)
 		msh_quit(msh, "fork failed", 1);
+	signal(SIGINT, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
 	if (msh->pid[i] == 0)
 		child_process(msh, i);
 	if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
@@ -129,7 +139,7 @@ void	msh_fork(t_msh *msh, int i)
 void	msh_waitpid(t_msh *msh, int i)
 {
 	int	wstatus;
-	int	sig;
+	int	signal;
 
 	if (waitpid(msh->pid[i], &wstatus, 0) == -1)
 		msh_quit(msh, "child waitpid failed", 1);
@@ -137,11 +147,11 @@ void	msh_waitpid(t_msh *msh, int i)
 		msh->status = WEXITSTATUS(wstatus);
 	else if (WIFSIGNALED(wstatus))
 	{
-		sig = WTERMSIG(wstatus);
-		msh->status = 128 + sig;
-		if (sig == SIGINT)
+		signal = WTERMSIG(wstatus);
+		msh->status = 128 + signal;
+		if (signal == SIGINT)
 			write(STDOUT_FILENO, "\n", 1);
-		else if (sig == SIGQUIT)
+		else if (signal == SIGQUIT)
 			write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
 	}
 }
@@ -176,4 +186,6 @@ void	run_command(t_msh *msh, int i)
 	i = -1;
 	while (++i < msh->n_cmds && msh->pid && msh->pid[i] != -1)
 		msh_waitpid(msh, i);
+	signal(SIGINT, handle_signal);
+	signal(SIGQUIT, SIG_IGN);
 }
