@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 05:05:23 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/16 17:02:00 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/16 19:12:35 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ int	print_heredoc_warning(t_heredoc heredoc, size_t ln)
 	ft_putnbr_fd(ln, STDERR_FILENO);
 	ft_putstr_fd(" delimeted by end-of-file (wanted `", STDERR_FILENO);
 	ft_putstr_fd(heredoc.delimiter, STDERR_FILENO);
-	ft_putstr_fd("`)\n", STDERR_FILENO);
+	ft_putstr_fd("')\n", STDERR_FILENO);
 	return (0);
 }
 
