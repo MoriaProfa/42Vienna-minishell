@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/16 16:37:48 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/16 23:19:20 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,72 +19,22 @@
 //<unistd.h> (write, access, read, close, fork, exit, getcwd, chdir, stat, 
 //lstat, fstat, unlink, execve, dup, dup2, pipe, isatty, ttyname, ttyslot, 
 //tcsetattr, tcgetattr)
-# include <curses.h>
-//tgetent, tgetflag, tgetnum, tgetstr, tgoto, tputs
-# include <dirent.h>
-//opendir, readdir, closedir
 # include <errno.h>
-//perror
 # include <fcntl.h>
-//open
 # include <limits.h>
-//INT_MAX, INT_MIN, LONG_MAX, LONG_MIN
 # include <readline/readline.h>
-//readline, rl_clear_history, rl_on_new_line, rl_replace_line, 
-//rl_redisplay, add_history
 # include <readline/history.h>
-//readline, rl_clear_history, rl_on_new_line, rl_replace_line,
-//rl_redisplay, add_history
 # include <signal.h>
-//signal, sigaction, sigemptyset, sigaddset, kill
-#include <stdbool.h>
-//booleans
+# include <stdbool.h>
 # include <stdio.h>
-//printf, perror
-# include <string.h>
-//strerror
-# include <sys/ioctl.h>
-//ioctl
-# include <sys/resource.h>
-//wait3, wait4
 # include <sys/stat.h>
 //stat, lstat, fstat
-# include <sys/time.h>
-//wait3, wait4
 # include <sys/types.h>
 //fork, wait, waitpid, wait3, wait4, kill, stat, lstat, fstat, opendir, closedir
 # include <sys/wait.h>
 //wait, waitpid, wait3, wait4
-# include <term.h>
-//tgetent, tgetflag, tgetnum, tgetstr, tgoto, tputs
-# include <termios.h>
-//tcsetattr, tcgetattr
 
 extern volatile sig_atomic_t   g_signal_flag;
-
-typedef struct s_env_var
-{
-	char	*name;
-	char	*value;
-}			t_env_var;
-
-typedef enum e_builtin_type
-{
-	B_NOT_BUILTIN,
-	B_PWD,
-	B_CD,
-	B_EXIT,
-	B_ENV,
-	B_EXPORT,
-	B_UNSET,
-	B_ECHO,
-}					t_builtin_type;
-
-typedef struct s_builtin
-{
-	bool			builtin;
-	t_builtin_type	type;
-}					t_builtin;
 
 typedef enum e_quote_type
 {
@@ -105,6 +55,24 @@ typedef enum e_token_type
 	T_HEREDOC_REDIRECT
 }	t_token_type;
 
+typedef enum e_builtin_type
+{
+	B_NOT_BUILTIN,
+	B_PWD,
+	B_CD,
+	B_EXIT,
+	B_ENV,
+	B_EXPORT,
+	B_UNSET,
+	B_ECHO,
+}	t_builtin_type;
+
+typedef struct s_env_var
+{
+	char	*name;
+	char	*value;
+}			t_env_var;
+
 typedef struct s_token
 {
 	char			*value;
@@ -113,6 +81,12 @@ typedef struct s_token
 	bool			is_adjacent;
 	bool			is_expanded;
 }					t_token;
+
+typedef struct s_builtin
+{
+	bool			builtin;
+	t_builtin_type	type;
+}					t_builtin;
 
 typedef struct s_redir
 {
@@ -124,25 +98,25 @@ typedef struct s_heredoc
 {
 	char	*delimiter;
 	char	*buffer;
-	char	*filename; // temp hd file
-	bool	expand;// true if delimiter is unquoted = expansion happens in buffer
+	char	*filename;
+	bool	expand;
 }			t_heredoc;
 
 typedef struct s_cmd
 {
-	char			**args;//command + args
-	int				n_args;// amount of args
-	int				capacity_args;// capacity of **args
+	char			**args;
+	int				n_args;
+	int				capacity_args;
 	t_builtin		builtin;
-	t_redir			*redirs;// list of >, >> and <
-	int				n_redirs;// amount of redirs
-	int				capacity_redirs;// capacity of *redirs
-	t_heredoc		*heredocs;// list of <<
+	t_redir			*redirs;
+	int				n_redirs;
+	int				capacity_redirs;
+	t_heredoc		*heredocs;
 	int				heredoc_read;
-	int				n_hd;//amount of heredocs
-	int				capacity_hd;//capacity of *heredocs
-	t_token_type	last_input;//infile or heredoc
-	char			*pathname;//pathname to an executable
+	int				n_hd;
+	int				capacity_hd;
+	t_token_type	last_input;
+	char			*pathname;
 }					t_cmd;
 
 typedef struct s_msh
@@ -171,7 +145,7 @@ __attribute__((noreturn)) void	msh_quit(t_msh *msh, char *msg, int status);
 void	msh_print(t_msh *msh, char *msg, int status);
 void	print_num_error_exit(t_msh *msh, char *str);
 
-// redirection.c
+// /src/redirection/redirection.c
 int	set_redirections(t_msh *msh, int i);
 
 #endif
