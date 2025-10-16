@@ -6,11 +6,30 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 05:05:23 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/14 05:07:33 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/16 17:02:00 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+int	print_heredoc_warning(t_heredoc heredoc, size_t ln)
+{
+	ft_putstr_fd("minishell: warning: here-document at line ", STDERR_FILENO);
+	ft_putnbr_fd(ln, STDERR_FILENO);
+	ft_putstr_fd(" delimeted by end-of-file (wanted `", STDERR_FILENO);
+	ft_putstr_fd(heredoc.delimiter, STDERR_FILENO);
+	ft_putstr_fd("`)\n", STDERR_FILENO);
+	return (0);
+}
+
+bool	compare_strings(char *s1, char *s2)
+{
+	if (ft_strlen(s1) == ft_strlen(s2) && ft_strncmp(s1, s2,
+			ft_strlen(s1)) == 0)
+		return (true);
+	else
+		return (false);
+}
 
 void	close_heredocs(t_msh *msh)
 {
