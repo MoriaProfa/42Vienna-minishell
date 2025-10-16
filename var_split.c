@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 18:17:55 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/16 16:39:09 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/16 18:51:14 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,16 +87,28 @@ t_list	*delete_current_node(t_list *tokens, t_list *cur_node)
 	return (tokens);
 }
 
-void	split_and_insert_tokens(t_list **cur_node_ptr, t_token *cur_token, 
+t_list	*create_new_node(char *value, t_msh *msh)
+{
+	t_token	*new_token;
+	t_list	*new_node;
+	int		quoted_adjacent[2];
+
+	ft_memset(quoted_adjacent, 0, sizeof(quoted_adjacent));
+	new_token = create_token(msh, value, T_WORD, quoted_adjacent);
+	new_token->is_expanded = true;
+	new_node = ft_lstnew(new_token);
+	if (!new_node)
+		msh_quit(msh, "split and insert create new_node malloc failed", 1);
+	return (new_node);
+}
+
+void	split_and_insert_tokens(t_list **cur_node, t_token *cur_token, 
 	t_msh *msh)
 {
 	char	**words;
-	int		quoted_adjacent[2];
 	int		i;
 	t_list	*new_node;
-	t_token	*new_token;
 
-	ft_memset(quoted_adjacent, 0, sizeof(quoted_adjacent));
 	i = 0;
 	words = ft_split_with_set(cur_token->value, " \t", 
 		count_words(cur_token->value, " \t"));
@@ -108,11 +120,9 @@ void	split_and_insert_tokens(t_list **cur_node_ptr, t_token *cur_token,
 		msh_quit(msh, "split and insert token value malloc failed", 1);
 	while (words[++i])
 	{
-		new_token = create_token(msh, words[i], T_WORD, quoted_adjacent);//check for malloc protection
-		new_token->is_expanded = true;
-		new_node = ft_lstnew(new_token);//check for malloc protection
-		ft_lstinsert_after(*cur_node_ptr, new_node);
-		*cur_node_ptr = new_node;
+		new_node = create_new_node(words[i], msh);
+		ft_lstinsert_after(*cur_node, new_node);
+		*cur_node = new_node;
 	}
 	ft_array_free(words, ft_array_size(words));
 }
@@ -132,6 +142,14 @@ void	correct_adjacency(t_list *cur_node, t_token *cur_token)
 		next_token->is_adjacent = false;
 }
 
+bool	check_token_validity_for_split(t_token *cur_token)
+{
+	if (cur_token && cur_token->value && cur_token->value[0] != '\0' && 
+			cur_token->quoted == Q_NONE && cur_token->is_expanded)
+		return (true);
+	return (false);
+}
+
 void    split_expanded_tokens(t_list *tokens, t_msh *msh)
 {
 	t_list  *cur_node;
@@ -143,8 +161,7 @@ void    split_expanded_tokens(t_list *tokens, t_msh *msh)
 	{
 		cur_token = (t_token *)cur_node->content;
 		next_node = cur_node->next;
-		if (cur_token && cur_token->value && cur_token->value[0] != '\0' && 
-			cur_token->quoted == Q_NONE && cur_token->is_expanded)
+		if (check_token_validity_for_split(cur_token))
 		{
 			if (check_for_whitespace_end(cur_token->value, 0))
 			{
