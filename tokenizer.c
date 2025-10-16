@@ -6,13 +6,14 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/15 01:15:11 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/16 16:39:23 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 void			expand_word_tokens(t_list *tokens, t_msh *msh);
+void    split_expanded_tokens(t_list *tokens, t_msh *msh);
 
 // just for testing purposes
 void	print_tokens(t_list *tokens)
@@ -364,6 +365,9 @@ void	msh_tokenizer(t_msh *msh)
 //	print_tokens(msh->tokens);
 	expand_word_tokens(msh->tokens, msh);
 //	printf("\nafter expansion:");
+//	print_tokens(msh->tokens);
+	split_expanded_tokens(msh->tokens, msh);
+//	printf("\nafter variable splitting:");
 //	print_tokens(msh->tokens);
 	merge_adjacent_tokens(&msh->tokens, msh);
 //	printf("\nafter adjacency handling:");
