@@ -6,23 +6,23 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 05:03:32 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/15 21:34:58 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/16 19:24:20 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static int	check_access_read(char *file)
-{
-	if (access(file, F_OK) == 0 && access(file, R_OK) != 0)
-	{
-		ft_putstr_fd("minishell: ", STDERR_FILENO);
-		perror(file);
-		return (0);
-	}
-	else
-		return (1);
-}
+// static int	check_access_read(char *file)
+// {
+// 	if (access(file, F_OK) == 0 && access(file, R_OK) != 0)
+// 	{
+// 		ft_putstr_fd("minishell: ", STDERR_FILENO);
+// 		perror(file);
+// 		return (0);
+// 	}
+// 	else
+// 		return (1);
+// }
 
 static int	set_infile(t_cmd *cmd, int j)
 {
@@ -31,8 +31,8 @@ static int	set_infile(t_cmd *cmd, int j)
 	fd = -1;
 	if (fd != -1)
 		close(fd);
-	if (check_access_read(cmd->redirs[j].filename) == 0)
-		return (-1);
+	// if (check_access_read(cmd->redirs[j].filename) == 0)
+	// 	return (-1);
 	fd = open(cmd->redirs[j].filename, O_RDONLY);
 	if (fd == -1)
 	{
