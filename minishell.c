@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/15 18:56:23 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/16 02:19:35 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	run_command(t_msh *msh, int i);
 void	msh_pid(t_msh *msh);
 void	msh_fork(t_msh *msh, int i, int fd_in, int fd_out);
 void	msh_execute(t_msh *msh, int i);
-void	collect_all_heredocs(t_msh *msh, int i);
+int		collect_all_heredocs(t_msh *msh, int i);
 void	init_env_vars(t_msh *msh, char **envp);
 void	free_env_var(void *content);
 void	print_env_vars(t_list *env_vars);
@@ -89,14 +89,14 @@ void	msh_quit(t_msh *msh, char *msg, int status)
 
 void	return_prompt(void)
 {
-	printf("\n");
+	/*printf("\n");
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();
-	/*for heredoc (maybe also child processes?) -> old return_prompt function:
+	for heredoc (maybe also child processes?) -> old return_prompt function:*/
 	rl_replace_line("", 0);
 	ioctl(0, TIOCSTI, "\n");
-	rl_on_new_line();*/
+	rl_on_new_line();
 }
 
 /* useless because of use of readline atm
@@ -171,12 +171,6 @@ int	main(int argc, char **argv, char **envp)
 		if (!msh.in_str) //by pressing CTRL+D
 			break ;//msh_quit(&msh, "exit", 0);//didnt work as intended for not yet known reason?!
 		msh.line_number++;
-		if (msh.in_str[0] == '\0' || check_for_whitespace_end(msh.in_str, 0))
-		{
-			free(msh.in_str);
-			continue ;
-		}
-		add_history(msh.in_str); //original bash doesnt add it when its starting with a whitespace
 		if (g_signal_flag)
 		{
 			free(msh.in_str);
@@ -185,6 +179,12 @@ int	main(int argc, char **argv, char **envp)
 			g_signal_flag = 0;
 			continue ;
 		}
+		if (msh.in_str[0] == '\0' || check_for_whitespace_end(msh.in_str, 0))
+		{
+			free(msh.in_str);
+			continue ;
+		}
+		add_history(msh.in_str); //original bash doesnt add it when its starting with a whitespace
 		msh_initialize(&msh);
 		check_quotationmarks(&msh);
 		build_envp_array(&msh);
@@ -196,18 +196,38 @@ int	main(int argc, char **argv, char **envp)
 			(build_cmd_table(&msh)/* , print_cmd_table(&msh) */); //print just for testing
 		if (!msh.error_check)
 			msh_pid(&msh); //allocates for msh.pid
-		if (!msh.error_check)
-			collect_all_heredocs(&msh, -1);
+		// if (!msh.error_check)
+		// {	
+		// 	if (collect_all_heredocs(&msh, -1) != 0)
+		// 	{
+		// 		free(msh.in_str);
+		// 		continue ;
+		// 	}
+		// }
 		//print_heredoc_fd(&msh);
 /*		if (!msh.error_check)
 		{
 			if (((t_cmd *)msh.cmd_table[0])->builtin.builtin == true && msh.n_cmds == 1)//why only if n_cmds is 1?
 			msh_builtins(&msh, 0);
 		}
-*/		if (!msh.error_check)
+*/		if (!msh.error_check && collect_all_heredocs(&msh, -1) == 0)
 			run_command(&msh, -1);
 		msh_free(&msh);
 	}
 	msh_quit(&msh, NULL, msh.status);
 	return (0);
 }
+/* why is there double minishell> ?
+minishell> cat<<lol
+> test^C
+minishell> cat<<lol
+> ^C
+minishell> cat
+ksjkajs
+ksjkajs
+^C
+
+minishell> 
+minishell> cat^C
+minishell> 
+*/

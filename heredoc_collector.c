@@ -6,17 +6,21 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/15 15:42:59 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/16 02:31:28 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+void	handle_signal(int signal);
+
 char		*expand_value(char *value, char *result, t_msh *msh);
 void		close_fds(t_msh *msh);
 void		close_heredocs(t_msh *msh);
 bool		compare_strings(char *s1, char *s2);
-void		print_heredoc_warning(t_cmd *cmd, int j, size_t ln);
+void		print_heredoc_warning(t_heredoc heredoc, size_t ln);
+
+extern volatile sig_atomic_t g_signal_flag;
 
 static void	expand_heredoc_input(t_msh *msh, char **value)
 {
@@ -58,35 +62,96 @@ static char	*create_filename(int i, int j)
 	return (name);
 }
 
-static void	collect_one_heredoc(t_msh *msh, t_cmd *cmd, int j, int fd)
+void	return_prompt(void);
+
+void	return_heredoc_prompt(void)
+{
+	/*printf("\n");
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
+	for heredoc (maybe also child processes?) -> old return_prompt function:*/
+	rl_replace_line("", 0);
+	ioctl(0, TIOCSTI, "\n");
+	rl_on_new_line();
+}
+
+void	handle_heredoc_signal(int signal)
+{
+	if (signal == SIGINT)
+	{
+		g_signal_flag = signal;
+		return_prompt();
+	}	
+}
+
+static int	collect_one_heredoc(t_msh *msh, t_heredoc heredoc, int fd)
 {
 	while (1)
 	{
-		cmd->heredocs[j].buffer = readline("> ");
-		if (!cmd->heredocs[j].buffer)
+		heredoc.buffer = readline("> ");
+		if (!heredoc.buffer)
 		{
-			print_heredoc_warning(cmd, j, msh->line_number);
-			return ;
+			print_heredoc_warning(heredoc, msh->line_number);
+			return (0);
 		}
-		if (cmd->heredocs[j].expand == true
-			&& compare_strings(cmd->heredocs[j].buffer,
-				cmd->heredocs[j].delimiter) == false)
-			expand_heredoc_input(msh, &cmd->heredocs[j].buffer);
-		if (compare_strings(cmd->heredocs[j].buffer,
-				cmd->heredocs[j].delimiter) == true)
+		if (g_signal_flag)
 		{
-			free(cmd->heredocs[j].buffer);
-			cmd->heredocs[j].buffer = NULL;
+			free(heredoc.buffer);
+			heredoc.buffer = NULL;
+			close(fd);
+			msh->status = 128 + g_signal_flag;
+			g_signal_flag = 0;
+			return (1);
+		}
+		if (heredoc.expand == true
+			&& compare_strings(heredoc.buffer,
+				heredoc.delimiter) == false)
+			expand_heredoc_input(msh, &heredoc.buffer);
+		if (compare_strings(heredoc.buffer,
+				heredoc.delimiter) == true)
+		{
+			free(heredoc.buffer);
+			heredoc.buffer = NULL;
 			break ;
 		}
-		write(fd, cmd->heredocs[j].buffer, ft_strlen(cmd->heredocs[j].buffer));
+		write(fd, heredoc.buffer, ft_strlen(heredoc.buffer));
 		write(fd, "\n", 1);
-		free(cmd->heredocs[j].buffer);
-		cmd->heredocs[j].buffer = NULL;
+		free(heredoc.buffer);
+		heredoc.buffer = NULL;
 	}
 	close(fd);
+	return (0);
 }
+void	collect_heredocs_in_child(t_msh *msh, int i, int j, int fd);
 
+int	collect_all_heredocs(t_msh *msh, int i)
+{
+	int	j;
+	int	fd;
+	int	return_value;
+
+	return_value = 0;
+	while ((t_cmd *)msh->cmd_table[++i])
+	{
+		j = -1;
+		while (((t_cmd *)msh->cmd_table[i])->heredocs[++j].delimiter)
+		{
+			((t_cmd *)msh->cmd_table[i])->heredocs[j].filename = create_filename(i,
+					j);
+			if (!((t_cmd *)msh->cmd_table[i])->heredocs[j].filename)
+				msh_quit(msh, "failed to create temporary filename", 1);
+			fd = open(((t_cmd *)msh->cmd_table[i])->heredocs[j].filename,
+					O_RDWR | O_CREAT | O_TRUNC, 0600);
+			if (fd == -1)
+				msh_quit(msh, "failed to create temporary heredoc file", 1);
+			return_value = collect_one_heredoc(msh, ((t_cmd *)msh->cmd_table[i])->heredocs[j], fd);
+			close(fd);
+		}
+	}
+	return (return_value);
+}
+/*
 void	collect_heredocs_in_child(t_msh *msh, int i, int j, int fd)
 {
 	pid_t	pid;
@@ -97,10 +162,9 @@ void	collect_heredocs_in_child(t_msh *msh, int i, int j, int fd)
 		msh_quit(msh, "heredoc fork failed", 1);
 	else if (pid == 0)
 	{
-		signal(SIGINT, SIG_DFL);
-		// need to add msh_free before terminatig heredoc?
-		signal(SIGQUIT, SIG_IGN); // ignore Ctrl+\ during heredoc
-		collect_one_heredoc(msh, (t_cmd *)msh->cmd_table[i], j, fd);
+		// signal(SIGINT, SIG_DFL);
+		// signal(SIGQUIT, SIG_IGN); // ignore Ctrl+\ during heredoc
+		collect_one_heredoc(msh, ((t_cmd *)msh->cmd_table[i])->heredocs[j], fd);
 		close(fd);
 		msh_quit(msh, NULL, 0);
 	}
@@ -117,28 +181,4 @@ void	collect_heredocs_in_child(t_msh *msh, int i, int j, int fd)
 			return ; // stop heredoc collection & skip execution
 		}
 	}
-}
-
-void	collect_all_heredocs(t_msh *msh, int i)
-{
-	int	j;
-	int	fd;
-
-	while ((t_cmd *)msh->cmd_table[++i])
-	{
-		j = -1;
-		while (((t_cmd *)msh->cmd_table[i])->heredocs[++j].delimiter)
-		{
-			((t_cmd *)msh->cmd_table[i])->heredocs[j].filename = create_filename(i,
-					j);
-			if (!((t_cmd *)msh->cmd_table[i])->heredocs[j].filename)
-				msh_quit(msh, "failed to create temporary filename", 1);
-			fd = open(((t_cmd *)msh->cmd_table[i])->heredocs[j].filename,
-					O_RDWR | O_CREAT | O_TRUNC, 0600);
-			if (fd == -1)
-				msh_quit(msh, "failed to create temporary heredoc file", 1);
-			collect_heredocs_in_child(msh, i, j, fd);
-			close(fd);
-		}
-	}
-}
+}*/
