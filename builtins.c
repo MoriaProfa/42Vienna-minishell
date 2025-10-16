@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/14 23:52:04 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/16 00:10:39 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ char	*get_env_var_value(t_msh *msh, char *name)
 	while (cur_node)
 	{
 		cur_env_var = (t_env_var *)(cur_node->content);
-		if (cur_env_var && cur_env_var->name && 
+		if (cur_env_var && cur_env_var->name && cur_env_var-> value && 
 				!ft_strncmp(name, cur_env_var->name, ft_strlen(name) + 1))
 			return (ft_strdup(cur_env_var->value));
 		cur_node = cur_node->next;
