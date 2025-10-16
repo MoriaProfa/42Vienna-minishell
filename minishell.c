@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/16 02:19:35 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/16 15:17:19 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void    free_envp(t_msh *msh);
 void	msh_builtins(t_msh *msh, int i);
 bool	check_for_whitespace_end(char *str, int start);
 
-volatile sig_atomic_t   g_signal_flag;
+volatile sig_atomic_t   g_signal_flag = 0;
 
 void	msh_print(t_msh *msh, char *msg, int status)
 {

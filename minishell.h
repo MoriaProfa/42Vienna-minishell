@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/15 19:50:02 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/16 15:14:34 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,8 @@
 //tgetent, tgetflag, tgetnum, tgetstr, tgoto, tputs
 # include <termios.h>
 //tcsetattr, tcgetattr
+
+extern volatile sig_atomic_t   g_signal_flag;
 
 typedef struct s_env_var
 {
