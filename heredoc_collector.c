@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/16 02:31:28 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/16 03:32:43 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,21 +61,21 @@ static char	*create_filename(int i, int j)
 		return (NULL);
 	return (name);
 }
-
+/*
 void	return_prompt(void);
 
 void	return_heredoc_prompt(void)
 {
-	/*printf("\n");
-	rl_on_new_line();
-	rl_replace_line("", 0);
-	rl_redisplay();
-	for heredoc (maybe also child processes?) -> old return_prompt function:*/
+	// printf("\n");
+	// rl_on_new_line();
+	// rl_replace_line("", 0);
+	// rl_redisplay();
+	// for heredoc (maybe also child processes?) -> old return_prompt function:
 	rl_replace_line("", 0);
 	ioctl(0, TIOCSTI, "\n");
 	rl_on_new_line();
 }
-
+*/
 void	handle_heredoc_signal(int signal)
 {
 	if (signal == SIGINT)
