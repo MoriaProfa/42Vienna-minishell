@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/15 21:29:03 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/16 17:00:42 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,16 +22,6 @@ int		check_if_directory(char *path);
 void	print_execution_error(t_msh *msh, char *cmd, int option, int code);
 void	msh_print(t_msh *msh, char *msg, int status);
 bool	compare_strings(char *s1, char *s2);
-
-void	print_fds(t_msh *msh, int i)
-{
-	printf("child[%d] msh->fd_in = %d\n", i, msh->fd_in);
-	printf("child[%d] msh->fd_out = %d\n", i, msh->fd_out);
-	printf("child[%d] msh->fd[0] = %d\n", i, msh->fd[0]);
-	printf("child[%d] msh->fd[1] = %d\n", i, msh->fd[1]);
-	printf("child[%d] msh->fd_pipe_read = %d\n", i, msh->fd_pipe_read);
-	print_heredoc_fd(msh);
-}
 
 void	msh_pid(t_msh *msh) // could be put in cmd_table
 {
