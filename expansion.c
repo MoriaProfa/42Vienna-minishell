@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 16:29:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/16 16:38:31 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/16 19:09:19 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ static void	exp_getenv(char *var_name, char ***result, t_msh *msh)
 	}
 	else
 	{
-		if (**result[0] != '\0')
+		if (**result && **result[0] != '\0')
 			return ;
 		free(**result);
 		**result = NULL;
