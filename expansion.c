@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 16:29:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/15 03:50:18 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/16 16:38:31 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,6 +139,7 @@ void	expand_word_tokens(t_list *tokens, t_msh *msh)
 				expanded = expand_value(cur_token->value, tmp, msh);
 				free(cur_token->value);
 				cur_token->value = expanded;
+				cur_token->is_expanded = true;
 			}
 		}
 		cur_node = cur_node->next;
