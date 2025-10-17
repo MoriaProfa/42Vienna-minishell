@@ -3,16 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   expansion.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 16:29:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/17 15:36:49 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 20:04:41 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
 char	*get_env_var_value(t_msh *msh, char *name);
+void	close_heredocs(t_msh *msh);
+void	close_fds(t_msh *msh);
 
 static void	add_to_result(char *tmp, char **result, size_t *i, t_msh *msh)
 {
@@ -38,6 +40,12 @@ static void	add_to_result(char *tmp, char **result, size_t *i, t_msh *msh)
 	(*i)++;
 }
 
+void	close_and_exit(t_msh *msh, char *msg, int status)
+{
+	close_fds(msh);
+	msh_quit(msh, msg, status);
+}
+
 static void	exp_getenv(t_token *token, char *var_name, char ***result, t_msh *msh)
 {
 	char		*env_value;
@@ -54,7 +62,7 @@ static void	exp_getenv(t_token *token, char *var_name, char ***result, t_msh *ms
 		free(env_value);
 		free(**result);
 		if (!tmp)
-			msh_quit(msh, "expander: env_value join malloc failed", 1);
+			close_and_exit(msh, "expander: env_value join malloc failed", 1);
 		**result = tmp;
 	}
 	else

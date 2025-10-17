@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 14:29:45 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/17 21:27:33 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,12 @@ void	msh_print(t_msh *msh, char *msg, int status);
 bool	compare_strings(char *s1, char *s2);
 void	handle_signal_parent(int signal);
 void	handle_signal_child(int signal);
+void	run_builtins(t_msh *msh, int i);
+bool	special_case_check(t_msh *msh, char *pathname, char *cmd);
 
 void	msh_pid(t_msh *msh) // could be put in cmd_table
 {
-	int i;
+	int	i;
 
 	i = -1;
 	msh->pid = (pid_t *)ft_calloc(msh->n_cmds + 1, sizeof(pid_t));
@@ -35,29 +37,6 @@ void	msh_pid(t_msh *msh) // could be put in cmd_table
 		msh_quit(msh, "pid malloc error", 1);
 	while (++i < msh->n_cmds)
 		msh->pid[i] = -1;
-}
-
-bool	special_case_check(t_msh *msh, char *pathname, char *cmd)
-{
-	if (!pathname)
-	{
-		print_execution_error(msh, cmd, 1, 127);
-		return (true);
-	}
-	if (compare_strings(cmd, ".") == true)
-	{
-		msh_print(msh,
-			"minishell: .: filename argument required\n.: usage: . filename [arguments]",
-			2);
-		return (true);
-	}
-	if (compare_strings(cmd, "..") == true && compare_strings(pathname,
-			"/..") == false)
-	{
-		print_execution_error(msh, cmd, 1, 127);
-		return (true);
-	}
-	return (false);
 }
 
 void	msh_execute(t_msh *msh, int i)
@@ -90,7 +69,7 @@ void	msh_execute(t_msh *msh, int i)
 
 void	child_process(t_msh *msh, int i)
 {
-	signal(SIGINT, handle_signal_child); // need to check signal handling in a child
+	signal(SIGINT, handle_signal_child);
 	signal(SIGQUIT, handle_signal_child);
 	if (set_redirections(msh, i) != 0)
 		msh_quit(msh, NULL, 1);
@@ -154,16 +133,6 @@ void	msh_waitpid(t_msh *msh, int i)
 		else if (signal == SIGQUIT)
 			write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
 	}
-}
-
-void	run_builtins(t_msh *msh, int i)
-{
-	save_stdin_stdout(msh, i);
-	if (set_redirections(msh, i) == 0)
-		msh_builtins(msh, i);
-	else
-		msh->status = 1;
-	restore_stdin_stdout(msh);
 }
 
 void	run_command(t_msh *msh, int i)

@@ -20,7 +20,6 @@ MY_SOURCES = minishell.c \
 			src/redirection/redirect_outfile.c \
 			src/heredoc/heredoc_redirect.c \
 			src/heredoc/heredoc_collector.c \
-			src/heredoc/heredoc_utils.c \
 			src/builtins/builtins.c \
 			src/builtins/msh_atol.c \
 			src/signals/signals.c

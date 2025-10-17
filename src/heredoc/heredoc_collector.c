@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 15:59:15 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/17 21:03:35 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,8 @@
 
 void		handle_signal(int signal);
 
-char		*expand_value(t_token *token, char *value, char *result, t_msh *msh);
+char		*expand_value(t_token *token, char *value, char *result,
+				t_msh *msh);
 void		close_fds(t_msh *msh);
 void		close_heredocs(t_msh *msh);
 bool		compare_strings(char *s1, char *s2);
@@ -29,7 +30,10 @@ static void	expand_heredoc_input(t_msh *msh, char **value)
 
 	tmp = ft_strdup("");
 	if (!tmp)
+	{
+		close_heredocs(msh);
 		msh_quit(msh, "heredoc expansion malloc failed", 1);
+	}
 	expanded = expand_value(NULL, *value, tmp, msh);
 	free(*value);
 	*value = expanded;
@@ -70,11 +74,13 @@ static int	collect_one_heredoc(t_msh *msh, t_heredoc heredoc, int fd)
 		if (!heredoc.buffer)
 			return (print_warning_heredoc(heredoc, msh->line_number));
 		if (g_signal_flag)
+		{
+			close_heredocs(msh);
 			return (handle_signal_heredoc(msh, &heredoc.buffer, fd));
+		}
 		if (heredoc.expand == true && compare_strings(heredoc.buffer,
 				heredoc.delimiter) == false)
 			expand_heredoc_input(msh, &heredoc.buffer);
-		msh->line_number++;
 		if (compare_strings(heredoc.buffer, heredoc.delimiter) == true)
 		{
 			ft_free(&heredoc.buffer);
@@ -83,6 +89,7 @@ static int	collect_one_heredoc(t_msh *msh, t_heredoc heredoc, int fd)
 		write(fd, heredoc.buffer, ft_strlen(heredoc.buffer));
 		write(fd, "\n", 1);
 		ft_free(&heredoc.buffer);
+		msh->line_number++;
 	}
 	close(fd);
 	return (0);
@@ -90,26 +97,26 @@ static int	collect_one_heredoc(t_msh *msh, t_heredoc heredoc, int fd)
 
 int	collect_all_heredocs(t_msh *msh, int i)
 {
-	int	j;
-	int	fd;
+	int		j;
+	t_cmd	**cmd;
 
+	cmd = msh->cmd_table;
 	while ((t_cmd *)msh->cmd_table[++i])
 	{
 		j = -1;
-		while (((t_cmd *)msh->cmd_table[i])->heredocs[++j].delimiter)
+		while ((cmd[i])->heredocs[++j].delimiter)
 		{
-			((t_cmd *)msh->cmd_table[i])->heredocs[j].filename = create_filename(i,
-					j);
-			if (!((t_cmd *)msh->cmd_table[i])->heredocs[j].filename)
+			(cmd[i])->heredocs[j].filename = create_filename(i, j);
+			if (!(cmd[i])->heredocs[j].filename)
 				msh_quit(msh, "failed to create temporary filename", 1);
-			fd = open(((t_cmd *)msh->cmd_table[i])->heredocs[j].filename,
+			(cmd[i])->heredoc_read = open((cmd[i])->heredocs[j].filename,
 					O_RDWR | O_CREAT | O_TRUNC, 0600);
-			if (fd == -1)
+			if ((cmd[i])->heredoc_read == -1)
 				msh_quit(msh, "failed to create temporary heredoc file", 1);
-			if (collect_one_heredoc(msh,
-					((t_cmd *)msh->cmd_table[i])->heredocs[j], fd) == 1)
+			if (collect_one_heredoc(msh, (cmd[i])->heredocs[j],
+					(cmd[i])->heredoc_read) == 1)
 				return (1);
-			close(fd);
+			close((cmd[i])->heredoc_read);
 		}
 	}
 	return (0);

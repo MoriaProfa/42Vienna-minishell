@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 15:13:34 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/17 20:34:13 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ void	msh_builtins(t_msh *msh, int i);
 bool	check_for_whitespace_end(char *str, int start);
 void	restore_stdin_stdout(t_msh *msh);
 void	handle_signal_parent(int signal);
+void	close_heredocs(t_msh *msh);
 
 volatile sig_atomic_t   g_signal_flag = 0;
 
@@ -114,7 +115,7 @@ int	main(int argc, char **argv, char **envp)
 	ft_bzero(&msh, sizeof(t_msh));
 	init_env_vars(&msh, envp); //envp is also accessible with __environ (=global env variable)
 	//print_env_vars(msh.env_vars);//just for testing if init_env_var worked correctly
-	msh.line_number = 0;
+	msh.line_number = 1;
 	while (1)
 	{
 		if (g_signal_flag)

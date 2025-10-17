@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirection.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/16 22:16:26 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 21:30:02 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void	close_fds(t_msh *msh)
 }
 
 void	save_stdin_stdout(t_msh *msh, int i)
-{	
+{
 	if (((t_cmd *)msh->cmd_table[i])->n_redirs > 0
 		|| ((t_cmd *)msh->cmd_table[i])->n_hd > 0)
 	{

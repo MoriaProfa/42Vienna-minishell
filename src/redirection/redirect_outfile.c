@@ -6,23 +6,11 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 00:52:04 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 16:37:07 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/17 21:30:28 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
-
-// static int	check_access_write(char *file)
-// {
-// 	if (access(file, F_OK) == 0 && access(file, W_OK) != 0)
-// 	{
-// 		ft_putstr_fd("minishell: ", STDERR_FILENO);
-// 		perror(file);
-// 		return (0);
-// 	}
-// 	else
-// 		return (1);
-// }
 
 static int	set_outfile(t_cmd *cmd, int j)
 {
@@ -31,14 +19,12 @@ static int	set_outfile(t_cmd *cmd, int j)
 	fd = -1;
 	if (fd != -1)
 		close(fd);
-	// if (check_access_write(cmd->redirs[j].filename) == 0)
-	// 	return (-1);
 	if (cmd->redirs[j].type == T_OUT_REDIRECT)
 		fd = open(cmd->redirs[j].filename, O_RDWR | O_CREAT | O_TRUNC,
 				0644);
 	else if (cmd->redirs[j].type == T_APPEND_REDIRECT)
 		fd = open(cmd->redirs[j].filename, O_RDWR | O_CREAT | O_APPEND,
-					0644);
+				0644);
 	if (fd == -1)
 	{
 		ft_putstr_fd("minishell: ", STDERR_FILENO);
