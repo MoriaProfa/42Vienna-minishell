@@ -6,13 +6,11 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 18:17:55 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/16 22:16:44 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 21:30:40 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
-
-bool	check_for_whitespace_end(char *str, int start);
 
 ssize_t	count_words(const char *s, const char *set)
 {

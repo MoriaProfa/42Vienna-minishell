@@ -6,13 +6,11 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 21:20:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/16 22:16:03 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 21:31:38 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
-
-bool	check_and_update_env_var_value(t_msh *msh, char *name, char *value);
 
 void	free_env_var(void *content)
 {
@@ -26,25 +24,6 @@ void	free_env_var(void *content)
 	if (cur_env_var->value)
 		free(cur_env_var->value);
 	free(cur_env_var);
-}
-
-void	print_env_vars(t_list *env_vars)
-{
-	t_list		*cur_node;
-	t_env_var	*cur_env_var;
-
-	cur_node = env_vars;
-	while (cur_node)
-	{
-		cur_env_var = (t_env_var *)(cur_node->content);
-		if (cur_env_var && cur_env_var->name && cur_env_var->value)
-		{
-			ft_putstr_fd(cur_env_var->name, STDOUT_FILENO);
-			ft_putchar_fd('=', STDOUT_FILENO);
-			ft_putendl_fd(cur_env_var->value, STDOUT_FILENO);
-		}
-		cur_node = cur_node->next;
-	}
 }
 
 void	add_to_env_vars(t_msh *msh, char *name, char *value)

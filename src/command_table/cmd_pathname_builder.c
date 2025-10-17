@@ -6,13 +6,11 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 18:40:52 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 19:55:58 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 21:32:40 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
-
-bool	compare_strings(char *s1, char *s2);
 
 char	*resolve_cmd_pathname(t_msh *msh, char **paths, char *cmd, 
 	char	*fallback)

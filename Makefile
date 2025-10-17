@@ -5,24 +5,30 @@ CC = cc
 CFLAGS = -Wall -Wextra -Werror -MMD -MP -g
 
 MY_SOURCES = minishell.c \
+			src/builtins/builtins_cd.c \
+			src/builtins/builtins_export.c \
+			src/builtins/builtins_helpers_atol.c \
+			src/builtins/builtins_helpers_checks.c \
+			src/builtins/builtins_helpers_env.c \
+			src/builtins/builtins_helpers_errorprints.c \
+			src/builtins/builtins_helpers_prints.c \
+			src/builtins/builtins.c \
+			src/command_table/cmd_pathname_builder.c \
+			src/command_table/cmd_table.c \
 			src/environment/env_var.c \
 			src/environment/envp.c \
-			src/tokenizer/lexing.c \
-			src/tokenizer/tokenizer.c \
-			src/tokenizer/expansion.c \
-			src/tokenizer/var_split.c \
-			src/command_table/cmd_table.c \
-			src/command_table/cmd_pathname_builder.c \
-			src/execution/execution.c \
 			src/execution/execution_utils.c \
-			src/redirection/redirection.c \
-			src/redirection/redirect_infile.c \
-			src/redirection/redirect_outfile.c \
-			src/heredoc/redirect_heredoc.c \
+			src/execution/execution.c \
 			src/heredoc/heredoc_collector.c \
 			src/heredoc/heredoc_utils.c \
-			src/builtins/builtins.c \
-			src/builtins/msh_atol.c   
+			src/heredoc/redirect_heredoc.c \
+			src/redirection/redirect_infile.c \
+			src/redirection/redirect_outfile.c \
+			src/redirection/redirection.c \
+			src/tokenizer/expansion.c \
+			src/tokenizer/lexing.c \
+			src/tokenizer/tokenizer.c \
+			src/tokenizer/var_split.c			
 
 MY_OBJECTS = $(MY_SOURCES:.c=.o)
 
