@@ -7,26 +7,26 @@ CFLAGS = -Wall -Wextra -Werror -MMD -MP -g
 MY_SOURCES = minishell.c \
 			src/builtins/builtins_cd.c \
 			src/builtins/builtins_export.c \
-			src/builtins/builtins_helpers_atol.c \
-			src/builtins/builtins_helpers_checks.c \
-			src/builtins/builtins_helpers_env.c \
-			src/builtins/builtins_helpers_errorprints.c \
-			src/builtins/builtins_helpers_prints.c \
+			src/builtins/builtins_utils_atol.c \
+			src/builtins/builtins_utils_checks.c \
+			src/builtins/builtins_utils_env.c \
+			src/builtins/builtins_utils_errorprints.c \
+			src/builtins/builtins_utils_prints.c \
 			src/builtins/builtins.c \
 			src/command_table/cmd_capacity.c \
 			src/command_table/cmd_free.c \
 			src/command_table/cmd_parser.c \
 			src/command_table/cmd_pathname_builder.c \
 			src/command_table/cmd_table.c \
+			src/environment/env_var_utils.c \
 			src/environment/env_var.c \
-			src/environment/env_var_helpers.c \
 			src/environment/envp.c \
 			src/execution/execution_utils.c \
 			src/execution/execution.c \
 			src/heredoc/heredoc_collector.c \
 			src/heredoc/heredoc_redirect.c \
-			src/msh_helpers/utils.c \
-			src/msh_helpers/signals.c \
+			src/msh_utils/msh_utils.c \
+			src/msh_utils/signals.c \
 			src/redirection/redirect_infile.c \
 			src/redirection/redirect_outfile.c \
 			src/redirection/redirection.c \
@@ -36,7 +36,7 @@ MY_SOURCES = minishell.c \
 			src/tokenizer/tokenizer_merger.c \
 			src/tokenizer/tokenizer_utils.c \
 			src/tokenizer/tokenizer.c \
-			src/tokenizer/var_split_helpers.c \
+			src/tokenizer/var_split_utils.c \
 			src/tokenizer/var_split.c
 
 MY_OBJECTS = $(MY_SOURCES:.c=.o)

@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 23:42:12 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 23:50:10 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,26 +147,26 @@ void	msh_cd(t_msh *msh, char **args);
 // src/builtins/builtins_export.c
 void	msh_export(t_msh *msh, char **args);
 
-// src/builtins/builtins_helpers_atol.c
+// src/builtins/builtins_utils_atol.c
 long	msh_atol(t_msh *msh, char *nptr);
 
-// src/builtins/builtins_helpers_checks.c
+// src/builtins/builtins_utils_checks.c
 bool	check_for_whitespace_end(char *str, int start);
 bool	check_newline_skipping(char *str);
 bool	check_name_validity(t_msh *msh, char *str);
 void	check_exit_code_validity(t_msh *msh, char *str);
 
-// src/builtins/builtins_helpers_env.c
+// src/builtins/builtins_utils_env.c
 char	*get_env_var_value(t_msh *msh, char *name);
 bool	check_and_update_env_var_value(t_msh *msh, char *name, char *value);
 void	check_and_delete_env_var(t_msh *msh, char *name);
 
-// src/builtins/builtins_helpers_errorprints.c
+// src/builtins/builtins_utils_errorprints.c
 void	print_getcwd_error(char *builtin_name);
 void	print_num_error_exit(t_msh *msh, char *str);
 void	print_export_error(t_msh *msh, char *str);
 
-// src/builtins/builtins_helpers_prints.c
+// src/builtins/builtins_utils_prints.c
 void	print_env_vars(t_list *env_vars);
 void	print_export_wo_args(t_msh *msh, char *name);
 void	print_echo_args(t_msh *msh, char **args, int start);
@@ -190,7 +190,7 @@ void	parse_single_cmd_tokens(t_cmd *cmd, t_list **tokens, t_msh *msh);
 // src/command_table/cmd_table.c
 void	build_cmd_table(t_msh *msh);
 
-// src/environment/env_var_helpers.c
+// src/environment/env_var_utils.c
 void	add_to_env_vars(t_msh *msh, char *name, char *value);
 void	prepare_and_add_to_env_vars(t_msh *msh, char *name, char *value);
 void	prepare_name_and_add_to_env_vars(t_msh *msh, char *name, char *m_value);
@@ -224,12 +224,12 @@ bool	compare_strings(char *s1, char *s2);
 void	close_heredocs(t_msh *msh);
 int		redirect_heredoc(t_msh *msh, int i, int j);
 
-// src/msh_helpers/utils.c
+// src/msh_utils/msh_utils.c
 void	msh_print(t_msh *msh, char *msg, int status);
 void	msh_free(t_msh *msh);
 __attribute__((noreturn)) void	msh_quit(t_msh *msh, char *msg, int status);
 
-// src/msh_helpers/signals.c
+// src/msh_utils/signals.c
 void	handle_signal_parent(int signal);
 void	handle_signal_child(int signal);
 int		handle_signal_heredoc(t_msh *msh, char **buffer, int fd);
@@ -271,7 +271,7 @@ void	remove_quotationmarks_in_tokens(t_list *tokens);
 void	free_token(void *content);
 void	msh_tokenizer(t_msh *msh);
 
-// src/tokenizer/var_split_helpers.c
+// src/tokenizer/var_split_utils.c
 ssize_t	count_words(const char *s, const char *set);
 char	**ft_split_with_set(const char *s, const char *set, ssize_t word_count);
 void	correct_adjacency(t_list *cur_node, t_token *cur_token);
