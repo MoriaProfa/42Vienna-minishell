@@ -31,7 +31,8 @@ MY_SOURCES = minishell.c \
 			src/tokenizer/expansion.c \
 			src/tokenizer/lexing.c \
 			src/tokenizer/tokenizer.c \
-			src/tokenizer/var_split.c			
+			src/tokenizer/var_split.c \
+			src/signals/signals.c	
 
 MY_OBJECTS = $(MY_SOURCES:.c=.o)
 
