@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 22:06:24 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/17 22:24:17 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,7 +210,18 @@ void	msh_builtins(t_msh *msh, int i);
 // src/command_table/cmd_pathname_builder.c
 char	*create_cmd_pathname(t_msh *msh, char *cmd);
 
+// src/command_table/cmd_capacity.c
+bool	ensure_capacity(void **array, int *count, int *capacity, size_t size);
+void	cmd_arrays_capacity_check(t_cmd *cmd, t_msh *msh);
+
+// src/command_table/cmd_free.c
+void	free_cmd_table(t_cmd **cmds, int n);
+
+// src/command_table/cmd_parser.c
+void	parse_single_cmd_tokens(t_cmd *cmd, t_list **tokens, t_msh *msh);
+
 // src/command_table/cmd_table.c
+void	build_cmd_table(t_msh *msh);
 
 // src/environment/env_var.c
 
@@ -231,7 +242,8 @@ char	*create_cmd_pathname(t_msh *msh, char *cmd);
 // src/redirection/redirect_outfile.c
 
 // src/redirection/redirection.c
-int	set_redirections(t_msh *msh, int i);
+void	restore_stdin_stdout(t_msh *msh);
+int		set_redirections(t_msh *msh, int i);
 
 // src/tokenizer/expansion.c
 
