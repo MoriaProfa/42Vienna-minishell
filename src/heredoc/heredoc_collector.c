@@ -3,23 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc_collector.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/16 22:16:14 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 14:15:31 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
-void	handle_signal(int signal);
+void		handle_signal(int signal);
 
 char		*expand_value(char *value, char *result, t_msh *msh);
 void		close_fds(t_msh *msh);
 void		close_heredocs(t_msh *msh);
 bool		compare_strings(char *s1, char *s2);
-int		print_heredoc_warning(t_heredoc heredoc, size_t ln);
-void	return_prompt(void);
+int			print_warning_heredoc(t_heredoc heredoc, size_t ln);
+void		return_prompt(void);
+int			handle_signal_heredoc(t_msh *msh, char **buffer, int fd);
 
 static void	expand_heredoc_input(t_msh *msh, char **value)
 {
@@ -61,30 +62,19 @@ static char	*create_filename(int i, int j)
 	return (name);
 }
 
-static int	handle_heredoc_signal(t_msh *msh, char **buffer, int fd)
-{
-	ft_free(buffer);
-	close(fd);
-	msh->status = 128 + g_signal_flag;
-	g_signal_flag = 0;
-	return (1);	
-}
-
 static int	collect_one_heredoc(t_msh *msh, t_heredoc heredoc, int fd)
 {
 	while (1)
 	{
 		heredoc.buffer = readline("> ");
 		if (!heredoc.buffer)
-			return (print_heredoc_warning(heredoc, msh->line_number));
+			return (print_warning_heredoc(heredoc, msh->line_number));
 		if (g_signal_flag)
-			return (handle_heredoc_signal(msh, &heredoc.buffer, fd));
-		if (heredoc.expand == true
-			&& compare_strings(heredoc.buffer,
+			return (handle_signal_heredoc(msh, &heredoc.buffer, fd));
+		if (heredoc.expand == true && compare_strings(heredoc.buffer,
 				heredoc.delimiter) == false)
 			expand_heredoc_input(msh, &heredoc.buffer);
-		if (compare_strings(heredoc.buffer,
-				heredoc.delimiter) == true)
+		if (compare_strings(heredoc.buffer, heredoc.delimiter) == true)
 		{
 			ft_free(&heredoc.buffer);
 			break ;
@@ -96,7 +86,6 @@ static int	collect_one_heredoc(t_msh *msh, t_heredoc heredoc, int fd)
 	close(fd);
 	return (0);
 }
-
 
 int	collect_all_heredocs(t_msh *msh, int i)
 {
@@ -118,10 +107,10 @@ int	collect_all_heredocs(t_msh *msh, int i)
 					O_RDWR | O_CREAT | O_TRUNC, 0600);
 			if (fd == -1)
 				msh_quit(msh, "failed to create temporary heredoc file", 1);
-			return_value = collect_one_heredoc(msh, ((t_cmd *)msh->cmd_table[i])->heredocs[j], fd);
+			return_value = collect_one_heredoc(msh,
+					((t_cmd *)msh->cmd_table[i])->heredocs[j], fd);
 			close(fd);
 		}
 	}
 	return (return_value);
 }
-

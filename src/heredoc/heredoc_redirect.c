@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   redirect_heredoc.c                                 :+:      :+:    :+:   */
+/*   heredoc_redirect.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 05:05:23 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/16 22:16:19 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 14:16:09 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
-int	print_heredoc_warning(t_heredoc heredoc, size_t ln)
+int	print_warning_heredoc(t_heredoc heredoc, size_t ln)
 {
 	ft_putstr_fd("minishell: warning: here-document at line ", STDERR_FILENO);
 	ft_putnbr_fd(ln, STDERR_FILENO);
