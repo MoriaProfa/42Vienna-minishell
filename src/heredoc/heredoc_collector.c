@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/16 22:16:14 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 15:29:06 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	handle_signal(int signal);
 
-char		*expand_value(char *value, char *result, t_msh *msh);
+char		*expand_value(t_token *token, char *value, char *result, t_msh *msh);
 void		close_fds(t_msh *msh);
 void		close_heredocs(t_msh *msh);
 bool		compare_strings(char *s1, char *s2);
@@ -29,7 +29,7 @@ static void	expand_heredoc_input(t_msh *msh, char **value)
 	tmp = ft_strdup("");
 	if (!tmp)
 		msh_quit(msh, "heredoc expansion malloc failed", 1);
-	expanded = expand_value(*value, tmp, msh);
+	expanded = expand_value(NULL, *value, tmp, msh);
 	free(*value);
 	*value = expanded;
 }
