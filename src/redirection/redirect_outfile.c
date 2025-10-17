@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirect_outfile.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 00:52:04 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/16 22:16:24 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 16:37:07 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,8 @@ static int	set_outfile(t_cmd *cmd, int j)
 
 int	redirect_outfile(t_msh *msh, int i, int j)
 {
+	if (msh->fd_out != -1)
+		close(msh->fd_out);
 	msh->fd_out = set_outfile(((t_cmd *)msh->cmd_table[i]), j);
 	if (msh->fd_out == -1)
 		return (1);
