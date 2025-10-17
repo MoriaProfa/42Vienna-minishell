@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 14:15:31 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/17 15:50:06 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ static int	collect_one_heredoc(t_msh *msh, t_heredoc heredoc, int fd)
 		if (heredoc.expand == true && compare_strings(heredoc.buffer,
 				heredoc.delimiter) == false)
 			expand_heredoc_input(msh, &heredoc.buffer);
+		msh->line_number++;
 		if (compare_strings(heredoc.buffer, heredoc.delimiter) == true)
 		{
 			ft_free(&heredoc.buffer);

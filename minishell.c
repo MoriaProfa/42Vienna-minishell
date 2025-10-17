@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 13:56:21 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/17 15:13:34 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,7 +114,7 @@ int	main(int argc, char **argv, char **envp)
 	ft_bzero(&msh, sizeof(t_msh));
 	init_env_vars(&msh, envp); //envp is also accessible with __environ (=global env variable)
 	//print_env_vars(msh.env_vars);//just for testing if init_env_var worked correctly
-	msh.line_number = 1;
+	msh.line_number = 0;
 	while (1)
 	{
 		if (g_signal_flag)
@@ -128,7 +128,6 @@ int	main(int argc, char **argv, char **envp)
 		msh.in_str = readline("minishell> ");
 		if (!msh.in_str) //by pressing CTRL+D
 			break ;//msh_quit(&msh, "exit", 0);//didnt work as intended for not yet known reason?!
-		msh.line_number++;
 		if (msh.in_str[0] == '\0' || check_for_whitespace_end(msh.in_str, 0))
 		{
 			free(msh.in_str);
