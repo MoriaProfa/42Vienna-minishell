@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 23:25:52 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 23:31:53 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -270,11 +270,14 @@ char	*create_word_token(t_msh *msh);
 void	remove_quotationmarks_in_tokens(t_list *tokens);
 
 // src/tokenizer/tokenizer.c
+void	free_token(void *content);
+void	msh_tokenizer(t_msh *msh);
+
+// src/tokenizer/var_split_helpers.c
 ssize_t	count_words(const char *s, const char *set);
 char	**ft_split_with_set(const char *s, const char *set, ssize_t word_count);
 void	correct_adjacency(t_list *cur_node, t_token *cur_token);
 bool	check_token_validity_for_split(t_token *cur_token);
-void	msh_tokenizer(t_msh *msh);
 
 // src/tokenizer/var_split.c
 void    split_expanded_tokens(t_list *tokens, t_msh *msh);
