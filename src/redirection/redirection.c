@@ -6,16 +6,11 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 21:30:02 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/17 22:31:16 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
-
-int			redirect_infile(t_msh *msh, int i, int j);
-int			redirect_outfile(t_msh *msh, int i, int j);
-int			redirect_heredoc(t_msh *msh, int i, int j);
-void		close_heredocs(t_msh *msh);
 
 void	close_fds(t_msh *msh)
 {
