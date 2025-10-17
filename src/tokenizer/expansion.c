@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 16:29:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/16 22:16:30 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 15:36:49 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ static void	add_to_result(char *tmp, char **result, size_t *i, t_msh *msh)
 	(*i)++;
 }
 
-static void	exp_getenv(char *var_name, char ***result, t_msh *msh)
+static void	exp_getenv(t_token *token, char *var_name, char ***result, t_msh *msh)
 {
 	char		*env_value;
 	char		*tmp;
@@ -59,14 +59,15 @@ static void	exp_getenv(char *var_name, char ***result, t_msh *msh)
 	}
 	else
 	{
-		if (**result && **result[0] != '\0')
+		if (**result && (**result[0] != '\0' || 
+				(token && token->quoted == Q_DOUBLE)))
 			return ;
 		free(**result);
 		**result = NULL;
 	}	
 }
 
-static void	exp_getenv_value(char *value, char **result, size_t *i, t_msh *msh)
+static void	exp_getenv_value(t_token *token, char *value, char **result, size_t *i, t_msh *msh)
 {
 	size_t	var_len;
 	size_t	start;
@@ -85,10 +86,10 @@ static void	exp_getenv_value(char *value, char **result, size_t *i, t_msh *msh)
 		free(*result);
 		msh_quit(msh, "expander: var_name substr malloc failed", 1);
 	}
-	exp_getenv(var_name, &result, msh);
+	exp_getenv(token, var_name, &result, msh);
 }
 
-char	*expand_value(char *value, char *result, t_msh *msh)
+char	*expand_value(t_token *token, char *value, char *result, t_msh *msh)
 {
 	size_t	i;
 
@@ -105,7 +106,7 @@ char	*expand_value(char *value, char *result, t_msh *msh)
 			else if (ft_isalpha(value[i + 1]) || value[i + 1] == '_')
 			{
 				i++;
-				exp_getenv_value(value, &result, &i, msh);
+				exp_getenv_value(token, value, &result, &i, msh);
 			}
 			else
 				add_to_result(ft_substr(value, i, 1), &result, &i, msh);
@@ -136,7 +137,7 @@ void	expand_word_tokens(t_list *tokens, t_msh *msh)
 				tmp = ft_strdup("");
 				if (!tmp)
 					msh_quit(msh, "expander: tmp init malloc failed", 1);
-				expanded = expand_value(cur_token->value, tmp, msh);
+				expanded = expand_value(cur_token, cur_token->value, tmp, msh);
 				free(cur_token->value);
 				cur_token->value = expanded;
 				cur_token->is_expanded = true;
