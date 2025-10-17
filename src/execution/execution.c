@@ -6,26 +6,11 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 21:27:33 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/17 22:27:13 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
-
-void	msh_builtins(t_msh *msh, int i);
-void	close_heredocs(t_msh *msh);
-void	print_heredoc_fd(t_msh *msh);
-void	save_stdin_stdout(t_msh *msh, int i);
-void	restore_stdin_stdout(t_msh *msh);
-void	close_fds(t_msh *msh);
-int		check_if_directory(char *path);
-void	print_execution_error(t_msh *msh, char *cmd, int option, int code);
-void	msh_print(t_msh *msh, char *msg, int status);
-bool	compare_strings(char *s1, char *s2);
-void	handle_signal_parent(int signal);
-void	handle_signal_child(int signal);
-void	run_builtins(t_msh *msh, int i);
-bool	special_case_check(t_msh *msh, char *pathname, char *cmd);
 
 void	msh_pid(t_msh *msh) // could be put in cmd_table
 {
@@ -39,7 +24,7 @@ void	msh_pid(t_msh *msh) // could be put in cmd_table
 		msh->pid[i] = -1;
 }
 
-void	msh_execute(t_msh *msh, int i)
+static void	msh_execute(t_msh *msh, int i)
 {
 	char	*pathname;
 	char	*cmd;
@@ -67,7 +52,7 @@ void	msh_execute(t_msh *msh, int i)
 	}
 }
 
-void	child_process(t_msh *msh, int i)
+static void	child_process(t_msh *msh, int i)
 {
 	signal(SIGINT, handle_signal_child);
 	signal(SIGQUIT, handle_signal_child);
@@ -88,7 +73,7 @@ void	child_process(t_msh *msh, int i)
 	msh_quit(msh, NULL, msh->status);
 }
 
-void	msh_fork(t_msh *msh, int i)
+static void	msh_fork(t_msh *msh, int i)
 {
 	msh->pid[i] = fork();
 	if (msh->pid[i] == -1)
@@ -112,7 +97,7 @@ void	msh_fork(t_msh *msh, int i)
 	}
 }
 
-void	msh_waitpid(t_msh *msh, int i)
+static void	msh_waitpid(t_msh *msh, int i)
 {
 	int	wstatus;
 	int	signal;

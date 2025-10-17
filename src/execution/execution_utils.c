@@ -6,22 +6,11 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 20:44:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 22:02:35 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/17 22:15:09 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
-
-void	msh_builtins(t_msh *msh, int i);
-void	close_heredocs(t_msh *msh);
-void	print_heredoc_fd(t_msh *msh);
-void	save_stdin_stdout(t_msh *msh, int i);
-void	restore_stdin_stdout(t_msh *msh);
-void	close_fds(t_msh *msh);
-int		check_if_directory(char *path);
-void	print_execution_error(t_msh *msh, char *cmd, int option, int code);
-void	msh_print(t_msh *msh, char *msg, int status);
-bool	compare_strings(char *s1, char *s2);
 
 void	close_and_exit(t_msh *msh, char *msg, int status)
 {

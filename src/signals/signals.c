@@ -6,13 +6,13 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 13:54:05 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 14:10:00 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/17 22:28:10 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
-void	return_prompt(void)
+static void	return_prompt(void)
 {
 	rl_replace_line("", 0);
 	ioctl(0, TIOCSTI, "\n");

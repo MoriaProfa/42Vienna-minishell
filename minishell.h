@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 22:06:24 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/17 22:27:57 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,8 +146,8 @@ void	build_cmd_table(t_msh *msh);
 void	build_envp_array(t_msh *msh);
 void	check_quotationmarks(t_msh *msh);
 void	check_tokens(t_msh *msh);
-int		collect_all_heredocs(t_msh *msh, int i);
-bool	compare_strings(char *s1, char *s2);
+
+
 void	expand_word_tokens(t_list *tokens, char *tmp, t_msh *msh);
 char	*extract_env_name(char *str, size_t *name_len);
 char	*extract_env_value(char *str, size_t name_len);
@@ -155,7 +155,6 @@ void    free_cmd_table(t_cmd **cmds, int n);
 void	free_env_var(void *content);
 void    free_envp(t_msh *msh);
 void	free_token(void *content);
-void	heredoc_collector(t_msh *msh, t_cmd **cmds);
 void	init_env_vars(t_msh *msh, char **envp);
 void	msh_execute(t_msh *msh, int i);
 void	msh_free(t_msh *msh);
@@ -166,10 +165,8 @@ void	msh_tokenizer(t_msh *msh);
 void	prepare_name_and_add_to_env_vars(t_msh *msh, char *name, char *m_value);
 void	run_command(t_msh *msh, int i);
 void    split_expanded_tokens(t_list *tokens, t_msh *msh);
-void	heredoc_collector(t_msh *msh, t_cmd **cmds);
 bool	compare_strings(char *s1, char *s2);
 char	*create_cmd_pathname(t_msh *msh, char *cmd);
-void	close_and_exit(t_msh *msh, char *msg, int status);
 
 
 // minishell.c
@@ -217,21 +214,30 @@ char	*create_cmd_pathname(t_msh *msh, char *cmd);
 // src/environment/envp.c
 
 // src/execution/execution_utils.c
+void	close_and_exit(t_msh *msh, char *msg, int status);
+void	run_builtins(t_msh *msh, int i);
+bool	special_case_check(t_msh *msh, char *pathname, char *cmd);
+int		check_if_directory(char *path);
+void	print_execution_error(t_msh *msh, char *cmd, int option, int code);
 
 // src/execution/execution.c
+void	run_command(t_msh *msh, int i);
 
 // src/heredoc/heredoc_collector.c
+int		collect_all_heredocs(t_msh *msh, int i);
 
-// src/heredoc/heredoc_utils.c
-
-// src/heredoc/redirect_heredoc.c
+// src/heredoc/heredoc_redirect.c
+int		print_warning_heredoc(t_heredoc heredoc, size_t ln);
+bool	compare_strings(char *s1, char *s2);
+void	close_heredocs(t_msh *msh);
+int		redirect_heredoc(t_msh *msh, int i, int j);
 
 // src/redirection/redirect_infile.c
 
 // src/redirection/redirect_outfile.c
 
 // src/redirection/redirection.c
-int	set_redirections(t_msh *msh, int i);
+int		set_redirections(t_msh *msh, int i);
 
 // src/tokenizer/expansion.c
 
@@ -243,5 +249,7 @@ int	set_redirections(t_msh *msh, int i);
 
 // src/signals/signals.c
 void	handle_signal_parent(int signal);
+void	handle_signal_child(int signal);
+int		handle_signal_heredoc(t_msh *msh, char **buffer, int fd);
 
 #endif
