@@ -6,23 +6,11 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 22:27:13 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/17 22:48:58 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
-
-void	msh_pid(t_msh *msh) // could be put in cmd_table
-{
-	int	i;
-
-	i = -1;
-	msh->pid = (pid_t *)ft_calloc(msh->n_cmds + 1, sizeof(pid_t));
-	if (!msh->pid)
-		msh_quit(msh, "pid malloc error", 1);
-	while (++i < msh->n_cmds)
-		msh->pid[i] = -1;
-}
 
 static void	msh_execute(t_msh *msh, int i)
 {
