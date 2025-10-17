@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 23:54:15 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 01:10:09 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,9 @@ typedef enum e_token_type
 	T_IN_REDIRECT,
 	T_OUT_REDIRECT,
 	T_APPEND_REDIRECT,
-	T_HEREDOC_REDIRECT //maybe renaming all "redirect" to "redir" to shorten line lengths
+	T_HEREDOC_REDIRECT
 }	t_token_type;
-
+//maybe renaming all "redirect" to "redir" to shorten line lengths
 typedef enum e_builtin_type
 {
 	B_NOT_BUILTIN,
@@ -65,7 +65,7 @@ typedef enum e_builtin_type
 	B_ENV,
 	B_EXPORT,
 	B_UNSET,
-	B_ECHO,
+	B_ECHO
 }	t_builtin_type;
 
 typedef struct s_env_var

@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 20:43:19 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/17 21:18:07 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 01:37:25 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,11 +83,28 @@ static void	handle_export_wo_args(t_msh *msh)
 	ft_array_free(names_array, size);
 }
 
+static void	handle_export_with_value(char *arg, t_msh *msh)
+{
+	size_t	name_len;
+	char	*value;
+	char	*name;
+
+	name_len = 0;
+	name = extract_env_name(arg, &name_len);
+	if (!name)
+		msh_quit(msh, "export: name init malloc failed", 1);
+	value = extract_env_value(arg, name_len + 1);
+	if (!value)
+		(free(name), msh_quit(msh, "export: value init malloc failed", 1));
+	if (check_and_update_env_var_value(msh, name, value))
+		free(name);
+	else
+		add_to_env_vars(msh, name, value);
+}
+
 void	msh_export(t_msh *msh, char **args)
 {
 	char	*name;
-	char	*value;
-	size_t	name_len;
 	int		i;
 
 	if (!args[1])
@@ -98,19 +115,7 @@ void	msh_export(t_msh *msh, char **args)
 		if (!check_name_validity(msh, args[i]))
 			continue ;
 		if (ft_strchr(args[i], '='))
-		{
-			name_len = 0;
-			name = extract_env_name(args[i], &name_len);
-			if (!name)
-				msh_quit(msh, "export: name init malloc failed", 1);
-			value = extract_env_value(args[i], name_len + 1);
-			if (!value)
-				(free(name), msh_quit(msh, "export: value init malloc failed", 1));
-			if (check_and_update_env_var_value(msh, name, value))
-				free(name);
-			else
-				add_to_env_vars(msh, name, value);
-		}
+			handle_export_with_value(args[i], msh);
 		else
 		{
 			name = ft_strdup(args[i]);
