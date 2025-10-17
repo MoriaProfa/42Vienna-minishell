@@ -18,11 +18,12 @@ MY_SOURCES = minishell.c \
 			src/redirection/redirection.c \
 			src/redirection/redirect_infile.c \
 			src/redirection/redirect_outfile.c \
-			src/heredoc/redirect_heredoc.c \
+			src/heredoc/heredoc_redirect.c \
 			src/heredoc/heredoc_collector.c \
 			src/heredoc/heredoc_utils.c \
 			src/builtins/builtins.c \
-			src/builtins/msh_atol.c   
+			src/builtins/msh_atol.c \
+			src/signals/signals.c
 
 MY_OBJECTS = $(MY_SOURCES:.c=.o)
 
