@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/16 23:32:16 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 20:33:09 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ typedef enum e_token_type
 	T_IN_REDIRECT,
 	T_OUT_REDIRECT,
 	T_APPEND_REDIRECT,
-	T_HEREDOC_REDIRECT
+	T_HEREDOC_REDIRECT //maybe renaming all "redirect" to "redir" to shorten line lengths
 }	t_token_type;
 
 typedef enum e_builtin_type
@@ -144,6 +144,19 @@ typedef struct s_msh
 void	free_token(void *content);
 __attribute__((noreturn)) void	msh_quit(t_msh *msh, char *msg, int status);
 void	msh_print(t_msh *msh, char *msg, int status);
+void	print_num_error_exit(t_msh *msh, char *str);
+char	*get_env_var_value(t_msh *msh, char *name);
+void	print_env_vars(t_list *env_vars);
+char	*extract_env_name(char *str, size_t *name_len);
+char	*extract_env_value(char *str, size_t name_len);
+bool	check_and_update_env_var_value(t_msh *msh, char *name, char *value);
+void	prepare_name_and_add_to_env_vars(t_msh *msh, char *name, char *m_value);
+void	add_to_env_vars(t_msh *msh, char *name, char *value);
+void	build_envp_array(t_msh *msh);
+void	free_env_var(void *content);
+void	msh_free(t_msh *msh);
+void    free_envp(t_msh *msh);
+long	msh_atol(t_msh *msh, char *nptr);
 void	print_num_error_exit(t_msh *msh, char *str);
 
 // /src/redirection/redirection.c

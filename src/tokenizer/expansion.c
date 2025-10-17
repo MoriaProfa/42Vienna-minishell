@@ -6,13 +6,11 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 16:29:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/17 18:36:12 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 20:27:36 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
-
-char	*get_env_var_value(t_msh *msh, char *name);
 
 static void	add_to_result(char *tmp, char **result, t_msh *msh)
 {
@@ -37,10 +35,11 @@ static void	add_to_result(char *tmp, char **result, t_msh *msh)
 		*result = tmp;
 }
 
-static void	exp_getenv(t_token *token, char *var_name, char **result, t_msh *msh)
+static void	exp_getenv(t_token *token, char *var_name, char **result,
+		t_msh *msh)
 {
-	char		*env_value;
-	char		*tmp;
+	char	*env_value;
+	char	*tmp;
 
 	env_value = get_env_var_value(msh, var_name);
 	free(var_name);
@@ -58,15 +57,16 @@ static void	exp_getenv(t_token *token, char *var_name, char **result, t_msh *msh
 	}
 	else
 	{
-		if (*result && (*result[0] != '\0' || 
-				(token && token->quoted == Q_DOUBLE)))
+		if (*result && (*result[0] != '\0' || (token
+					&& token->quoted == Q_DOUBLE)))
 			return ;
 		free(*result);
 		*result = NULL;
 	}
 }
 
-static void	exp_getenv_value(t_token *token, char **value, char **result, t_msh *msh)
+static void	exp_getenv_value(t_token *token, char **value, char **result,
+		t_msh *msh)
 {
 	size_t	var_len;
 	char	*start;

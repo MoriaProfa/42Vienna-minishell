@@ -6,23 +6,11 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 03:12:35 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 20:31:56 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
-
-void	print_env_vars(t_list *env_vars);
-char	*extract_env_name(char *str, size_t *name_len);
-char	*extract_env_value(char *str, size_t name_len);
-bool	check_and_update_env_var_value(t_msh *msh, char *name, char *value);
-void	prepare_name_and_add_to_env_vars(t_msh *msh, char *name, char *m_value);
-void	add_to_env_vars(t_msh *msh, char *name, char *value);
-void	build_envp_array(t_msh *msh);
-void	free_env_var(void *content);
-void	msh_free(t_msh *msh);
-void    free_envp(t_msh *msh);
-long	msh_atol(t_msh *msh, char *nptr);
 
 char	*get_env_var_value(t_msh *msh, char *name)
 {
@@ -49,48 +37,6 @@ void	print_getcwd_error(char *builtin_name)
 	perror("");
 }
 
-/*bool	check_pwd_validity(const char *pwd)
-{
-	int	len;
-
-	if (!pwd || pwd[0] != '/')
-		return (false);
-	len = ft_strlen(pwd);
-	if (len >= PATH_MAX)//PATH_MAX is included in limits.h even if vs code doesnt recognize this
-		return (false);
-	if (ft_strnstr(pwd, "/./", len) || ft_strnstr(pwd, "/../", len))
-		return (false);
-	if (len >= 2 && !ft_strncmp(pwd + (len - 2), "/.", 2))
-		return (false);
-	if (len >= 3 && !ft_strncmp(pwd + (len - 3), "/..", 3))
-		return (false);
-	return (true);
-}*/
-
-/*void	msh_pwd(t_msh *msh)
-{
-	char	*pwd;
-
-	pwd = get_env_var_value(msh, "PWD");
-	if (check_pwd_validity(pwd))
-	{
-		ft_putendl_fd(pwd, STDOUT_FILENO);
-		free(pwd);
-		return ;
-	}
-	if (pwd)
-		free(pwd);
-	pwd = getcwd(NULL, 0);
-	if (!pwd)
-	{
-		print_getcwd_error("pwd");
-		msh->status = 1;
-		return ;
-	}
-	ft_putendl_fd(pwd, STDOUT_FILENO);
-	free(pwd);
-}*/
-
 void	msh_pwd(t_msh *msh)
 {
 	char	*pwd;
@@ -103,85 +49,6 @@ void	msh_pwd(t_msh *msh)
 	free(pwd);
 }
 
-char	*get_cd_path(t_msh *msh, char **args)
-{
-	char	*path;
-
-	if (!args[1])
-	{
-		path = get_env_var_value(msh, "HOME");
-		if (!path)
-			msh_print(msh, "cd: HOME not set", 1);
-	}
-	else if (args[1][0] == '\0')
-		return (NULL);
-	else if (args[1][0] == '-' && args[1][1] == '\0')
-	{
-		path = get_env_var_value(msh, "OLDPWD");
-		if (!path)
-			msh_print(msh, "cd: OLDPWD not set", 1);
-		else
-			ft_putendl_fd(path, STDOUT_FILENO);
-	}
-	else
-	{
-		path = ft_strdup(args[1]);
-		if (!path)
-			msh_print(msh, "cd: path malloc failed", 1);
-	}
-	return (path);
-}
-
-void	handle_cd_env_var_update(t_msh *msh, char *oldpwd)
-{
-	char	*newpwd;
-
-	if (!check_and_update_env_var_value(msh, "OLDPWD", oldpwd))
-		prepare_name_and_add_to_env_vars(msh, "OLDPWD", oldpwd);
-	newpwd = getcwd(NULL, 0);
-	if (!newpwd)
-		return (print_getcwd_error("cd"));
-	if (!check_and_update_env_var_value(msh, "PWD", newpwd))
-		prepare_name_and_add_to_env_vars(msh, "PWD", newpwd);
-}
-
-void	msh_cd(t_msh *msh, char **args)
-{
-	char	*path;
-	char	*oldpwd;
-	
-	if (args[2])
-		return (msh_print(msh, "cd: too many arguments", 1));
-	path = get_cd_path(msh, args);
-	if (!path)
-		return ;
-	oldpwd = get_env_var_value(msh, "PWD");
-	if (!oldpwd)
-	{
-		oldpwd = getcwd(NULL, 0);
-		if (!oldpwd)
-			return (free(path), print_getcwd_error("cd"));
-	}
-	msh->status = chdir(path);
-	if (msh->status != 0)
-		return (msh_print(msh, NULL, 1), 
-			ft_putstr_fd("minishell: cd: ", STDERR_FILENO), 
-			perror(path), free(oldpwd), free(path));
-	else
-	{
-		free(path);
-		handle_cd_env_var_update(msh, oldpwd);
-	}
-}
-
-void	print_num_error_exit(t_msh *msh, char *str)
-{
-	//ft_putendl_fd("exit", STDERR_FILENO);//tester doesnt accept "exit"
-	ft_putstr_fd("exit: ", STDERR_FILENO);
-	ft_putstr_fd(str, STDERR_FILENO);
-	msh_quit(msh, ": numeric argument required", 2);
-}
-
 bool	check_for_whitespace_end(char *str, int start)
 {
 	while(str[start])
@@ -191,46 +58,6 @@ bool	check_for_whitespace_end(char *str, int start)
 		start++;
 	}
 	return (true);
-}
-
-void	check_exit_code_validity(t_msh *msh, char *str)
-{
-	int	i;
-
-	if (str[0] == '\0')
-		print_num_error_exit(msh, str);
-	i = 0;
-	while (ft_strchr(" \t", str[i]))
-		i++;
-	if (str[i] != '+' && str[i] != '-')
-		i--;
-	while (str[++i])
-	{
-		if (ft_strchr(" \t", str[i]) && check_for_whitespace_end(str, i))
-			break ;
-		if (!ft_isdigit(str[i]))
-			print_num_error_exit(msh, str);
-	}
-}
-
-void	msh_exit(t_msh *msh, char **args)
-{
-	long	code;
-
-	if (!args[1])
-	{
-		ft_putendl_fd("exit", STDERR_FILENO);
-		msh_quit(msh, NULL, msh->status);
-	}
-	check_exit_code_validity(msh, args[1]);	
-	code = msh_atol(msh, args[1]);
-	if (args[2])
-	{
-		//ft_putendl_fd("exit", STDERR_FILENO);//tester doesnt accept "exit"
-		msh_print(msh, "exit: too many arguments", 1);
-	}
-	else
-		msh_quit(msh, NULL/*"exit"*/, (code % 256 + 256) % 256);//tester doesnt accept "exit"
 }
 
 void	populate_names_array(t_msh *msh, char **names_array, size_t size)
