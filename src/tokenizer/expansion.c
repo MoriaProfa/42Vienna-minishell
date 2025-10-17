@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 16:29:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/17 18:31:39 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 18:36:12 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,28 +90,28 @@ static void	exp_getenv_value(t_token *token, char **value, char **result, t_msh 
 
 char	*expand_value(t_token *token, char *value, char *result, t_msh *msh)
 {
-	char	*p;
+	char	*p_value;
 
-	p = value;
-	while (*p)
+	p_value = value;
+	while (*p_value)
 	{
-		if (*p == '$')
+		if (*p_value == '$')
 		{
-			if (*(p + 1) == '?')
+			if (*(p_value + 1) == '?')
 			{
 				add_to_result(ft_itoa(msh->status), &result, msh);
-				p += 2;
+				p_value += 2;
 			}
-			else if (ft_isalpha(*(p + 1)) || *(p + 1) == '_')
+			else if (ft_isalpha(*(p_value + 1)) || *(p_value + 1) == '_')
 			{
-				p++;
-				exp_getenv_value(token, &p, &result, msh);
+				p_value++;
+				exp_getenv_value(token, &p_value, &result, msh);
 			}
 			else
-				add_to_result(ft_substr(p++, 0, 1), &result, msh);
+				add_to_result(ft_substr(p_value++, 0, 1), &result, msh);
 		}
 		else
-			add_to_result(ft_substr(p++, 0, 1), &result, msh);
+			add_to_result(ft_substr(p_value++, 0, 1), &result, msh);
 	}
 	return (result);
 }
