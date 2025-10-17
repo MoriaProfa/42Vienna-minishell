@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 23:02:55 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 23:25:52 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,13 +141,10 @@ typedef struct s_msh
 	size_t			line_number;
 }					t_msh;
 
-void	expand_word_tokens(t_list *tokens, char *tmp, t_msh *msh);
-void	free_token(void *content);
 void	msh_free(t_msh *msh);
 void	msh_pid(t_msh *msh);
 void	msh_print(t_msh *msh, char *msg, int status);
 __attribute__((noreturn)) void	msh_quit(t_msh *msh, char *msg, int status);
-void	msh_tokenizer(t_msh *msh);
 
 // minishell.c
 
@@ -259,11 +256,25 @@ void	expand_word_tokens(t_list *tokens, char *tmp, t_msh *msh);
 void	check_quotationmarks(t_msh *msh);
 void	check_tokens(t_msh *msh);
 
+// src/tokenizer/tokenizer_handler.c
+int		handle_metacharacters(t_msh *msh);
+char	*handle_quoted(t_msh *msh, int *len);
+char	*handle_unquoted(t_msh *msh, int *len);
+
+// src/tokenizer/tokenizer_merger.c
+void	merge_adjacent_tokens(t_list **tokens, t_msh *msh);
+
+// src/tokenizer/tokenizer_utils.c
+void	fill_token_list(t_msh *msh, char *value, t_token_type type,	int *quoted_adjacent);
+char	*create_word_token(t_msh *msh);
+void	remove_quotationmarks_in_tokens(t_list *tokens);
+
 // src/tokenizer/tokenizer.c
 ssize_t	count_words(const char *s, const char *set);
 char	**ft_split_with_set(const char *s, const char *set, ssize_t word_count);
 void	correct_adjacency(t_list *cur_node, t_token *cur_token);
 bool	check_token_validity_for_split(t_token *cur_token);
+void	msh_tokenizer(t_msh *msh);
 
 // src/tokenizer/var_split.c
 void    split_expanded_tokens(t_list *tokens, t_msh *msh);

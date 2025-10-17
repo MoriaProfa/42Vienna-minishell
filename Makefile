@@ -18,8 +18,8 @@ MY_SOURCES = minishell.c \
 			src/command_table/cmd_parser.c \
 			src/command_table/cmd_pathname_builder.c \
 			src/command_table/cmd_table.c \
-			src/environment/env_var_helpers.c \
 			src/environment/env_var.c \
+			src/environment/env_var_helpers.c \
 			src/environment/envp.c \
 			src/execution/execution_utils.c \
 			src/execution/execution.c \
@@ -31,6 +31,9 @@ MY_SOURCES = minishell.c \
 			src/signals/signals.c \
 			src/tokenizer/expansion.c \
 			src/tokenizer/lexing.c \
+			src/tokenizer/tokenizer_handler.c \
+			src/tokenizer/tokenizer_merger.c \
+			src/tokenizer/tokenizer_utils.c \
 			src/tokenizer/tokenizer.c \
 			src/tokenizer/var_split_helpers.c \
 			src/tokenizer/var_split.c
