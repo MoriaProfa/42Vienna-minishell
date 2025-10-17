@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/16 22:16:42 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 14:17:47 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -299,8 +299,8 @@ void	merge_adjacent_tokens(t_list **tokens, t_msh *msh)
 	while (cur_node)
 	{
 		cur_token = (t_token *)cur_node->content;
-		if (cur_token->type == T_WORD && cur_token->is_adjacent
-			&& cur_node->prev
+		if (cur_token->type == T_WORD && cur_token->value && 
+			cur_token->is_adjacent && cur_node->prev
 			&& ((t_token *)cur_node->prev->content)->type == T_WORD)
 		{
 			prev_node = cur_node->prev;
