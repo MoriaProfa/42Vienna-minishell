@@ -13,15 +13,18 @@ MY_SOURCES = minishell.c \
 			src/builtins/builtins_helpers_errorprints.c \
 			src/builtins/builtins_helpers_prints.c \
 			src/builtins/builtins.c \
+			src/command_table/cmd_capacity.c \
+			src/command_table/cmd_free.c \
+			src/command_table/cmd_parser.c \
 			src/command_table/cmd_pathname_builder.c \
 			src/command_table/cmd_table.c \
+			src/environment/env_var_helpers.c \
 			src/environment/env_var.c \
 			src/environment/envp.c \
 			src/execution/execution_utils.c \
 			src/execution/execution.c \
 			src/heredoc/heredoc_collector.c \
-			src/heredoc/heredoc_utils.c \
-			src/heredoc/redirect_heredoc.c \
+			src/heredoc/heredoc_redirect.c \
 			src/redirection/redirect_infile.c \
 			src/redirection/redirect_outfile.c \
 			src/redirection/redirection.c \
