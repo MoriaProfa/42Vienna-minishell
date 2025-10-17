@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/16 22:16:01 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 14:25:43 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,7 +205,7 @@ void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens,
 	word_token = get_next_token(tokens);
 	if (!word_token)
 		return ;
-	if (!word_token->value || word_token->value[0] == '\0')
+	if (!word_token->value)
 		return (msh_print(msh, "minishell: ambiguous redirect", 1));
 	word = ft_strdup(word_token->value);
 	if (!word)
