@@ -6,13 +6,13 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/17 14:17:47 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 16:06:00 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
-void			expand_word_tokens(t_list *tokens, t_msh *msh);
+void			expand_word_tokens(t_list *tokens, char *tmp, t_msh *msh);
 void    split_expanded_tokens(t_list *tokens, t_msh *msh);
 
 // just for testing purposes
@@ -363,7 +363,7 @@ void	msh_tokenizer(t_msh *msh)
 	remove_quotationmarks_in_tokens(msh->tokens);
 //	printf("\nafter quote removal:");
 //	print_tokens(msh->tokens);
-	expand_word_tokens(msh->tokens, msh);
+	expand_word_tokens(msh->tokens, NULL, msh);
 //	printf("\nafter expansion:");
 //	print_tokens(msh->tokens);
 	split_expanded_tokens(msh->tokens, msh);

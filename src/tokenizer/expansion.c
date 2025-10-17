@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 16:29:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/17 15:36:49 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 16:06:47 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ static void	exp_getenv(t_token *token, char *var_name, char ***result, t_msh *ms
 			return ;
 		free(**result);
 		**result = NULL;
-	}	
+	}
 }
 
 static void	exp_getenv_value(t_token *token, char *value, char **result, size_t *i, t_msh *msh)
@@ -117,11 +117,10 @@ char	*expand_value(t_token *token, char *value, char *result, t_msh *msh)
 	return (result);
 }
 
-void	expand_word_tokens(t_list *tokens, t_msh *msh)
+void	expand_word_tokens(t_list *tokens, char *tmp, t_msh *msh)
 {
 	t_list	*cur_node;
 	t_token	*cur_token;
-	char	*tmp;
 	char	*expanded;
 
 	cur_node = tokens;
