@@ -6,13 +6,13 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 18:40:52 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 21:32:40 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 21:58:02 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
-char	*resolve_cmd_pathname(t_msh *msh, char **paths, char *cmd, 
+static char	*resolve_cmd_pathname(t_msh *msh, char **paths, char *cmd, 
 	char	*fallback)
 {
 	char	*pathname;
