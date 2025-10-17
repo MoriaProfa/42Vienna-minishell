@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 20:34:13 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/17 21:57:45 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,27 +16,8 @@
 
 #include "minishell.h"
 
-void	print_tokens(t_list *tokens);
-void	print_cmd_table(t_msh *msh);
-void	check_quotationmarks(t_msh *msh);
-void	check_tokens(t_msh *msh);
-void	msh_tokenizer(t_msh *msh);
-void	build_cmd_table(t_msh *msh);
-void    free_cmd_table(t_cmd **cmds, int n);
-void	run_command(t_msh *msh, int i);
-void	msh_pid(t_msh *msh);
-void	msh_execute(t_msh *msh, int i);
-int		collect_all_heredocs(t_msh *msh, int i);
-void	init_env_vars(t_msh *msh, char **envp);
-void	free_env_var(void *content);
-void	print_env_vars(t_list *env_vars);
-void    build_envp_array(t_msh *msh);
-void    free_envp(t_msh *msh);
-void	msh_builtins(t_msh *msh, int i);
-bool	check_for_whitespace_end(char *str, int start);
-void	restore_stdin_stdout(t_msh *msh);
-void	handle_signal_parent(int signal);
-void	close_heredocs(t_msh *msh);
+void	print_tokens(t_list *tokens);//for testing only
+void	print_cmd_table(t_msh *msh);//for testing only
 
 volatile sig_atomic_t   g_signal_flag = 0;
 

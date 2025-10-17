@@ -6,15 +6,11 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/17 14:25:43 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 21:31:48 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
-
-void	heredoc_collector(t_msh *msh, t_cmd **cmds);
-bool	compare_strings(char *s1, char *s2);
-char	*create_cmd_pathname(t_msh *msh, char *cmd);
 
 // just for testing purposes
 void	print_cmd_table(t_msh *msh)
