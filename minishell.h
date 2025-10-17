@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 22:24:17 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 22:35:05 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,29 +141,21 @@ typedef struct s_msh
 	size_t			line_number;
 }					t_msh;
 
-void	add_to_env_vars(t_msh *msh, char *name, char *value);
 void	build_cmd_table(t_msh *msh);
-void	build_envp_array(t_msh *msh);
 void	check_quotationmarks(t_msh *msh);
 void	check_tokens(t_msh *msh);
 int		collect_all_heredocs(t_msh *msh, int i);
 bool	compare_strings(char *s1, char *s2);
 void	expand_word_tokens(t_list *tokens, char *tmp, t_msh *msh);
-char	*extract_env_name(char *str, size_t *name_len);
-char	*extract_env_value(char *str, size_t name_len);
 void    free_cmd_table(t_cmd **cmds, int n);
-void	free_env_var(void *content);
-void    free_envp(t_msh *msh);
 void	free_token(void *content);
 void	heredoc_collector(t_msh *msh, t_cmd **cmds);
-void	init_env_vars(t_msh *msh, char **envp);
 void	msh_execute(t_msh *msh, int i);
 void	msh_free(t_msh *msh);
 void	msh_pid(t_msh *msh);
 void	msh_print(t_msh *msh, char *msg, int status);
 __attribute__((noreturn)) void	msh_quit(t_msh *msh, char *msg, int status);
 void	msh_tokenizer(t_msh *msh);
-void	prepare_name_and_add_to_env_vars(t_msh *msh, char *name, char *m_value);
 void	run_command(t_msh *msh, int i);
 void    split_expanded_tokens(t_list *tokens, t_msh *msh);
 void	heredoc_collector(t_msh *msh, t_cmd **cmds);
@@ -223,9 +215,20 @@ void	parse_single_cmd_tokens(t_cmd *cmd, t_list **tokens, t_msh *msh);
 // src/command_table/cmd_table.c
 void	build_cmd_table(t_msh *msh);
 
+// src/environment/env_var_helpers.c
+void	add_to_env_vars(t_msh *msh, char *name, char *value);
+void	prepare_and_add_to_env_vars(t_msh *msh, char *name, char *value);
+void	prepare_name_and_add_to_env_vars(t_msh *msh, char *name, char *m_value);
+char	*extract_env_value(char *str, size_t name_len);
+char	*extract_env_name(char *str, size_t *name_len);
+
 // src/environment/env_var.c
+void	free_env_var(void *content);
+void	init_env_vars(t_msh *msh, char **envp);
 
 // src/environment/envp.c
+void    free_envp(t_msh *msh);
+void	build_envp_array(t_msh *msh);
 
 // src/execution/execution_utils.c
 
