@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/16 23:41:24 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 13:56:21 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ void    build_envp_array(t_msh *msh);
 void    free_envp(t_msh *msh);
 void	msh_builtins(t_msh *msh, int i);
 bool	check_for_whitespace_end(char *str, int start);
+void	restore_stdin_stdout(t_msh *msh);
+void	handle_signal_parent(int signal);
 
 volatile sig_atomic_t   g_signal_flag = 0;
 
@@ -76,6 +78,7 @@ void	msh_quit(t_msh *msh, char *msg, int status)
 		fd = STDOUT_FILENO;
 	if (msg)
 		ft_putendl_fd(msg, fd);
+	restore_stdin_stdout(msh);
 	close(STDIN_FILENO);
 	close(STDOUT_FILENO);
 	close(STDERR_FILENO);
@@ -84,13 +87,6 @@ void	msh_quit(t_msh *msh, char *msg, int status)
 	msh_free(msh);
 	rl_clear_history();
 	exit(msh->status);
-}
-
-void	return_prompt(void)
-{
-	rl_replace_line("", 0);
-	ioctl(0, TIOCSTI, "\n");
-	rl_on_new_line();
 }
 
 void	msh_initialize(t_msh *msh)
@@ -106,15 +102,6 @@ void	msh_initialize(t_msh *msh)
 	msh->saved_stdout = -1;
 }
 
-void	handle_signal(int signal)
-{
-	if (signal == SIGINT)
-	{
-		g_signal_flag = signal;
-		return_prompt();
-	}	
-}
-
 int	main(int argc, char **argv, char **envp)
 {
 	t_msh				msh;
@@ -122,7 +109,7 @@ int	main(int argc, char **argv, char **envp)
 	if (argc > 1)
 		return (ft_putendl_fd("No arguments accepted.", STDERR_FILENO), 1);
 	(void)argv;
-	signal(SIGINT, handle_signal);
+	signal(SIGINT, handle_signal_parent);
 	signal(SIGQUIT, SIG_IGN);
 	ft_bzero(&msh, sizeof(t_msh));
 	init_env_vars(&msh, envp); //envp is also accessible with __environ (=global env variable)

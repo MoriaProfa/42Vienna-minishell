@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/16 22:16:11 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 13:58:04 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@ int		check_if_directory(char *path);
 void	print_execution_error(t_msh *msh, char *cmd, int option, int code);
 void	msh_print(t_msh *msh, char *msg, int status);
 bool	compare_strings(char *s1, char *s2);
-void	handle_signal(int signal);
+void	handle_signal_parent(int signal);
+void	handle_signal_child(int signal);
 
 void	msh_pid(t_msh *msh) // could be put in cmd_table
 {
@@ -85,13 +86,6 @@ void	msh_execute(t_msh *msh, int i)
 		msh_print(msh, NULL, 126);
 		return ;
 	}
-}
-void	handle_signal_child(int sig)
-{
-	if (sig == SIGINT)
-		g_signal_flag = sig;
-	rl_on_new_line();
-	rl_replace_line("", 0);
 }
 
 void	child_process(t_msh *msh, int i)
@@ -186,6 +180,6 @@ void	run_command(t_msh *msh, int i)
 	i = -1;
 	while (++i < msh->n_cmds && msh->pid && msh->pid[i] != -1)
 		msh_waitpid(msh, i);
-	signal(SIGINT, handle_signal);
+	signal(SIGINT, handle_signal_parent);
 	signal(SIGQUIT, SIG_IGN);
 }
