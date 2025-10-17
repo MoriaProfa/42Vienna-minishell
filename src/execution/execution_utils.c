@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 20:44:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 21:20:35 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/17 22:02:35 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,12 @@ int		check_if_directory(char *path);
 void	print_execution_error(t_msh *msh, char *cmd, int option, int code);
 void	msh_print(t_msh *msh, char *msg, int status);
 bool	compare_strings(char *s1, char *s2);
+
+void	close_and_exit(t_msh *msh, char *msg, int status)
+{
+	close_fds(msh);
+	msh_quit(msh, msg, status);
+}
 
 void	run_builtins(t_msh *msh, int i)
 {

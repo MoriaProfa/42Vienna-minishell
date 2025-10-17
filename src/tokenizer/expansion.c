@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 16:29:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/17 21:57:08 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/17 22:01:09 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,12 +33,6 @@ static void	add_to_result(char *tmp, char **result, t_msh *msh)
 	}
 	else
 		*result = tmp;
-}
-
-void	close_and_exit(t_msh *msh, char *msg, int status)
-{
-	close_fds(msh);
-	msh_quit(msh, msg, status);
 }
 
 static void	exp_getenv(t_token *token, char *var_name, char **result,

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 21:48:40 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 22:03:18 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,6 +169,7 @@ void    split_expanded_tokens(t_list *tokens, t_msh *msh);
 void	heredoc_collector(t_msh *msh, t_cmd **cmds);
 bool	compare_strings(char *s1, char *s2);
 char	*create_cmd_pathname(t_msh *msh, char *cmd);
+void	close_and_exit(t_msh *msh, char *msg, int status);
 
 
 // minishell.c
@@ -237,5 +238,8 @@ int	set_redirections(t_msh *msh, int i);
 // src/tokenizer/tokenizer.c
 
 // src/tokenizer/var_split.c
+
+// src/signals/signals.c
+void	handle_signal_parent(int signal);
 
 #endif
