@@ -6,13 +6,13 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 21:09:08 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 21:57:44 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
-void	msh_echo(t_msh *msh, char **args)
+static void	msh_echo(t_msh *msh, char **args)
 {
 	int		start;
 	bool	skip_newline;
@@ -37,7 +37,7 @@ void	msh_echo(t_msh *msh, char **args)
 		msh_print(msh, "", 0);
 }
 
-void	msh_pwd(t_msh *msh)
+static void	msh_pwd(t_msh *msh)
 {
 	char	*pwd;
 
@@ -49,7 +49,7 @@ void	msh_pwd(t_msh *msh)
 	free(pwd);
 }
 
-void	msh_unset(t_msh *msh, char **args)
+static void	msh_unset(t_msh *msh, char **args)
 {
 	int	i;
 
@@ -59,7 +59,7 @@ void	msh_unset(t_msh *msh, char **args)
 	msh->status = 0;
 }
 
-void	msh_exit(t_msh *msh, char **args)
+static void	msh_exit(t_msh *msh, char **args)
 {
 	long	code;
 
