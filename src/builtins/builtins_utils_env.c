@@ -21,8 +21,8 @@ char	*get_env_var_value(t_msh *msh, char *name)
 	while (cur_node)
 	{
 		cur_env_var = (t_env_var *)(cur_node->content);
-		if (cur_env_var && cur_env_var->name && cur_env_var-> value && 
-				!ft_strncmp(name, cur_env_var->name, ft_strlen(name) + 1))
+		if (cur_env_var && cur_env_var->name && cur_env_var->value
+			&& !ft_strncmp(name, cur_env_var->name, ft_strlen(name) + 1))
 			return (ft_strdup(cur_env_var->value));
 		cur_node = cur_node->next;
 	}
