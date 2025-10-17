@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/16 22:14:59 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 03:02:50 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,16 +41,12 @@ char	*get_env_var_value(t_msh *msh, char *name)
 	return (NULL);
 }
 
-void	print_getcwd_error(t_msh *msh, char *builtin_name)
+void	print_getcwd_error(char *builtin_name)
 {
 	ft_putstr_fd(builtin_name, STDERR_FILENO);
 	ft_putstr_fd(": error retrieving current directory: ", STDERR_FILENO);
 	ft_putstr_fd("getcwd: cannot access parent directories: ", STDERR_FILENO);
 	perror("");
-	if (!ft_strncmp(builtin_name, "cd", ft_strlen("cd") + 1))
-		msh_print(msh, NULL, 1);
-	else
-		msh_quit(msh, NULL, 1);
 }
 
 /*bool	check_pwd_validity(const char *pwd)
@@ -87,7 +83,7 @@ void	print_getcwd_error(t_msh *msh, char *builtin_name)
 	pwd = getcwd(NULL, 0);
 	if (!pwd)
 	{
-		print_getcwd_error(msh, "pwd");
+		print_getcwd_error("pwd");
 		msh->status = 1;
 		return ;
 	}
@@ -101,7 +97,7 @@ void	msh_pwd(t_msh *msh)
 
 	pwd = getcwd(NULL, 0);
 	if (!pwd)
-		print_getcwd_error(msh, "pwd");
+		print_getcwd_error("pwd");
 	ft_putendl_fd(pwd, STDOUT_FILENO);
 	msh->status = 0;
 	free(pwd);
@@ -144,7 +140,7 @@ void	handle_cd_env_var_update(t_msh *msh, char *oldpwd)
 		prepare_name_and_add_to_env_vars(msh, "OLDPWD", oldpwd);
 	newpwd = getcwd(NULL, 0);
 	if (!newpwd)
-		return (print_getcwd_error(msh, "cd"));
+		return (print_getcwd_error("cd"));
 	if (!check_and_update_env_var_value(msh, "PWD", newpwd))
 		prepare_name_and_add_to_env_vars(msh, "PWD", newpwd);
 }
@@ -164,7 +160,7 @@ void	msh_cd(t_msh *msh, char **args)
 	{
 		oldpwd = getcwd(NULL, 0);
 		if (!oldpwd)
-			return (free(path), print_getcwd_error(msh, "cd"));
+			return (free(path), print_getcwd_error("cd"));
 	}
 	msh->status = chdir(path);
 	if (msh->status != 0)
