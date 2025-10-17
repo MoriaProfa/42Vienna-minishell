@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 22:38:33 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/17 22:41:04 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -259,6 +259,8 @@ void	restore_stdin_stdout(t_msh *msh);
 int		set_redirections(t_msh *msh, int i);
 
 // src/tokenizer/expansion.c
+char	*expand_value(t_token *token, char *value, char *result, t_msh *msh);
+void	expand_word_tokens(t_list *tokens, char *tmp, t_msh *msh);
 
 // src/tokenizer/lexing.c
 
