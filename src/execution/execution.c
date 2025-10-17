@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 13:58:04 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/17 14:29:45 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,10 @@ void	msh_fork(t_msh *msh, int i)
 {
 	msh->pid[i] = fork();
 	if (msh->pid[i] == -1)
+	{
+		close_fds(msh);
 		msh_quit(msh, "fork failed", 1);
+	}
 	signal(SIGINT, SIG_IGN);
 	signal(SIGQUIT, SIG_IGN);
 	if (msh->pid[i] == 0)
@@ -136,7 +139,10 @@ void	msh_waitpid(t_msh *msh, int i)
 	int	signal;
 
 	if (waitpid(msh->pid[i], &wstatus, 0) == -1)
-		msh_quit(msh, "child waitpid failed", 1);
+	{
+		close_fds(msh);
+		msh_quit(msh, "waitpid failed", 1);
+	}
 	if (WIFEXITED(wstatus))
 		msh->status = WEXITSTATUS(wstatus);
 	else if (WIFSIGNALED(wstatus))
