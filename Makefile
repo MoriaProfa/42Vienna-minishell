@@ -25,10 +25,11 @@ MY_SOURCES = minishell.c \
 			src/execution/execution.c \
 			src/heredoc/heredoc_collector.c \
 			src/heredoc/heredoc_redirect.c \
+			src/msh_helpers/utils.c \
+			src/msh_helpers/signals.c \
 			src/redirection/redirect_infile.c \
 			src/redirection/redirect_outfile.c \
 			src/redirection/redirection.c \
-			src/signals/signals.c \
 			src/tokenizer/expansion.c \
 			src/tokenizer/lexing.c \
 			src/tokenizer/tokenizer_handler.c \
