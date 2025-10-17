@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 03:02:50 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/17 03:12:35 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -220,7 +220,7 @@ void	msh_exit(t_msh *msh, char **args)
 	if (!args[1])
 	{
 		ft_putendl_fd("exit", STDERR_FILENO);
-		msh_quit(msh, NULL, 0);
+		msh_quit(msh, NULL, msh->status);
 	}
 	check_exit_code_validity(msh, args[1]);	
 	code = msh_atol(msh, args[1]);
