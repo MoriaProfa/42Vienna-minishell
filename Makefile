@@ -28,11 +28,12 @@ MY_SOURCES = minishell.c \
 			src/redirection/redirect_infile.c \
 			src/redirection/redirect_outfile.c \
 			src/redirection/redirection.c \
+			src/signals/signals.c \
 			src/tokenizer/expansion.c \
 			src/tokenizer/lexing.c \
 			src/tokenizer/tokenizer.c \
-			src/tokenizer/var_split.c \
-			src/signals/signals.c	
+			src/tokenizer/var_split_helpers.c \
+			src/tokenizer/var_split.c
 
 MY_OBJECTS = $(MY_SOURCES:.c=.o)
 
