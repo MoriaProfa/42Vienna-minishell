@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 05:05:23 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 16:12:52 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/18 00:22:18 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void	close_heredocs(t_msh *msh)
 			close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
 	}
 }
-
+/*
 static int	set_heredocs(t_msh *msh, int i, int j)
 {
 	int	fd;
@@ -64,10 +64,9 @@ static int	set_heredocs(t_msh *msh, int i, int j)
 	}
 	return (fd);
 }
-
-int	redirect_heredoc(t_msh *msh, int i, int j)
+*/
+int	redirect_heredoc(t_msh *msh, int i)
 {
-	((t_cmd *)msh->cmd_table[i])->heredoc_read = set_heredocs(msh, i, j);
 	if (((t_cmd *)msh->cmd_table[i])->heredoc_read == -1)
 		return (1);
 	else if (((t_cmd *)msh->cmd_table[i])->last_input == T_HEREDOC_REDIRECT)

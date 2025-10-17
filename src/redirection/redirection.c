@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 22:31:16 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/18 00:19:12 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ int	set_redirections(t_msh *msh, int i)
 			return (return_value);
 	}
 	if (return_value == 0 && ((t_cmd *)msh->cmd_table[i])->n_hd > 0)
-		return_value += redirect_heredoc(msh, i, -1);
+		return_value += redirect_heredoc(msh, i);
 	if (msh->fd_in != -1)
 		close(msh->fd_in);
 	if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)

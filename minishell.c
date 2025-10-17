@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 22:49:06 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/18 01:19:17 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,7 +144,7 @@ int	main(int argc, char **argv, char **envp)
 			if (((t_cmd *)msh.cmd_table[0])->builtin.builtin == true && msh.n_cmds == 1)//why only if n_cmds is 1?
 			msh_builtins(&msh, 0);
 		}
-*/		if (!msh.error_check && collect_all_heredocs(&msh, -1) == 0)
+*/		if (!msh.error_check/* && collect_all_heredocs(&msh, -1) == 0*/)
 			run_command(&msh, -1);
 		msh_free(&msh);
 	}

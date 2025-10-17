@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 22:14:38 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/18 01:19:46 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ static void	expand_heredoc_input(t_msh *msh, char **value)
 	*value = expanded;
 }
 
-static char	*create_filename(int i, int j)
+char	*create_filename(int i, int j)
 {
 	char	*temp;
 	char	*name;
@@ -55,7 +55,7 @@ static char	*create_filename(int i, int j)
 	return (name);
 }
 
-static int	collect_one_heredoc(t_msh *msh, t_heredoc heredoc, int fd)
+int	collect_one_heredoc(t_msh *msh, t_heredoc heredoc, int fd)
 {
 	while (1)
 	{
@@ -63,10 +63,7 @@ static int	collect_one_heredoc(t_msh *msh, t_heredoc heredoc, int fd)
 		if (!heredoc.buffer)
 			return (print_warning_heredoc(heredoc, msh->line_number));
 		if (g_signal_flag)
-		{
-			close_heredocs(msh);
 			return (handle_signal_heredoc(msh, &heredoc.buffer, fd));
-		}
 		if (heredoc.expand == true && compare_strings(heredoc.buffer,
 				heredoc.delimiter) == false)
 			expand_heredoc_input(msh, &heredoc.buffer);
@@ -80,7 +77,6 @@ static int	collect_one_heredoc(t_msh *msh, t_heredoc heredoc, int fd)
 		ft_free(&heredoc.buffer);
 		msh->line_number++;
 	}
-	close(fd);
 	return (0);
 }
 

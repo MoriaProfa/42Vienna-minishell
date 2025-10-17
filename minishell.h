@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 22:54:15 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 01:28:10 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -229,13 +229,15 @@ void	print_execution_error(t_msh *msh, char *cmd, int option, int code);
 void	run_command(t_msh *msh, int i);
 
 // src/heredoc/heredoc_collector.c
+char	*create_filename(int i, int j);
+int		collect_one_heredoc(t_msh *msh, t_heredoc heredoc, int fd);
 int		collect_all_heredocs(t_msh *msh, int i);
 
 // src/heredoc/heredoc_redirect.c
 int		print_warning_heredoc(t_heredoc heredoc, size_t ln);
 bool	compare_strings(char *s1, char *s2);
 void	close_heredocs(t_msh *msh);
-int		redirect_heredoc(t_msh *msh, int i, int j);
+int		redirect_heredoc(t_msh *msh, int i);
 
 // src/redirection/redirect_infile.c
 int		redirect_infile(t_msh *msh, int i, int j);

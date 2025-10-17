@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_parser.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 22:10:32 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/17 22:17:57 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 01:38:20 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,12 +55,37 @@ static t_token	*get_next_token(t_list **tokens)
 	return (NULL);
 }
 
-static void	parse_heredoc_token(t_cmd *cmd, t_token *word_token, char *word)
+static int	parse_heredoc_token(t_cmd *cmd, t_token *word_token, char *word,
+		t_msh *msh)
 {
 	if (word_token->quoted == Q_NONE)
 		cmd->heredocs[cmd->n_hd].expand = 1;
-	cmd->heredocs[cmd->n_hd++].delimiter = word;
+	cmd->heredocs[cmd->n_hd].delimiter = word;
+	cmd->heredocs[cmd->n_hd].filename = create_filename(msh->n_cmds, cmd->n_hd);
+	if (!cmd->heredocs[cmd->n_hd].filename)
+		msh_quit(msh, "failed to create temporary filename", 1);
+	if (cmd->heredoc_read != -1)
+		close(cmd->heredoc_read);
+	cmd->heredoc_read = open(cmd->heredocs[cmd->n_hd].filename,
+			O_RDWR | O_CREAT | O_TRUNC, 0600);
+	if (cmd->heredoc_read == -1)
+		msh_quit(msh, "failed to create temporary heredoc file", 1);
+	if (collect_one_heredoc(msh, cmd->heredocs[cmd->n_hd],
+			cmd->heredoc_read) == 1)
+		return (1);
+	printf("cmd->heredoc_read = %d\n", cmd->heredoc_read);
+	close(cmd->heredoc_read);
+	cmd->heredoc_read = open(cmd->heredocs[cmd->n_hd].filename, O_RDONLY);
+	if (cmd->heredoc_read == -1)
+	{
+		msh_print(msh, "failed to open temporary heredoc file", 1);
+		return (1);
+	}
+	else
+		unlink(cmd->heredocs[cmd->n_hd].filename);
+	cmd->n_hd++;
 	cmd->last_input = T_HEREDOC_REDIRECT;
+	return (0);
 }
 
 static void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens,
@@ -89,7 +114,10 @@ static void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens,
 		cmd->redirs[cmd->n_redirs++].type = token->type;
 	}
 	else if (token->type == T_HEREDOC_REDIRECT)
-		parse_heredoc_token(cmd, word_token, word);
+	{
+		if (parse_heredoc_token(cmd, word_token, word, msh) == 1)
+			return ;
+	}
 }
 
 void	parse_single_cmd_tokens(t_cmd *cmd, t_list **tokens, t_msh *msh)
@@ -102,7 +130,7 @@ void	parse_single_cmd_tokens(t_cmd *cmd, t_list **tokens, t_msh *msh)
 		token = (*tokens)->content;
 		if (token->type == T_WORD)
 		{
-			if (token->value/* && token->value[0] != '\0'*/)
+			if (token->value /* && token->value[0] != '\0'*/)
 			{
 				cmd->args[cmd->n_args] = ft_strdup(token->value);
 				if (!cmd->args[cmd->n_args++])
@@ -118,4 +146,3 @@ void	parse_single_cmd_tokens(t_cmd *cmd, t_list **tokens, t_msh *msh)
 	if (cmd->args && cmd->args[0])
 		cmd->builtin = builtin_check(cmd->args[0]);
 }
-
