@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/17 23:16:14 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 02:00:39 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,8 +106,7 @@ void	msh_tokenizer(t_msh *msh)
 		{
 			quoted_adjacent[0] = set_quoted(*msh->cpy_in_str);
 			word = create_word_token(msh);
-			fill_token_list(msh, word, T_WORD, quoted_adjacent);
-			free(word);
+			(fill_token_list(msh, word, T_WORD, quoted_adjacent), free(word));
 		}
 	}
 //	printf("\nraw tokens:");

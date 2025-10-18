@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 01:10:09 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 01:54:08 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,6 +145,7 @@ typedef struct s_msh
 void	msh_cd(t_msh *msh, char **args);
 
 // src/builtins/builtins_export.c
+void	handle_export_with_value(char *arg, t_msh *msh);
 void	msh_export(t_msh *msh, char **args);
 
 // src/builtins/builtins_utils_atol.c

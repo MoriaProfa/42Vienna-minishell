@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 23:56:52 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 01:44:41 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,8 +76,7 @@ static void	msh_exit(t_msh *msh, char **args)
 		msh_print(msh, "exit: too many arguments", 1);
 	}
 	else
-		msh_quit(msh, NULL /*"exit"*/, (code % 256 + 256) % 256);
-			// tester doesnt accept "exit"
+		msh_quit(msh, NULL/*, "exit"*/, (code % 256 + 256) % 256);// tester doesnt accept "exit"
 }
 
 void	msh_builtins(t_msh *msh, int i)

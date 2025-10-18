@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 20:43:19 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/18 01:37:25 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 01:53:48 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ static void	handle_export_wo_args(t_msh *msh)
 	ft_array_free(names_array, size);
 }
 
-static void	handle_export_with_value(char *arg, t_msh *msh)
+void	handle_export_with_value(char *arg, t_msh *msh)
 {
 	size_t	name_len;
 	char	*value;
