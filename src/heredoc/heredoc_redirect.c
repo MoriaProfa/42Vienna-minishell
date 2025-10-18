@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc_redirect.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 05:05:23 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 05:09:06 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/18 15:09:41 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ int	redirect_heredoc(t_msh *msh, int i)
 {
 	if (((t_cmd *)msh->cmd_table[i])->heredoc_read == -1)
 		return (1);
-	else if (((t_cmd *)msh->cmd_table[i])->last_input == T_HEREDOC_REDIRECT)
+	else if (((t_cmd *)msh->cmd_table[i])->last_input == T_HEREDOC)
 	{
 		dup2(((t_cmd *)msh->cmd_table[i])->heredoc_read, STDIN_FILENO);
 		close(((t_cmd *)msh->cmd_table[i])->heredoc_read);

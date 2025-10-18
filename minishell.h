@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 12:12:44 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 15:10:16 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,10 +50,10 @@ typedef enum e_token_type
 	T_NONE,
 	T_WORD,
 	T_PIPE,
-	T_IN_REDIRECT,
-	T_OUT_REDIRECT,
-	T_APPEND_REDIRECT,
-	T_HEREDOC_REDIRECT
+	T_IN_REDIR,
+	T_OUT_REDIR,
+	T_APPEND_REDIR,
+	T_HEREDOC
 }	t_token_type;
 //maybe renaming all "redirect" to "redir" to shorten line lengths
 typedef enum e_builtin_type

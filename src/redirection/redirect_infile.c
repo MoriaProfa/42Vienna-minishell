@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirect_infile.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 05:03:32 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 21:28:59 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/18 15:10:00 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ int	redirect_infile(t_msh *msh, int i, int j)
 	msh->fd_in = set_infile(((t_cmd *)msh->cmd_table[i]), j);
 	if (msh->fd_in == -1)
 		return (1);
-	else if (((t_cmd *)msh->cmd_table[i])->last_input == T_IN_REDIRECT)
+	else if (((t_cmd *)msh->cmd_table[i])->last_input == T_IN_REDIR)
 		dup2(msh->fd_in, STDIN_FILENO);
 	return (0);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirect_outfile.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 00:52:04 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 21:30:28 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/18 15:10:16 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,10 @@ static int	set_outfile(t_cmd *cmd, int j)
 	fd = -1;
 	if (fd != -1)
 		close(fd);
-	if (cmd->redirs[j].type == T_OUT_REDIRECT)
+	if (cmd->redirs[j].type == T_OUT_REDIR)
 		fd = open(cmd->redirs[j].filename, O_RDWR | O_CREAT | O_TRUNC,
 				0644);
-	else if (cmd->redirs[j].type == T_APPEND_REDIRECT)
+	else if (cmd->redirs[j].type == T_APPEND_REDIR)
 		fd = open(cmd->redirs[j].filename, O_RDWR | O_CREAT | O_APPEND,
 				0644);
 	if (fd == -1)

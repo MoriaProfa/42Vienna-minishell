@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 16:29:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/17 22:45:46 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 15:09:41 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,7 +130,7 @@ void	expand_word_tokens(t_list *tokens, char *tmp, t_msh *msh)
 			&& ft_strchr(cur_token->value, '$'))
 		{
 			if (!cur_node->prev || (cur_node->prev
-					&& ((t_token *)cur_node->prev->content)->type != T_HEREDOC_REDIRECT))
+					&& ((t_token *)cur_node->prev->content)->type != T_HEREDOC))
 			{
 				tmp = ft_strdup("");
 				if (!tmp)
