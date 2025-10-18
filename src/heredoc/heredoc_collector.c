@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 00:10:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 22:14:38 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/18 03:26:03 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,22 @@ static char	*create_filename(int i, int j)
 	return (name);
 }
 
+void	unlink_heredocs(t_msh *msh)
+{
+	int	i;
+	int	j;
+
+	i = -1;
+	j = -1;
+	while ((t_cmd *)msh->cmd_table[++i])
+	{
+		while (((t_cmd *)msh->cmd_table[i])->heredocs[++j].filename)
+		{
+			unlink(((t_cmd *)msh->cmd_table[i])->heredocs[j].filename);
+		}
+	}
+}
+
 static int	collect_one_heredoc(t_msh *msh, t_heredoc heredoc, int fd)
 {
 	while (1)
@@ -64,6 +80,7 @@ static int	collect_one_heredoc(t_msh *msh, t_heredoc heredoc, int fd)
 			return (print_warning_heredoc(heredoc, msh->line_number));
 		if (g_signal_flag)
 		{
+			unlink(heredoc.filename);
 			close_heredocs(msh);
 			return (handle_signal_heredoc(msh, &heredoc.buffer, fd));
 		}
