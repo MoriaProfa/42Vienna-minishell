@@ -6,14 +6,14 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 18:40:52 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 21:58:02 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 15:07:55 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
-static char	*resolve_cmd_pathname(t_msh *msh, char **paths, char *cmd, 
-	char	*fallback)
+static char	*resolve_cmd_pathname(t_msh *msh, char **paths, char *cmd,
+		char *fallback)
 {
 	char	*pathname;
 	char	*tmp;
@@ -24,13 +24,13 @@ static char	*resolve_cmd_pathname(t_msh *msh, char **paths, char *cmd,
 	{
 		tmp = ft_strjoin(paths[j], "/");
 		if (!tmp)
-			(ft_array_free(paths, ft_array_size(paths)),
-				msh_quit(msh, "pathname tmp ft_strjoin malloc failed", 1));
+			(ft_array_free(paths, ft_array_size(paths)), msh_quit(msh,
+					"pathname tmp ft_strjoin malloc failed", 1));
 		pathname = ft_strjoin(tmp, cmd);
 		free(tmp);
 		if (!pathname)
-			(ft_array_free(paths, ft_array_size(paths)),
-				msh_quit(msh, "pathname ft_strjoin malloc failed", 1));
+			(ft_array_free(paths, ft_array_size(paths)), msh_quit(msh,
+					"pathname ft_strjoin malloc failed", 1));
 		if (access(pathname, X_OK) == 0)
 			return (free(fallback), pathname);
 		else if (!fallback && access(pathname, F_OK) == 0)
@@ -83,6 +83,6 @@ char	*create_cmd_pathname(t_msh *msh, char *cmd)
 	}
 	while (msh->envp[j] && ft_strncmp(msh->envp[j], "PATH=", 5) != 0)
 		j++;
-	pathname = search_cmd_pathname(msh, cmd, msh->envp[j]);	
+	pathname = search_cmd_pathname(msh, cmd, msh->envp[j]);
 	return (pathname);
 }

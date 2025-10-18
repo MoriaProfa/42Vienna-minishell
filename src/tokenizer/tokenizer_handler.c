@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 23:05:58 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/17 23:10:34 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 15:10:16 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,19 +36,19 @@ int	handle_metacharacters(t_msh *msh)
 	ft_memset(quoted_adjacent, 0, sizeof(quoted_adjacent));
 	if (*msh->cpy_in_str == '<' && *(msh->cpy_in_str + 1) == '<')
 	{
-		fill_token_list(msh, "<<", T_HEREDOC_REDIRECT, quoted_adjacent);
+		fill_token_list(msh, "<<", T_HEREDOC, quoted_adjacent);
 		msh->cpy_in_str += 2;
 		return (1);
 	}
 	if (*msh->cpy_in_str == '>' && *(msh->cpy_in_str + 1) == '>')
 	{
-		fill_token_list(msh, ">>", T_APPEND_REDIRECT, quoted_adjacent);
+		fill_token_list(msh, ">>", T_APPEND_REDIR, quoted_adjacent);
 		msh->cpy_in_str += 2;
 		return (1);
 	}
-	if (handle_single_metacharacter(msh, '<', T_IN_REDIRECT))
+	if (handle_single_metacharacter(msh, '<', T_IN_REDIR))
 		return (1);
-	if (handle_single_metacharacter(msh, '>', T_OUT_REDIRECT))
+	if (handle_single_metacharacter(msh, '>', T_OUT_REDIR))
 		return (1);
 	if (handle_single_metacharacter(msh, '|', T_PIPE))
 		return (1);

@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 20:43:19 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/18 01:53:48 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 15:03:29 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,8 @@ static void	populate_names_array(t_msh *msh, char **names_array, size_t size)
 	while (i < size && cur_node)
 	{
 		cur_env_var = (t_env_var *)(cur_node->content);
-		if (cur_env_var && cur_env_var->name && ft_strncmp(cur_env_var->name, 
-			"_", ft_strlen(cur_env_var->name) + 1))
+		if (cur_env_var && cur_env_var->name && ft_strncmp(cur_env_var->name,
+				"_", ft_strlen(cur_env_var->name) + 1))
 		{
 			names_array[i] = ft_strdup(cur_env_var->name);
 			if (!names_array[i])
@@ -108,7 +108,7 @@ void	msh_export(t_msh *msh, char **args)
 	int		i;
 
 	if (!args[1])
-		return(handle_export_wo_args(msh));
+		return (handle_export_wo_args(msh));
 	i = 0;
 	while (args[++i])
 	{

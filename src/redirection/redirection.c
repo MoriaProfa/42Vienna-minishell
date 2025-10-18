@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirection.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 05:09:51 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/18 15:10:00 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ int	set_redirections(t_msh *msh, int i)
 		redirect_pipes(msh, i);
 	while (((t_cmd *)msh->cmd_table[i])->redirs[++j].filename)
 	{
-		if (((t_cmd *)msh->cmd_table[i])->redirs[j].type == T_IN_REDIRECT)
+		if (((t_cmd *)msh->cmd_table[i])->redirs[j].type == T_IN_REDIR)
 			return_value += redirect_infile(msh, i, j);
 		else
 			return_value += redirect_outfile(msh, i, j);

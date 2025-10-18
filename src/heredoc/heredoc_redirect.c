@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 05:05:23 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 13:39:43 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/18 15:40:13 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ int	redirect_heredoc(t_msh *msh, int i)
 {
 	if (((t_cmd *)msh->cmd_table[i])->heredoc_read == -1)
 		return (1);
-	else if (((t_cmd *)msh->cmd_table[i])->last_input == T_HEREDOC_REDIRECT)
+	else if (((t_cmd *)msh->cmd_table[i])->last_input == T_HEREDOC)
 	{
 		dup2(((t_cmd *)msh->cmd_table[i])->heredoc_read, STDIN_FILENO);
 		close(((t_cmd *)msh->cmd_table[i])->heredoc_read);

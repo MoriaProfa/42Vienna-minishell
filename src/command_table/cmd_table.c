@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/17 22:18:34 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 15:10:00 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ void	print_cmd_table(t_msh *msh)
 			printf("\n");
 		}
 		printf("\tlast_input: %i\n", cmd->last_input);
-		// 0 if T_NONE, 3 if T_IN_REDIRECT, 6 if T_HEREDOC_REDIRECT
+		// 0 if T_NONE, 3 if T_IN_REDIR, 6 if T_HEREDOC
 		if (cmd->pathname)
 			printf("\tpathname: %s\n", cmd->pathname);
 		i++;
@@ -67,14 +67,14 @@ static t_cmd	*init_cmd_data(t_msh *msh, t_cmd *cmd)
 	cmd->capacity_redirs = 4;
 	cmd->redirs = ft_calloc(cmd->capacity_redirs, sizeof(t_redir));
 	if (!cmd->redirs)
-		(free(cmd->args), free(cmd), 
-			msh_quit(msh, "malloc for cmd->redirs failed", 1));
+		(free(cmd->args), free(cmd), msh_quit(msh,
+				"malloc for cmd->redirs failed", 1));
 	cmd->capacity_hd = 4;
 	cmd->heredocs = ft_calloc(cmd->capacity_hd, sizeof(t_heredoc));
 	if (!cmd->heredocs)
-		(free(cmd->redirs), free(cmd->args), free(cmd), 
-			msh_quit(msh, "malloc for cmd->heredocs failed", 1));
-	cmd->last_input = T_NONE;//should be set to that in the beginning already?
+		(free(cmd->redirs), free(cmd->args), free(cmd), msh_quit(msh,
+				"malloc for cmd->heredocs failed", 1));
+	cmd->last_input = T_NONE; // should be set to that in the beginning already?
 	return (cmd);
 }
 
@@ -108,8 +108,7 @@ void	build_cmd_table(t_msh *msh)
 		parse_single_cmd_tokens(msh->cmd_table[msh->n_cmds - 1], &tokens, msh);
 		if (msh->cmd_table[msh->n_cmds - 1]->args[0])
 			msh->cmd_table[msh->n_cmds - 1]->pathname = create_cmd_pathname(msh,
-				msh->cmd_table[msh->n_cmds - 1]->args[0]);
+					msh->cmd_table[msh->n_cmds - 1]->args[0]);
 		msh->cmd_table[msh->n_cmds - 1]->heredoc_read = -1;
 	}
 }
-

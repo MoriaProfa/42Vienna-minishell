@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 22:10:32 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/17 22:17:57 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 15:10:16 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ static void	parse_heredoc_token(t_cmd *cmd, t_token *word_token, char *word)
 	if (word_token->quoted == Q_NONE)
 		cmd->heredocs[cmd->n_hd].expand = 1;
 	cmd->heredocs[cmd->n_hd++].delimiter = word;
-	cmd->last_input = T_HEREDOC_REDIRECT;
+	cmd->last_input = T_HEREDOC;
 }
 
 static void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens,
@@ -77,18 +77,18 @@ static void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens,
 	word = ft_strdup(word_token->value);
 	if (!word)
 		msh_quit(msh, "word_token->value ft_strdup malloc failed", 1);
-	if (token->type == T_IN_REDIRECT)
+	if (token->type == T_IN_REDIR)
 	{
 		cmd->redirs[cmd->n_redirs].filename = word;
-		cmd->redirs[cmd->n_redirs++].type = T_IN_REDIRECT;
-		cmd->last_input = T_IN_REDIRECT;
+		cmd->redirs[cmd->n_redirs++].type = T_IN_REDIR;
+		cmd->last_input = T_IN_REDIR;
 	}
-	else if (token->type == T_OUT_REDIRECT || token->type == T_APPEND_REDIRECT)
+	else if (token->type == T_OUT_REDIR || token->type == T_APPEND_REDIR)
 	{
 		cmd->redirs[cmd->n_redirs].filename = word;
 		cmd->redirs[cmd->n_redirs++].type = token->type;
 	}
-	else if (token->type == T_HEREDOC_REDIRECT)
+	else if (token->type == T_HEREDOC)
 		parse_heredoc_token(cmd, word_token, word);
 }
 
@@ -102,7 +102,7 @@ void	parse_single_cmd_tokens(t_cmd *cmd, t_list **tokens, t_msh *msh)
 		token = (*tokens)->content;
 		if (token->type == T_WORD)
 		{
-			if (token->value/* && token->value[0] != '\0'*/)
+			if (token->value /* && token->value[0] != '\0'*/)
 			{
 				cmd->args[cmd->n_args] = ft_strdup(token->value);
 				if (!cmd->args[cmd->n_args++])
@@ -118,4 +118,3 @@ void	parse_single_cmd_tokens(t_cmd *cmd, t_list **tokens, t_msh *msh)
 	if (cmd->args && cmd->args[0])
 		cmd->builtin = builtin_check(cmd->args[0]);
 }
-
