@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 16:16:11 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 16:28:36 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,11 +75,11 @@ static void	msh_exit(t_msh *msh, char **args)
 	code = msh_atol(msh, args[1]);
 	if (args[2])
 	{
-		// ft_putendl_fd("exit", STDERR_FILENO);
+		ft_putendl_fd("exit", STDERR_FILENO);
 		msh_print(msh, "exit: too many arguments", 1);
 	}
 	else
-		msh_quit(msh, NULL /*, "exit"*/, (code % 256 + 256) % 256);
+		msh_quit(msh, "exit", (code % 256 + 256) % 256);
 }
 
 void	msh_builtins(t_msh *msh, int i)
