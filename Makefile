@@ -27,8 +27,7 @@ MY_SOURCES = minishell.c \
 			src/heredoc/heredoc_redirect.c \
 			src/msh_utils/msh_utils.c \
 			src/msh_utils/signals.c \
-			src/redirection/redirect_infile.c \
-			src/redirection/redirect_outfile.c \
+			src/redirection/redirect_files.c \
 			src/redirection/redirection.c \
 			src/tokenizer/expansion.c \
 			src/tokenizer/lexing.c \
