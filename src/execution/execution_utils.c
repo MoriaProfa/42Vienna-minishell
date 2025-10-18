@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 20:44:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 23:16:45 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/18 06:45:01 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,21 @@
 
 void	close_and_exit(t_msh *msh, char *msg, int status)
 {
+	int	i;
+	int	j;
+
+	i = 0;
+	while ((t_cmd *)msh->cmd_table[i])
+	{
+		j = 0;
+		while (((t_cmd *)msh->cmd_table[i])->heredocs)
+		{
+			if (((t_cmd *)msh->cmd_table[i])->heredocs[j].filename)
+				unlink(((t_cmd *)msh->cmd_table[i])->heredocs->filename);
+			j++;
+		}
+		i++;
+	}
 	close_heredocs(msh);
 	msh_quit(msh, msg, status);
 }
