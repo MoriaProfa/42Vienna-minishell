@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirection.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 15:10:00 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 16:47:59 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ void	save_stdin_stdout(t_msh *msh, int i)
 	{
 		msh->saved_stdout = dup(STDOUT_FILENO);
 		msh->saved_stdin = dup(STDIN_FILENO);
+		if (msh->saved_stdout == -1 || msh->saved_stdin == -1)
+			msh_quit(msh, "dup failed", 1);
 	}
 }
 

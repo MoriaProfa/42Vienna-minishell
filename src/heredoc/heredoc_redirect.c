@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc_redirect.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 05:05:23 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 16:22:23 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 17:43:31 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,10 +36,13 @@ void	close_heredocs(t_msh *msh)
 	int	i;
 
 	i = -1;
-	while ((t_cmd *)msh->cmd_table[++i])
+	if (msh->cmd_table)
 	{
-		if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
-			close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
+		while (++i < msh->n_cmds)
+		{
+			if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
+				close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
+		}
 	}
 }
 
