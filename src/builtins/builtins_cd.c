@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 20:22:27 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/17 20:29:49 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 12:08:15 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ static void	handle_cd_env_var_update(t_msh *msh, char *oldpwd)
 		prepare_name_and_add_to_env_vars(msh, "OLDPWD", oldpwd);
 	newpwd = getcwd(NULL, 0);
 	if (!newpwd)
-		return (print_getcwd_error("cd"));
+		return (print_getcwd_error("cd", msh));
 	if (!check_and_update_env_var_value(msh, "PWD", newpwd))
 		prepare_name_and_add_to_env_vars(msh, "PWD", newpwd);
 }
@@ -69,7 +69,7 @@ void	msh_cd(t_msh *msh, char **args)
 	{
 		oldpwd = getcwd(NULL, 0);
 		if (!oldpwd)
-			return (free(path), print_getcwd_error("cd"));
+			return (free(path), print_getcwd_error("cd", msh));
 	}
 	msh->status = chdir(path);
 	if (msh->status != 0)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 05:21:55 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/18 12:07:39 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,7 +163,7 @@ bool	check_and_update_env_var_value(t_msh *msh, char *name, char *value);
 void	check_and_delete_env_var(t_msh *msh, char *name);
 
 // src/builtins/builtins_utils_errorprints.c
-void	print_getcwd_error(char *builtin_name);
+void	print_getcwd_error(char *builtin_name, t_msh *msh);
 void	print_num_error_exit(t_msh *msh, char *str);
 void	print_export_error(t_msh *msh, char *str);
 
