@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 01:44:41 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 11:52:43 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,9 +44,12 @@ static void	msh_pwd(t_msh *msh)
 	pwd = getcwd(NULL, 0);
 	if (!pwd)
 		print_getcwd_error("pwd");
-	ft_putendl_fd(pwd, STDOUT_FILENO);
-	msh->status = 0;
-	free(pwd);
+	else
+	{
+		ft_putendl_fd(pwd, STDOUT_FILENO);
+		msh->status = 0;
+		free(pwd);
+	}
 }
 
 static void	msh_unset(t_msh *msh, char **args)
