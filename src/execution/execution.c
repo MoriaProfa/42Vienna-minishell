@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 22:48:58 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/18 04:35:17 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,9 @@ static void	child_process(t_msh *msh, int i)
 	{
 		signal(SIGPIPE, SIG_IGN);
 		msh_builtins(msh, i);
+		signal(SIGPIPE, SIG_DFL);
 	}
+	close_heredocs(msh);
 	close_fds(msh);
 	msh_quit(msh, NULL, msh->status);
 }

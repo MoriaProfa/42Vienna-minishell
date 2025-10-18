@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 13:54:05 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 02:12:47 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/18 04:22:54 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ void	handle_signal_child(int signal)
 int	handle_signal_heredoc(t_msh *msh, char **buffer)
 {
 	ft_free(buffer);
+	close_heredocs(msh);
 	msh->status = 128 + g_signal_flag;
 	g_signal_flag = 0;
 	return (1);	
