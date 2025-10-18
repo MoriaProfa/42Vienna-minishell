@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 05:05:23 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 17:42:14 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/18 17:43:31 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void	close_heredocs(t_msh *msh)
 	i = -1;
 	if (msh->cmd_table)
 	{
-		while ((t_cmd *)msh->cmd_table[++i])
+		while (++i < msh->n_cmds)
 		{
 			if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
 				close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
