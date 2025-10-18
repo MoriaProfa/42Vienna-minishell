@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 20:44:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 16:22:01 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 16:33:09 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ bool	special_case_check(t_msh *msh, char *pathname, char *cmd)
 	}
 	if (compare_strings(cmd, ".") == true)
 	{
-		ft_putstr_fd(": filename argument required", STDERR_FILENO);
+		ft_putstr_fd(".: filename argument required", STDERR_FILENO);
 		msh_print(msh, "\n.: usage: . filename [arguments]", 2);
 		return (true);
 	}
