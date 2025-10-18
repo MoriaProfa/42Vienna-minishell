@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 05:03:32 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 15:10:00 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 16:22:28 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@ static int	set_infile(t_cmd *cmd, int j)
 	fd = open(cmd->redirs[j].filename, O_RDONLY);
 	if (fd == -1)
 	{
-		ft_putstr_fd("minishell: ", STDERR_FILENO);
 		perror(cmd->redirs[j].filename);
 		return (fd);
 	}

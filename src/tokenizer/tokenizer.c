@@ -6,32 +6,11 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 21:25:30 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/18 02:00:39 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 16:18:46 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
-
-// just for testing purposes
-void	print_tokens(t_list *tokens)
-{
-	t_list	*cur_node;
-	t_token	*cur_token;
-	int		i;
-
-	cur_node = tokens;
-	i = 1;
-	printf("\nToken list:\n");
-	while (cur_node)
-	{
-		cur_token = (t_token *)(cur_node->content);
-		if (cur_token)
-			printf("Token #%i:\n\tValue: %s, Type: %d, Quotes: %d, is adjacent: %d\n", i, cur_token->value, cur_token->type, cur_token->quoted,
-				cur_token->is_adjacent);
-		cur_node = cur_node->next;
-		i++;
-	}
-}
 
 void	free_token(void *content)
 {
@@ -109,17 +88,17 @@ void	msh_tokenizer(t_msh *msh)
 			(fill_token_list(msh, word, T_WORD, quoted_adjacent), free(word));
 		}
 	}
-//	printf("\nraw tokens:");
-//	print_tokens(msh->tokens);
+	//	printf("\nraw tokens:");
+	//	print_tokens(msh->tokens);
 	remove_quotationmarks_in_tokens(msh->tokens);
-//	printf("\nafter quote removal:");
-//	print_tokens(msh->tokens);
+	//	printf("\nafter quote removal:");
+	//	print_tokens(msh->tokens);
 	expand_word_tokens(msh->tokens, NULL, msh);
-//	printf("\nafter expansion:");
-//	print_tokens(msh->tokens);
+	//	printf("\nafter expansion:");
+	//	print_tokens(msh->tokens);
 	split_expanded_tokens(msh->tokens, msh);
-//	printf("\nafter variable splitting:");
-//	print_tokens(msh->tokens);
+	//	printf("\nafter variable splitting:");
+	//	print_tokens(msh->tokens);
 	merge_adjacent_tokens(&msh->tokens, msh);
-//	printf("\nafter adjacency handling:");
+	//	printf("\nafter adjacency handling:");
 }

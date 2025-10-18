@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 20:44:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 06:45:01 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/18 16:22:01 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ bool	special_case_check(t_msh *msh, char *pathname, char *cmd)
 	}
 	if (compare_strings(cmd, ".") == true)
 	{
-		ft_putstr_fd("minishell: .: filename argument required", STDERR_FILENO);
+		ft_putstr_fd(": filename argument required", STDERR_FILENO);
 		msh_print(msh, "\n.: usage: . filename [arguments]", 2);
 		return (true);
 	}
@@ -85,19 +85,16 @@ void	print_execution_error(t_msh *msh, char *cmd, int option, int code)
 	}
 	if (option == 2)
 	{
-		ft_putstr_fd("minishell: ", STDERR_FILENO);
 		perror(cmd);
 		return (msh_print(msh, NULL, code));
 	}
 	if (option == 3)
 	{
-		ft_putstr_fd("minishell: ", STDERR_FILENO);
 		ft_putstr_fd(cmd, STDERR_FILENO);
 		return (msh_print(msh, ": Is a directory", code));
 	}
 	if (option == 4)
 	{
-		//ft_putstr_fd("minishell: ", STDERR_FILENO); // commented out to pass the tester, bash prints "bash: err message"
 		perror(cmd);
 		return ((msh_print(msh, NULL, code)));
 	}

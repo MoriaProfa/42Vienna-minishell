@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 04:35:17 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/18 16:22:15 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ static void	msh_execute(t_msh *msh, int i)
 	}
 	else
 	{
-		ft_putstr_fd("minishell: ", STDERR_FILENO);
 		perror(((t_cmd *)msh->cmd_table[i])->args[0]);
 		msh_print(msh, NULL, 126);
 		return ;
