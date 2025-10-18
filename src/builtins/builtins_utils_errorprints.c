@@ -23,7 +23,6 @@ void	print_getcwd_error(char *builtin_name, t_msh *msh)
 
 void	print_num_error_exit(t_msh *msh, char *str)
 {
-	// ft_putendl_fd("exit", STDERR_FILENO);
 	ft_putstr_fd("exit: ", STDERR_FILENO);
 	ft_putstr_fd(str, STDERR_FILENO);
 	msh_quit(msh, ": numeric argument required", 2);

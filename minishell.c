@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 17:31:17 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 17:41:55 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,6 @@ int	main(int argc, char **argv, char **envp)
 	{
 		if (g_signal_flag)
 		{
-		//	msh.in_str = NULL;
 			msh.status = 128 + g_signal_flag;
 			g_signal_flag = 0;
 		}

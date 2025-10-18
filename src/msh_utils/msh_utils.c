@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 23:38:20 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/18 15:38:45 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 17:42:25 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ void	msh_free(t_msh *msh)
 {
 	if (msh->in_str)
 		free(msh->in_str);
+	msh->in_str = NULL;
 	ft_lstclear(&msh->tokens, free_token);
 	free_cmd_table(msh->cmd_table, msh->n_cmds);
 	msh->cmd_table = NULL;

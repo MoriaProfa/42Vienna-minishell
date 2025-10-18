@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 16:52:16 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 17:49:25 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -254,6 +254,7 @@ char	*handle_quoted(t_msh *msh, int *len);
 char	*handle_unquoted(t_msh *msh, int *len);
 
 // src/tokenizer/tokenizer_merger.c
+bool	check_adjacency(t_list *tokens);
 void	merge_adjacent_tokens(t_list **tokens, t_msh *msh);
 
 // src/tokenizer/tokenizer_utils.c

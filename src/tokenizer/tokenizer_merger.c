@@ -6,11 +6,25 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 23:07:36 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/17 23:09:56 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 17:49:07 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
+
+bool	check_adjacency(t_list *tokens)
+{
+	t_list	*last_node;
+	t_token	*last_token;
+
+	if (!tokens)
+		return (false);
+	last_node = ft_lstlast(tokens);
+	last_token = (t_token *)last_node->content;
+	if (last_token->type == T_WORD)
+		return (true);
+	return (false);
+}
 
 static t_quote_type	merge_quote_types(t_quote_type q1, t_quote_type q2)
 {

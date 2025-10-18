@@ -8,7 +8,6 @@
 void	print_tokens(t_list *tokens); // for testing only
 void	print_cmd_table(t_msh *msh);  // for testing only
 
-
 // just for testing purposes
 void	print_tokens(t_list *tokens)
 {
@@ -23,7 +22,7 @@ void	print_tokens(t_list *tokens)
 	{
 		cur_token = (t_token *)(cur_node->content);
 		if (cur_token)
-			printf("Token #%i:\n\tValue: %s, Type: %d, Quotes: %d, is adjacent: %d\n", i, cur_token->value, cur_token->type, cur_token->quoted,
+			printf("Token #%i:\n\tValue: %s, Type: %d, Quotes: %d, is adjacent:	%d\n", i, cur_token->value, cur_token->type, cur_token->quoted,
 				cur_token->is_adjacent);
 		cur_node = cur_node->next;
 		i++;
