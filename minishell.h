@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 01:10:09 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 02:13:31 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -222,7 +222,7 @@ int		collect_all_heredocs(t_msh *msh, int i);
 int		print_warning_heredoc(t_heredoc heredoc, size_t ln);
 bool	compare_strings(char *s1, char *s2);
 void	close_heredocs(t_msh *msh);
-int		redirect_heredoc(t_msh *msh, int i, int j);
+int		redirect_heredoc(t_msh *msh, int i/*, int j*/);
 
 // src/msh_utils/msh_utils.c
 void	msh_print(t_msh *msh, char *msg, int status);
@@ -232,7 +232,7 @@ __attribute__((noreturn)) void	msh_quit(t_msh *msh, char *msg, int status);
 // src/msh_utils/signals.c
 void	handle_signal_parent(int signal);
 void	handle_signal_child(int signal);
-int		handle_signal_heredoc(t_msh *msh, char **buffer, int fd);
+int		handle_signal_heredoc(t_msh *msh, char **buffer);
 
 // src/redirection/redirect_infile.c
 int		redirect_infile(t_msh *msh, int i, int j);
