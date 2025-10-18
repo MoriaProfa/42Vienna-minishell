@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 23:40:01 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 16:04:06 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ static void	msh_initialize(t_msh *msh)
 	msh->fd[1] = -1;
 	msh->saved_stdin = -1;
 	msh->saved_stdout = -1;
+	//msh->line_number = 1;
 }
 
 static void	msh_pid(t_msh *msh)
@@ -48,7 +49,7 @@ static void	msh_pid(t_msh *msh)
 
 int	main(int argc, char **argv, char **envp)
 {
-	t_msh				msh;
+	t_msh	msh;
 	
 	if (argc > 1)
 		return (ft_putendl_fd("No arguments accepted.", STDERR_FILENO), 1);
@@ -56,28 +57,26 @@ int	main(int argc, char **argv, char **envp)
 	signal(SIGINT, handle_signal_parent);
 	signal(SIGQUIT, SIG_IGN);
 	ft_bzero(&msh, sizeof(t_msh));
-	init_env_vars(&msh, envp); //envp is also accessible with __environ (=global env variable)
-	//print_env_vars(msh.env_vars);//just for testing if init_env_var worked correctly
+	init_env_vars(&msh, envp);
 	msh.line_number = 1;
 	while (1)
 	{
 		if (g_signal_flag)
 		{
-			//free(msh.in_str);
 			msh.in_str = NULL;
 			msh.status = 128 + g_signal_flag;
 			g_signal_flag = 0;
 			continue ;
 		}
 		msh.in_str = readline("minishell> ");
-		if (!msh.in_str) //by pressing CTRL+D
+		if (!msh.in_str)
 			break ;//msh_quit(&msh, "exit", 0);//didnt work as intended for not yet known reason?!
 		if (msh.in_str[0] == '\0' || check_for_whitespace_end(msh.in_str, 0))
 		{
 			free(msh.in_str);
 			continue ;
 		}
-		add_history(msh.in_str); //original bash doesnt add it when its starting with a whitespace
+		add_history(msh.in_str);
 		msh_initialize(&msh);
 		check_quotationmarks(&msh);
 		build_envp_array(&msh);
@@ -88,13 +87,8 @@ int	main(int argc, char **argv, char **envp)
 		if (!msh.error_check)
 			(build_cmd_table(&msh)/* , print_cmd_table(&msh) */); //print just for testing
 		if (!msh.error_check)
-			msh_pid(&msh); //allocates for msh.pid
-/*		if (!msh.error_check)
-		{
-			if (((t_cmd *)msh.cmd_table[0])->builtin.builtin == true && msh.n_cmds == 1)//why only if n_cmds is 1?
-			msh_builtins(&msh, 0);
-		}
-*/		if (!msh.error_check && collect_all_heredocs(&msh, -1) == 0)
+			msh_pid(&msh);
+		if (!msh.error_check && collect_all_heredocs(&msh, -1) == 0)
 			run_command(&msh, -1);
 		msh_free(&msh);
 	}

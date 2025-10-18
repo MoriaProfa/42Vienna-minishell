@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/03 21:20:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/18 01:56:29 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 15:38:09 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ void	free_env_var(void *content)
 	free(cur_env_var);
 }
 
-
 static void	create_env(t_msh *msh)
 {
 	char	*cwd;
@@ -45,7 +44,7 @@ static void	create_env(t_msh *msh)
 		prepare_name_and_add_to_env_vars(msh, "PWD", cwd);
 	}
 	if (!check_and_update_env_var_value(msh, "OLDPWD", NULL))
-		prepare_and_add_to_env_vars(msh, "OLDPWD", NULL);//gets init in cd, if we do it here, cd - doesnt work always
+		prepare_and_add_to_env_vars(msh, "OLDPWD", NULL);
 }
 
 void	init_env_vars(t_msh *msh, char **envp)

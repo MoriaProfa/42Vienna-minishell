@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 02:39:40 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/16 22:16:05 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 15:38:27 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,10 +36,11 @@ static char	*create_envp_entry(char *name, char *value, t_msh *msh)
 		result = ft_strjoin(tmp, value);
 		free(tmp);
 		if (!result)
-			msh_quit(msh, "(re)building envp entry 2nd strjoin malloc failed", 1);
+			msh_quit(msh, "(re)building envp entry 2nd strjoin malloc failed",
+				1);
 	}
 	else
-		result = tmp;	
+		result = tmp;
 	return (result);
 }
 
@@ -66,7 +67,6 @@ void	build_envp_array(t_msh *msh)
 					cur_env_var->value, msh);
 		if (!msh->envp[i])
 			break ;
-//      printf("msh->envp[%li] = %s\n", i, msh->envp[i]);//for testing
 		cur_node = cur_node->next;
 	}
 }

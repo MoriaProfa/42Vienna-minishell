@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 20:22:27 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/18 12:32:18 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 15:51:56 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ void	msh_cd(t_msh *msh, char **args)
 				STDERR_FILENO), perror(path), free(oldpwd), free(path));
 	else
 	{
-		if (args[1][0] == '-' && args[1][1] == '\0')
+		if (args[1] && (args[1][0] == '-' && args[1][1] == '\0'))
 			ft_putendl_fd(path, STDOUT_FILENO);
 		(free(path), handle_cd_env_var_update(msh, oldpwd));
 	}
