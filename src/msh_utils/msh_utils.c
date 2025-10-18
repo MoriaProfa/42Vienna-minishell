@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   msh_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 23:38:20 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/17 23:38:58 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 13:08:36 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ void	msh_quit(t_msh *msh, char *msg, int status)
 	if (msg)
 		ft_putendl_fd(msg, fd);
 	restore_stdin_stdout(msh);
+	close_fds(msh);
 	close(STDIN_FILENO);
 	close(STDOUT_FILENO);
 	close(STDERR_FILENO);
