@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 15:49:04 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 16:52:16 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,27 +14,17 @@
 # define MINISHELL_H
 
 # include "libft/libft.h"
-//<stdint.h>
-//<stdlib.h> (malloc, free, getenv)
-//<unistd.h> (write, access, read, close, fork, exit, getcwd, chdir, stat,
-// lstat, fstat, unlink, execve, dup, dup2, pipe, isatty, ttyname, ttyslot,
-// tcsetattr, tcgetattr)
 # include <errno.h>
 # include <fcntl.h>
 # include <limits.h>
+# include <stdio.h>
 # include <readline/history.h>
 # include <readline/readline.h>
 # include <signal.h>
 # include <stdbool.h>
-# include <stdio.h>
 # include <sys/ioctl.h>
 # include <sys/stat.h>
-// stat, lstat, fstat
-# include <sys/types.h>
-// fork, wait, waitpid, wait3, wait4, kill, stat,
-// lstat, fstat, opendir, closedir
 # include <sys/wait.h>
-// wait, waitpid, wait3, wait4
 
 extern volatile sig_atomic_t	g_signal_flag;
 
@@ -226,7 +216,7 @@ int		print_warning_heredoc(t_heredoc heredoc, size_t ln);
 bool	compare_strings(char *s1, char *s2);
 void	close_heredocs(t_msh *msh);
 int		set_heredoc(t_msh *msh, t_cmd *cmd, t_heredoc heredoc);
-int		redirect_heredoc(t_msh *msh, int i /*, int j*/);
+int		redirect_heredoc(t_msh *msh, int i);
 
 // src/msh_utils/msh_utils.c
 void	msh_print(t_msh *msh, char *msg, int status);
@@ -267,7 +257,8 @@ char	*handle_unquoted(t_msh *msh, int *len);
 void	merge_adjacent_tokens(t_list **tokens, t_msh *msh);
 
 // src/tokenizer/tokenizer_utils.c
-void	fill_token_list(t_msh *msh, char *value, t_token_type type, int *quoted_adjacent);
+void	fill_token_list(t_msh *msh, char *value, t_token_type type,
+			int *quoted_adjacent);
 char	*create_word_token(t_msh *msh);
 void	remove_quotationmarks_in_tokens(t_list *tokens);
 
