@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/18 15:10:00 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 15:37:09 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,6 @@ static t_cmd	*init_cmd_data(t_msh *msh, t_cmd *cmd)
 	if (!cmd->heredocs)
 		(free(cmd->redirs), free(cmd->args), free(cmd), msh_quit(msh,
 				"malloc for cmd->heredocs failed", 1));
-	cmd->last_input = T_NONE; // should be set to that in the beginning already?
 	return (cmd);
 }
 

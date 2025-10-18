@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 22:10:32 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/18 15:10:16 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 15:36:24 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ void	parse_single_cmd_tokens(t_cmd *cmd, t_list **tokens, t_msh *msh)
 		token = (*tokens)->content;
 		if (token->type == T_WORD)
 		{
-			if (token->value /* && token->value[0] != '\0'*/)
+			if (token->value)
 			{
 				cmd->args[cmd->n_args] = ft_strdup(token->value);
 				if (!cmd->args[cmd->n_args++])

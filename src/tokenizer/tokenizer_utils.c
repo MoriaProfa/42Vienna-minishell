@@ -6,14 +6,14 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 23:12:03 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/18 02:00:04 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 15:39:51 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
-static t_token	*create_token(t_msh *msh, char *value, t_token_type type, 
-	int *quoted_adjacent)
+static t_token	*create_token(t_msh *msh, char *value, t_token_type type,
+		int *quoted_adjacent)
 {
 	t_token	*token;
 
@@ -38,7 +38,8 @@ static t_token	*create_token(t_msh *msh, char *value, t_token_type type,
 	return (token);
 }
 
-void	fill_token_list(t_msh *msh, char *value, t_token_type type,	int *quoted_adjacent)
+void	fill_token_list(t_msh *msh, char *value, t_token_type type,
+		int *quoted_adjacent)
 {
 	t_list	*cur_node;
 	t_token	*token;

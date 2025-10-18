@@ -6,36 +6,37 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 15:10:16 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 15:49:04 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include "libft/libft.h" 
+# include "libft/libft.h"
 //<stdint.h>
 //<stdlib.h> (malloc, free, getenv)
-//<unistd.h> (write, access, read, close, fork, exit, getcwd, chdir, stat, 
-//lstat, fstat, unlink, execve, dup, dup2, pipe, isatty, ttyname, ttyslot, 
-//tcsetattr, tcgetattr)
+//<unistd.h> (write, access, read, close, fork, exit, getcwd, chdir, stat,
+// lstat, fstat, unlink, execve, dup, dup2, pipe, isatty, ttyname, ttyslot,
+// tcsetattr, tcgetattr)
 # include <errno.h>
 # include <fcntl.h>
-# include <sys/ioctl.h>
 # include <limits.h>
-# include <stdio.h>
-# include <readline/readline.h>
 # include <readline/history.h>
+# include <readline/readline.h>
 # include <signal.h>
 # include <stdbool.h>
+# include <stdio.h>
+# include <sys/ioctl.h>
 # include <sys/stat.h>
-//stat, lstat, fstat
+// stat, lstat, fstat
 # include <sys/types.h>
-//fork, wait, waitpid, wait3, wait4, kill, stat, lstat, fstat, opendir, closedir
+// fork, wait, waitpid, wait3, wait4, kill, stat,
+// lstat, fstat, opendir, closedir
 # include <sys/wait.h>
-//wait, waitpid, wait3, wait4
+// wait, waitpid, wait3, wait4
 
-extern volatile sig_atomic_t   g_signal_flag;
+extern volatile sig_atomic_t	g_signal_flag;
 
 typedef enum e_quote_type
 {
@@ -55,7 +56,7 @@ typedef enum e_token_type
 	T_APPEND_REDIR,
 	T_HEREDOC
 }	t_token_type;
-//maybe renaming all "redirect" to "redir" to shorten line lengths
+
 typedef enum e_builtin_type
 {
 	B_NOT_BUILTIN,
@@ -122,24 +123,24 @@ typedef struct s_cmd
 
 typedef struct s_msh
 {
-	bool			error_check;
-	char			*in_str;
-	char			*cpy_in_str;
-	t_list			*env_vars;
-	char			**envp;
-	t_list			*tokens;
-	t_cmd			**cmd_table;
-	int				n_cmds;
-	int				status;
-	pid_t			*pid;
-	int				fd[2];
-	int				fd_pipe_read;
-	int				fd_in;
-	int				fd_out;
-	int				saved_stdout;
-	int				saved_stdin;
-	size_t			line_number;
-}					t_msh;
+	bool	error_check;
+	char	*in_str;
+	char	*cpy_in_str;
+	t_list	*env_vars;
+	char	**envp;
+	t_list	*tokens;
+	t_cmd	**cmd_table;
+	int		n_cmds;
+	int		status;
+	pid_t	*pid;
+	int		fd[2];
+	int		fd_pipe_read;
+	int		fd_in;
+	int		fd_out;
+	int		saved_stdout;
+	int		saved_stdin;
+	size_t	line_number;
+}			t_msh;
 
 // src/builtins/builtins_cd.c
 void	msh_cd(t_msh *msh, char **args);
@@ -192,7 +193,7 @@ void	parse_single_cmd_tokens(t_cmd *cmd, t_list **tokens, t_msh *msh);
 void	build_cmd_table(t_msh *msh);
 
 // src/environment/env_var_utils.c
-void	add_to_env_vars(t_msh *msh, char *name, char *value);
+void	add_to_env_vars(t_msh *msh, char *name,	char *value);
 void	prepare_and_add_to_env_vars(t_msh *msh, char *name, char *value);
 void	prepare_name_and_add_to_env_vars(t_msh *msh, char *name, char *m_value);
 char	*extract_env_value(char *str, size_t name_len);
@@ -203,7 +204,7 @@ void	free_env_var(void *content);
 void	init_env_vars(t_msh *msh, char **envp);
 
 // src/environment/envp.c
-void    free_envp(t_msh *msh);
+void	free_envp(t_msh *msh);
 void	build_envp_array(t_msh *msh);
 
 // src/execution/execution_utils.c
@@ -217,7 +218,7 @@ void	print_execution_error(t_msh *msh, char *cmd, int option, int code);
 void	run_command(t_msh *msh, int i);
 
 // src/heredoc/heredoc_collector.c
-int		collect_one_heredoc(t_msh *msh, t_heredoc heredoc, int fd);
+int		collect_one_heredoc(t_msh *msh,	t_heredoc heredoc, int fd);
 int		collect_all_heredocs(t_msh *msh, int i);
 
 // src/heredoc/heredoc_redirect.c
@@ -225,12 +226,12 @@ int		print_warning_heredoc(t_heredoc heredoc, size_t ln);
 bool	compare_strings(char *s1, char *s2);
 void	close_heredocs(t_msh *msh);
 int		set_heredoc(t_msh *msh, t_cmd *cmd, t_heredoc heredoc);
-int		redirect_heredoc(t_msh *msh, int i/*, int j*/);
+int		redirect_heredoc(t_msh *msh, int i /*, int j*/);
 
 // src/msh_utils/msh_utils.c
 void	msh_print(t_msh *msh, char *msg, int status);
 void	msh_free(t_msh *msh);
-__attribute__((noreturn)) void	msh_quit(t_msh *msh, char *msg, int status);
+void	msh_quit(t_msh *msh, char *msg, int status);
 
 // src/msh_utils/signals.c
 void	handle_signal_parent(int signal);
@@ -266,7 +267,7 @@ char	*handle_unquoted(t_msh *msh, int *len);
 void	merge_adjacent_tokens(t_list **tokens, t_msh *msh);
 
 // src/tokenizer/tokenizer_utils.c
-void	fill_token_list(t_msh *msh, char *value, t_token_type type,	int *quoted_adjacent);
+void	fill_token_list(t_msh *msh, char *value, t_token_type type, int *quoted_adjacent);
 char	*create_word_token(t_msh *msh);
 void	remove_quotationmarks_in_tokens(t_list *tokens);
 
@@ -281,6 +282,6 @@ void	correct_adjacency(t_list *cur_node, t_token *cur_token);
 bool	check_token_validity_for_split(t_token *cur_token);
 
 // src/tokenizer/var_split.c
-void    split_expanded_tokens(t_list *tokens, t_msh *msh);
+void	split_expanded_tokens(t_list *tokens, t_msh *msh);
 
 #endif
