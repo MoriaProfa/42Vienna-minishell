@@ -2,7 +2,7 @@ NAME = minishell
 
 CC = cc
 
-CFLAGS = -Wall -Wextra -Werror -MMD -MP -g
+CFLAGS = -Wall -Wextra -Werror -MMD -MP
 
 MY_SOURCES = minishell.c \
 			src/builtins/builtins_cd.c \
