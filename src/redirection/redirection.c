@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirection.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 16:47:59 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/18 19:15:44 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ int	set_redirections(t_msh *msh, int i)
 		else
 			return_value += redirect_outfile(msh, i, j);
 		if (return_value != 0)
-			return (close_heredocs(msh), return_value);
+			return (close_fds(msh), return_value);
 	}
 	if (return_value == 0 && ((t_cmd *)msh->cmd_table[i])->n_hd > 0)
 		return_value += redirect_heredoc(msh, i);
@@ -99,5 +99,5 @@ int	set_redirections(t_msh *msh, int i)
 		close(msh->fd_in);
 	if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
 		close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
-	return (close_heredocs(msh), return_value);
+	return (close_fds(msh), return_value);
 }
