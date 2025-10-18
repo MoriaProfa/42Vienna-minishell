@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 16:22:15 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 19:56:58 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,7 +121,11 @@ void	run_command(t_msh *msh, int i)
 			if (i < msh->n_cmds - 1)
 			{
 				if (pipe(msh->fd) == -1)
+				{
+					msh->fd[0] = -1;
+					msh->fd[1] = -1;
 					msh_quit(msh, "pipe failed", 1);
+				}
 			}
 			msh_fork(msh, i);
 		}
