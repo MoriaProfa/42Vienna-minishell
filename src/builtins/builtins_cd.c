@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 20:22:27 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/18 12:08:15 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 12:32:18 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,6 @@ static char	*get_cd_path(t_msh *msh, char **args)
 		path = get_env_var_value(msh, "OLDPWD");
 		if (!path)
 			msh_print(msh, "cd: OLDPWD not set", 1);
-		else
-			ft_putendl_fd(path, STDOUT_FILENO);
 	}
 	else
 	{
@@ -77,7 +75,8 @@ void	msh_cd(t_msh *msh, char **args)
 				STDERR_FILENO), perror(path), free(oldpwd), free(path));
 	else
 	{
-		free(path);
-		handle_cd_env_var_update(msh, oldpwd);
+		if (args[1][0] == '-' && args[1][1] == '\0')
+			ft_putendl_fd(path, STDOUT_FILENO);
+		(free(path), handle_cd_env_var_update(msh, oldpwd));
 	}
 }
