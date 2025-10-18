@@ -6,33 +6,25 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:00:15 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 16:04:06 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 16:14:39 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-//valgrind command:
-//valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=all --trace-children=yes --suppressions=minishell.supp ./minishell
-//pwd test < file1 > file2 >> file3 test2 << file4 << "file5" | cd hello | ls test3 test4 test5 test6 test7
-
 #include "minishell.h"
 
-void	print_tokens(t_list *tokens);//for testing only
-void	print_cmd_table(t_msh *msh);//for testing only
-
-volatile sig_atomic_t   g_signal_flag = 0;
+volatile sig_atomic_t	g_signal_flag = 0;
 
 static void	msh_initialize(t_msh *msh)
 {
 	msh->error_check = false;
 	msh->cpy_in_str = msh->in_str;
 	msh->fd_pipe_read = -1;
-	msh->fd_in = -1; 
+	msh->fd_in = -1;
 	msh->fd_out = -1;
 	msh->fd[0] = -1;
 	msh->fd[1] = -1;
 	msh->saved_stdin = -1;
 	msh->saved_stdout = -1;
-	//msh->line_number = 1;
 }
 
 static void	msh_pid(t_msh *msh)
@@ -50,7 +42,7 @@ static void	msh_pid(t_msh *msh)
 int	main(int argc, char **argv, char **envp)
 {
 	t_msh	msh;
-	
+
 	if (argc > 1)
 		return (ft_putendl_fd("No arguments accepted.", STDERR_FILENO), 1);
 	(void)argv;
@@ -70,7 +62,7 @@ int	main(int argc, char **argv, char **envp)
 		}
 		msh.in_str = readline("minishell> ");
 		if (!msh.in_str)
-			break ;//msh_quit(&msh, "exit", 0);//didnt work as intended for not yet known reason?!
+			break ; // msh_quit(&msh, "exit", 0);//didnt work as intended for not yet known reason?!
 		if (msh.in_str[0] == '\0' || check_for_whitespace_end(msh.in_str, 0))
 		{
 			free(msh.in_str);
@@ -81,11 +73,11 @@ int	main(int argc, char **argv, char **envp)
 		check_quotationmarks(&msh);
 		build_envp_array(&msh);
 		if (!msh.error_check)
-			(msh_tokenizer(&msh)/* , print_tokens(msh.tokens) */); //print just for testing
+			(msh_tokenizer(&msh));
 		if (!msh.error_check)
 			check_tokens(&msh);
 		if (!msh.error_check)
-			(build_cmd_table(&msh)/* , print_cmd_table(&msh) */); //print just for testing
+			(build_cmd_table(&msh));
 		if (!msh.error_check)
 			msh_pid(&msh);
 		if (!msh.error_check && collect_all_heredocs(&msh, -1) == 0)

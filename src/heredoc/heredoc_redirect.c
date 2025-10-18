@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 05:05:23 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 15:40:13 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/18 17:39:42 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int	print_warning_heredoc(t_heredoc heredoc, size_t ln)
 {
-	ft_putstr_fd("minishell: warning: here-document at line ", STDERR_FILENO);
+	ft_putstr_fd("warning: here-document at line ", STDERR_FILENO);
 	ft_putnbr_fd(ln, STDERR_FILENO);
 	ft_putstr_fd(" delimited by end-of-file (wanted `", STDERR_FILENO);
 	ft_putstr_fd(heredoc.delimiter, STDERR_FILENO);

@@ -6,57 +6,11 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/18 15:37:09 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 16:16:43 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
-
-// just for testing purposes
-void	print_cmd_table(t_msh *msh)
-{
-	int		i;
-	t_cmd	*cmd;
-	int		j;
-
-	i = 0;
-	if (!msh->cmd_table)
-		return ;
-	printf("\n=== Command Table (n = %i) ===\n", msh->n_cmds);
-	while (msh->cmd_table[i] && i < msh->n_cmds)
-	{
-		cmd = msh->cmd_table[i];
-		printf("Command %i:\n", i);
-		printf("\targs (%i): ", cmd->n_args);
-		j = 0;
-		while (cmd->args[j] && j < cmd->n_args)
-			printf("[%s] ", cmd->args[j++]);
-		printf("\n\tBuiltin args[0]: %d\n", cmd->builtin.builtin);
-		if (cmd->redirs)
-		{
-			j = -1;
-			printf("\tredirs (%i): ", cmd->n_redirs);
-			while (cmd->redirs[++j].filename && j < cmd->n_redirs)
-				printf("[%s (type = %d)] ", cmd->redirs[j].filename,
-					cmd->redirs[j].type);
-			printf("\n");
-		}
-		if (cmd->heredocs)
-		{
-			j = -1;
-			printf("\theredocs (%i): ", cmd->n_hd);
-			while (cmd->heredocs[++j].delimiter && j < cmd->n_hd)
-				printf("[%s (expand = %d)] ", cmd->heredocs[j].delimiter,
-					cmd->heredocs[j].expand);
-			printf("\n");
-		}
-		printf("\tlast_input: %i\n", cmd->last_input);
-		// 0 if T_NONE, 3 if T_IN_REDIR, 6 if T_HEREDOC
-		if (cmd->pathname)
-			printf("\tpathname: %s\n", cmd->pathname);
-		i++;
-	}
-}
 
 static t_cmd	*init_cmd_data(t_msh *msh, t_cmd *cmd)
 {
