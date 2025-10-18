@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 12:07:39 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 12:12:44 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,11 @@
 # include <fcntl.h>
 # include <sys/ioctl.h>
 # include <limits.h>
+# include <stdio.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <signal.h>
 # include <stdbool.h>
-# include <stdio.h>
 # include <sys/stat.h>
 //stat, lstat, fstat
 # include <sys/types.h>
