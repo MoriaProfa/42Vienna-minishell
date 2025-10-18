@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 05:05:23 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 16:12:52 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/18 05:09:06 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,34 +43,27 @@ void	close_heredocs(t_msh *msh)
 	}
 }
 
-static int	set_heredocs(t_msh *msh, int i, int j)
+int	set_heredoc(t_msh *msh, t_cmd *cmd, t_heredoc heredoc)
 {
-	int	fd;
-
-	fd = -1;
-	while (((t_cmd *)msh->cmd_table[i])->heredocs[++j].delimiter)
-	{
-		if (fd != -1)
-			close(fd);
-		fd = open(((t_cmd *)msh->cmd_table[i])->heredocs[j].filename,
-				O_RDONLY);
-		if (fd == -1)
-		{
-			msh_print(msh, "failed to open temporary heredoc file", 1);
-			return (-1);
-		}
-		else
-			unlink(((t_cmd *)msh->cmd_table[i])->heredocs[j].filename);
-	}
-	return (fd);
+	if (collect_one_heredoc(msh, heredoc, cmd->heredoc_read) == 1)
+		return (1);
+	close(cmd->heredoc_read);
+	cmd->heredoc_read = open(heredoc.filename, O_RDONLY);
+	if (cmd->heredoc_read == -1)
+		return (1);
+	else
+		unlink(heredoc.filename);
+	return (0);
 }
 
-int	redirect_heredoc(t_msh *msh, int i, int j)
+int	redirect_heredoc(t_msh *msh, int i)
 {
-	((t_cmd *)msh->cmd_table[i])->heredoc_read = set_heredocs(msh, i, j);
 	if (((t_cmd *)msh->cmd_table[i])->heredoc_read == -1)
 		return (1);
 	else if (((t_cmd *)msh->cmd_table[i])->last_input == T_HEREDOC_REDIRECT)
+	{
 		dup2(((t_cmd *)msh->cmd_table[i])->heredoc_read, STDIN_FILENO);
+		close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
+	}
 	return (0);
 }

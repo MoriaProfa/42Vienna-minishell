@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 01:54:08 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 05:21:55 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -217,13 +217,15 @@ void	print_execution_error(t_msh *msh, char *cmd, int option, int code);
 void	run_command(t_msh *msh, int i);
 
 // src/heredoc/heredoc_collector.c
+int		collect_one_heredoc(t_msh *msh, t_heredoc heredoc, int fd);
 int		collect_all_heredocs(t_msh *msh, int i);
 
 // src/heredoc/heredoc_redirect.c
 int		print_warning_heredoc(t_heredoc heredoc, size_t ln);
 bool	compare_strings(char *s1, char *s2);
 void	close_heredocs(t_msh *msh);
-int		redirect_heredoc(t_msh *msh, int i, int j);
+int		set_heredoc(t_msh *msh, t_cmd *cmd, t_heredoc heredoc);
+int		redirect_heredoc(t_msh *msh, int i/*, int j*/);
 
 // src/msh_utils/msh_utils.c
 void	msh_print(t_msh *msh, char *msg, int status);
@@ -233,7 +235,7 @@ __attribute__((noreturn)) void	msh_quit(t_msh *msh, char *msg, int status);
 // src/msh_utils/signals.c
 void	handle_signal_parent(int signal);
 void	handle_signal_child(int signal);
-int		handle_signal_heredoc(t_msh *msh, char **buffer, int fd);
+int		handle_signal_heredoc(t_msh *msh, char **buffer);
 
 // src/redirection/redirect_infile.c
 int		redirect_infile(t_msh *msh, int i, int j);
