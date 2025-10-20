@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 17:08:56 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 21:57:44 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/18 16:28:36 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,10 +43,13 @@ static void	msh_pwd(t_msh *msh)
 
 	pwd = getcwd(NULL, 0);
 	if (!pwd)
-		print_getcwd_error("pwd");
-	ft_putendl_fd(pwd, STDOUT_FILENO);
-	msh->status = 0;
-	free(pwd);
+		print_getcwd_error("pwd", msh);
+	else
+	{
+		ft_putendl_fd(pwd, STDOUT_FILENO);
+		msh->status = 0;
+		free(pwd);
+	}
 }
 
 static void	msh_unset(t_msh *msh, char **args)
@@ -72,11 +75,11 @@ static void	msh_exit(t_msh *msh, char **args)
 	code = msh_atol(msh, args[1]);
 	if (args[2])
 	{
-		// ft_putendl_fd("exit", STDERR_FILENO);//tester doesnt accept "exit"
+		ft_putendl_fd("exit", STDERR_FILENO);
 		msh_print(msh, "exit: too many arguments", 1);
 	}
 	else
-		msh_quit(msh, NULL /*"exit"*/, (code % 256 + 256) % 256);// tester doesnt accept "exit"
+		msh_quit(msh, "exit", (code % 256 + 256) % 256);
 }
 
 void	msh_builtins(t_msh *msh, int i)

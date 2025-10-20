@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   builtins_helpers_errorprints.c                     :+:      :+:    :+:   */
+/*   builtins_utils_errorprints.c                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,17 +12,17 @@
 
 #include "../../minishell.h"
 
-void	print_getcwd_error(char *builtin_name)
+void	print_getcwd_error(char *builtin_name, t_msh *msh)
 {
 	ft_putstr_fd(builtin_name, STDERR_FILENO);
 	ft_putstr_fd(": error retrieving current directory: ", STDERR_FILENO);
 	ft_putstr_fd("getcwd: cannot access parent directories: ", STDERR_FILENO);
 	perror("");
+	msh->status = 1;
 }
 
 void	print_num_error_exit(t_msh *msh, char *str)
 {
-	// ft_putendl_fd("exit", STDERR_FILENO);//tester doesnt accept "exit"
 	ft_putstr_fd("exit: ", STDERR_FILENO);
 	ft_putstr_fd(str, STDERR_FILENO);
 	msh_quit(msh, ": numeric argument required", 2);

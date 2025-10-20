@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 05:05:23 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 00:22:18 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/20 18:01:39 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int	print_warning_heredoc(t_heredoc heredoc, size_t ln)
 {
-	ft_putstr_fd("minishell: warning: here-document at line ", STDERR_FILENO);
+	ft_putstr_fd("warning: here-document at line ", STDERR_FILENO);
 	ft_putnbr_fd(ln, STDERR_FILENO);
 	ft_putstr_fd(" delimited by end-of-file (wanted `", STDERR_FILENO);
 	ft_putstr_fd(heredoc.delimiter, STDERR_FILENO);
@@ -36,40 +36,37 @@ void	close_heredocs(t_msh *msh)
 	int	i;
 
 	i = -1;
-	while ((t_cmd *)msh->cmd_table[++i])
+	if (msh->cmd_table)
 	{
-		if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
-			close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
-	}
-}
-/*
-static int	set_heredocs(t_msh *msh, int i, int j)
-{
-	int	fd;
-
-	fd = -1;
-	while (((t_cmd *)msh->cmd_table[i])->heredocs[++j].delimiter)
-	{
-		if (fd != -1)
-			close(fd);
-		fd = open(((t_cmd *)msh->cmd_table[i])->heredocs[j].filename,
-				O_RDONLY);
-		if (fd == -1)
+		while (++i < msh->n_cmds)
 		{
-			msh_print(msh, "failed to open temporary heredoc file", 1);
-			return (-1);
+			if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
+				close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
 		}
-		else
-			unlink(((t_cmd *)msh->cmd_table[i])->heredocs[j].filename);
 	}
-	return (fd);
 }
-*/
+
+int	set_heredoc(t_msh *msh, t_cmd *cmd, t_heredoc heredoc)
+{
+	if (collect_one_heredoc(msh, heredoc, cmd->heredoc_read) == 1)
+		return (1);
+	close(cmd->heredoc_read);
+	cmd->heredoc_read = open(heredoc.filename, O_RDONLY);
+	if (cmd->heredoc_read == -1)
+		return (1);
+	else
+		unlink(heredoc.filename);
+	return (0);
+}
+
 int	redirect_heredoc(t_msh *msh, int i)
 {
 	if (((t_cmd *)msh->cmd_table[i])->heredoc_read == -1)
 		return (1);
-	else if (((t_cmd *)msh->cmd_table[i])->last_input == T_HEREDOC_REDIRECT)
+	else if (((t_cmd *)msh->cmd_table[i])->last_input == T_HEREDOC)
+	{
 		dup2(((t_cmd *)msh->cmd_table[i])->heredoc_read, STDIN_FILENO);
+		close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
+	}
 	return (0);
 }

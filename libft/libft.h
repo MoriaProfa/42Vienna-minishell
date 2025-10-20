@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/04 15:03:49 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/19 23:12:51 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/20 13:08:11 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 # include <stdint.h>
 # include <stdlib.h>
 # include <unistd.h>
+# include <limits.h>
 
 typedef struct s_list
 {

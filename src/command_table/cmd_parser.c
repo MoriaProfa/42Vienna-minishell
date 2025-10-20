@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 22:10:32 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/18 01:38:20 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/20 18:01:16 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,32 +60,8 @@ static int	parse_heredoc_token(t_cmd *cmd, t_token *word_token, char *word,
 {
 	if (word_token->quoted == Q_NONE)
 		cmd->heredocs[cmd->n_hd].expand = 1;
-	cmd->heredocs[cmd->n_hd].delimiter = word;
-	cmd->heredocs[cmd->n_hd].filename = create_filename(msh->n_cmds, cmd->n_hd);
-	if (!cmd->heredocs[cmd->n_hd].filename)
-		msh_quit(msh, "failed to create temporary filename", 1);
-	if (cmd->heredoc_read != -1)
-		close(cmd->heredoc_read);
-	cmd->heredoc_read = open(cmd->heredocs[cmd->n_hd].filename,
-			O_RDWR | O_CREAT | O_TRUNC, 0600);
-	if (cmd->heredoc_read == -1)
-		msh_quit(msh, "failed to create temporary heredoc file", 1);
-	if (collect_one_heredoc(msh, cmd->heredocs[cmd->n_hd],
-			cmd->heredoc_read) == 1)
-		return (1);
-	printf("cmd->heredoc_read = %d\n", cmd->heredoc_read);
-	close(cmd->heredoc_read);
-	cmd->heredoc_read = open(cmd->heredocs[cmd->n_hd].filename, O_RDONLY);
-	if (cmd->heredoc_read == -1)
-	{
-		msh_print(msh, "failed to open temporary heredoc file", 1);
-		return (1);
-	}
-	else
-		unlink(cmd->heredocs[cmd->n_hd].filename);
-	cmd->n_hd++;
-	cmd->last_input = T_HEREDOC_REDIRECT;
-	return (0);
+	cmd->heredocs[cmd->n_hd++].delimiter = word;
+	cmd->last_input = T_HEREDOC;
 }
 
 static void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens,
@@ -98,26 +74,23 @@ static void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens,
 	if (!word_token)
 		return ;
 	if (!word_token->value)
-		return (msh_print(msh, "minishell: ambiguous redirect", 1));
+		return (msh_print(msh, "ambiguous redirect", 1));
 	word = ft_strdup(word_token->value);
 	if (!word)
 		msh_quit(msh, "word_token->value ft_strdup malloc failed", 1);
-	if (token->type == T_IN_REDIRECT)
+	if (token->type == T_IN_REDIR)
 	{
 		cmd->redirs[cmd->n_redirs].filename = word;
-		cmd->redirs[cmd->n_redirs++].type = T_IN_REDIRECT;
-		cmd->last_input = T_IN_REDIRECT;
+		cmd->redirs[cmd->n_redirs++].type = T_IN_REDIR;
+		cmd->last_input = T_IN_REDIR;
 	}
-	else if (token->type == T_OUT_REDIRECT || token->type == T_APPEND_REDIRECT)
+	else if (token->type == T_OUT_REDIR || token->type == T_APPEND_REDIR)
 	{
 		cmd->redirs[cmd->n_redirs].filename = word;
 		cmd->redirs[cmd->n_redirs++].type = token->type;
 	}
-	else if (token->type == T_HEREDOC_REDIRECT)
-	{
-		if (parse_heredoc_token(cmd, word_token, word, msh) == 1)
-			return ;
-	}
+	else if (token->type == T_HEREDOC)
+		parse_heredoc_token(cmd, word_token, word);
 }
 
 void	parse_single_cmd_tokens(t_cmd *cmd, t_list **tokens, t_msh *msh)
@@ -130,7 +103,7 @@ void	parse_single_cmd_tokens(t_cmd *cmd, t_list **tokens, t_msh *msh)
 		token = (*tokens)->content;
 		if (token->type == T_WORD)
 		{
-			if (token->value /* && token->value[0] != '\0'*/)
+			if (token->value)
 			{
 				cmd->args[cmd->n_args] = ft_strdup(token->value);
 				if (!cmd->args[cmd->n_args++])

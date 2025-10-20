@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   builtins_helpers_checks.c                          :+:      :+:    :+:   */
+/*   builtins_utils_checks.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -14,7 +14,7 @@
 
 bool	check_for_whitespace_end(char *str, int start)
 {
-	while(str[start])
+	while (str[start])
 	{
 		if (!ft_strchr(" \t", str[start]))
 			return (false);
@@ -26,6 +26,7 @@ bool	check_for_whitespace_end(char *str, int start)
 bool	check_newline_skipping(char *str)
 {
 	int	i;
+
 	if (str[0] != '-')
 		return (false);
 	i = 0;

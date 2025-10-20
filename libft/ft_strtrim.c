@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strtrim.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com>   +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/04 20:51:09 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/04/16 22:49:30 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/20 13:15:48 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ char	*ft_strtrim(char const *s1, char const *set)
 		a = 1;
 	else
 		a = ft_strlen(s1) - f_counter(s1, set) - b_counter(s1, set) + 1;
-	strtrim = (char *)malloc(sizeof(char) * a);
+	strtrim = (char *)ft_calloc(a, sizeof(char));
 	if (strtrim == NULL)
 		return (NULL);
 	else

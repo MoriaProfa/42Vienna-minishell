@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 20:44:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 22:15:09 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/18 17:41:59 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,22 @@
 
 void	close_and_exit(t_msh *msh, char *msg, int status)
 {
-	close_fds(msh);
+	int	i;
+	int	j;
+
+	i = 0;
+	while (i < msh->n_cmds)
+	{
+		j = 0;
+		while (j < ((t_cmd *)msh->cmd_table[i])->n_hd)
+		{
+			if (((t_cmd *)msh->cmd_table[i])->heredocs[j].filename)
+				unlink(((t_cmd *)msh->cmd_table[i])->heredocs->filename);
+			j++;
+		}
+		i++;
+	}
+	close_heredocs(msh);
 	msh_quit(msh, msg, status);
 }
 
@@ -37,7 +52,7 @@ bool	special_case_check(t_msh *msh, char *pathname, char *cmd)
 	}
 	if (compare_strings(cmd, ".") == true)
 	{
-		ft_putstr_fd("minishell: .: filename argument required", STDERR_FILENO);
+		ft_putstr_fd(".: filename argument required", STDERR_FILENO);
 		msh_print(msh, "\n.: usage: . filename [arguments]", 2);
 		return (true);
 	}
@@ -70,19 +85,16 @@ void	print_execution_error(t_msh *msh, char *cmd, int option, int code)
 	}
 	if (option == 2)
 	{
-		ft_putstr_fd("minishell: ", STDERR_FILENO);
 		perror(cmd);
 		return (msh_print(msh, NULL, code));
 	}
 	if (option == 3)
 	{
-		ft_putstr_fd("minishell: ", STDERR_FILENO);
 		ft_putstr_fd(cmd, STDERR_FILENO);
 		return (msh_print(msh, ": Is a directory", code));
 	}
 	if (option == 4)
 	{
-		//ft_putstr_fd("minishell: ", STDERR_FILENO); // commented out to pass the tester, bash prints "bash: err message"
 		perror(cmd);
 		return ((msh_print(msh, NULL, code)));
 	}

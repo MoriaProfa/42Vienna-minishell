@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_itoa.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com>   +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/05 15:54:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/03/25 15:33:20 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/20 13:18:10 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ char	*ft_itoa(int n)
 	s = 0;
 	if (n < 0)
 		s = 1;
-	str = (char *)malloc(sizeof(char) * (c + s + 1));
+	str = (char *)ft_calloc(c + s + 1, sizeof(char));
 	if (str == NULL)
 		return (NULL);
 	else

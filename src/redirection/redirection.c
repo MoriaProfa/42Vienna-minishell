@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 10:48:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 00:19:12 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/20 18:02:15 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ void	save_stdin_stdout(t_msh *msh, int i)
 	{
 		msh->saved_stdout = dup(STDOUT_FILENO);
 		msh->saved_stdin = dup(STDIN_FILENO);
+		if (msh->saved_stdout == -1 || msh->saved_stdin == -1)
+			msh_quit(msh, "dup failed", 1);
 	}
 }
 
@@ -84,12 +86,12 @@ int	set_redirections(t_msh *msh, int i)
 		redirect_pipes(msh, i);
 	while (((t_cmd *)msh->cmd_table[i])->redirs[++j].filename)
 	{
-		if (((t_cmd *)msh->cmd_table[i])->redirs[j].type == T_IN_REDIRECT)
+		if (((t_cmd *)msh->cmd_table[i])->redirs[j].type == T_IN_REDIR)
 			return_value += redirect_infile(msh, i, j);
 		else
 			return_value += redirect_outfile(msh, i, j);
 		if (return_value != 0)
-			return (return_value);
+			return (close_fds(msh), return_value);
 	}
 	if (return_value == 0 && ((t_cmd *)msh->cmd_table[i])->n_hd > 0)
 		return_value += redirect_heredoc(msh, i);
@@ -97,5 +99,5 @@ int	set_redirections(t_msh *msh, int i)
 		close(msh->fd_in);
 	if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
 		close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
-	return (return_value);
+	return (close_fds(msh), return_value);
 }

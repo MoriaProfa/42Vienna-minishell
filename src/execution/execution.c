@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:33:42 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/17 22:48:58 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/18 19:56:58 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ static void	msh_execute(t_msh *msh, int i)
 	}
 	else
 	{
-		ft_putstr_fd("minishell: ", STDERR_FILENO);
 		perror(((t_cmd *)msh->cmd_table[i])->args[0]);
 		msh_print(msh, NULL, 126);
 		return ;
@@ -56,7 +55,9 @@ static void	child_process(t_msh *msh, int i)
 	{
 		signal(SIGPIPE, SIG_IGN);
 		msh_builtins(msh, i);
+		signal(SIGPIPE, SIG_DFL);
 	}
+	close_heredocs(msh);
 	close_fds(msh);
 	msh_quit(msh, NULL, msh->status);
 }
@@ -120,7 +121,11 @@ void	run_command(t_msh *msh, int i)
 			if (i < msh->n_cmds - 1)
 			{
 				if (pipe(msh->fd) == -1)
+				{
+					msh->fd[0] = -1;
+					msh->fd[1] = -1;
 					msh_quit(msh, "pipe failed", 1);
+				}
 			}
 			msh_fork(msh, i);
 		}

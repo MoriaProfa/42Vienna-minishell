@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strjoin_with_space.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edarmaev <edarmaev@student.42vienna.com>   +#+  +:+       +#+        */
+/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/04 18:36:49 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/04/17 19:07:55 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/20 13:16:25 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ char	*ft_strjoin_with_space(char const *s1, char const *s2)
 		return (NULL);
 	i = ft_strlen(s1);
 	j = ft_strlen(s2);
-	strjoin = (char *)malloc((i + j + 2) * sizeof(char));
+	strjoin = (char *)ft_calloc(i + j + 2, sizeof(char));
 	if (strjoin == NULL)
 		return (NULL);
 	i = 0;
