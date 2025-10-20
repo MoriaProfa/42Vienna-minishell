@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 05:05:23 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/20 18:01:39 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/20 19:30:31 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,10 @@ int	set_heredoc(t_msh *msh, t_cmd *cmd, t_heredoc heredoc)
 	close(cmd->heredoc_read);
 	cmd->heredoc_read = open(heredoc.filename, O_RDONLY);
 	if (cmd->heredoc_read == -1)
+	{
+		msh_print(msh, "failed to open temporary heredoc", 1);
 		return (1);
+	}
 	else
 		unlink(heredoc.filename);
 	return (0);

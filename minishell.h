@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/20 18:01:04 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/20 19:29:32 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,6 +207,7 @@ void	print_execution_error(t_msh *msh, char *cmd, int option, int code);
 void	run_command(t_msh *msh, int i);
 
 // src/heredoc/heredoc_collector.c
+char	*create_filename(int i, int j);
 int		collect_one_heredoc(t_msh *msh,	t_heredoc heredoc, int fd);
 int		collect_all_heredocs(t_msh *msh, int i);
 

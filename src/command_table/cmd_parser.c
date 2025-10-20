@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 22:10:32 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/20 18:01:16 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/20 19:30:00 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,8 +60,20 @@ static int	parse_heredoc_token(t_cmd *cmd, t_token *word_token, char *word,
 {
 	if (word_token->quoted == Q_NONE)
 		cmd->heredocs[cmd->n_hd].expand = 1;
-	cmd->heredocs[cmd->n_hd++].delimiter = word;
+	cmd->heredocs[cmd->n_hd].delimiter = word;
+	cmd->heredocs[cmd->n_hd].filename = create_filename(msh->n_cmds, cmd->n_hd);
+	if (!cmd->heredocs[cmd->n_hd].filename)
+		msh_quit(msh, "failed to create temporary filename", 1);
+	if (cmd->heredoc_read == -1)
+		close(cmd->heredoc_read);
+	cmd->heredoc_read = open(cmd->heredocs[cmd->n_hd].filename, O_RDWR | O_CREAT | O_TRUNC, 0600);
+	if (cmd->heredoc_read == -1)
+		msh_quit(msh, "failed to create temporary heredoc file", 1);
+	if (set_heredoc(msh, cmd, cmd->heredocs[cmd->n_hd]) == 1)
+		return (1);
+	cmd->n_hd++;
 	cmd->last_input = T_HEREDOC;
+	return (0);
 }
 
 static void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens,
@@ -90,7 +102,10 @@ static void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens,
 		cmd->redirs[cmd->n_redirs++].type = token->type;
 	}
 	else if (token->type == T_HEREDOC)
-		parse_heredoc_token(cmd, word_token, word);
+	{
+		if (parse_heredoc_token(cmd, word_token, word, msh) == 1)
+			return ;
+	}
 }
 
 void	parse_single_cmd_tokens(t_cmd *cmd, t_list **tokens, t_msh *msh)
