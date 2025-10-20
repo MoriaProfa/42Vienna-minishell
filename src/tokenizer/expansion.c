@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expansion.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
+/*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 16:29:54 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/18 15:09:41 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/20 19:49:34 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ static void	exp_getenv(t_token *token, char *var_name, char **result,
 		free(env_value);
 		free(*result);
 		if (!tmp)
-			close_and_exit(msh, "expander: env_value join malloc failed", 1);
+			msh_quit(msh, "expander: env_value join malloc failed", 1);
 		*result = tmp;
 	}
 	else

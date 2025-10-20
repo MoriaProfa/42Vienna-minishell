@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/21 14:28:42 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/20 18:01:24 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/20 19:57:29 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,5 @@ void	build_cmd_table(t_msh *msh)
 		if (msh->cmd_table[msh->n_cmds - 1]->args[0])
 			msh->cmd_table[msh->n_cmds - 1]->pathname = create_cmd_pathname(msh,
 					msh->cmd_table[msh->n_cmds - 1]->args[0]);
-		msh->cmd_table[msh->n_cmds - 1]->heredoc_read = -1;
 	}
 }

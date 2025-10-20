@@ -6,32 +6,30 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 20:44:43 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/18 17:41:59 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/20 19:49:46 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
-void	close_and_exit(t_msh *msh, char *msg, int status)
-{
-	int	i;
-	int	j;
+// void	close_and_exit(t_msh *msh, char *msg, int status)
+// {
+// 	int	i;
+// 	int	j;
 
-	i = 0;
-	while (i < msh->n_cmds)
-	{
-		j = 0;
-		while (j < ((t_cmd *)msh->cmd_table[i])->n_hd)
-		{
-			if (((t_cmd *)msh->cmd_table[i])->heredocs[j].filename)
-				unlink(((t_cmd *)msh->cmd_table[i])->heredocs->filename);
-			j++;
-		}
-		i++;
-	}
-	close_heredocs(msh);
-	msh_quit(msh, msg, status);
-}
+// 	i = -1;
+// 	while (++i < msh->n_cmds)
+// 	{
+// 		j = -1;
+// 		while (++j < ((t_cmd *)msh->cmd_table[i])->n_hd)
+// 		{
+// 			if (((t_cmd *)msh->cmd_table[i])->heredocs[j].filename)
+// 				unlink(((t_cmd *)msh->cmd_table[i])->heredocs->filename);
+// 		}
+// 	}
+// 	close_heredocs(msh);
+// 	msh_quit(msh, msg, status);
+// }
 
 void	run_builtins(t_msh *msh, int i)
 {

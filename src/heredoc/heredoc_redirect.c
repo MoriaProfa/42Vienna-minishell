@@ -6,7 +6,7 @@
 /*   By: edarmaev <edarmaev@student.42vienna.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 05:05:23 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/20 19:30:31 by edarmaev         ###   ########.fr       */
+/*   Updated: 2025/10/20 19:48:17 by edarmaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,12 +34,16 @@ bool	compare_strings(char *s1, char *s2)
 void	close_heredocs(t_msh *msh)
 {
 	int	i;
+	int	j;
 
 	i = -1;
-	if (msh->cmd_table)
+	while (++i < msh->n_cmds && msh->cmd_table)
 	{
-		while (++i < msh->n_cmds)
+		j = -1;
+		while (++j < ((t_cmd *)msh->cmd_table[i])->n_hd)
 		{
+			if (((t_cmd *)msh->cmd_table[i])->heredocs[j].filename)
+				unlink(((t_cmd *)msh->cmd_table[i])->heredocs->filename);
 			if (((t_cmd *)msh->cmd_table[i])->heredoc_read != -1)
 				close(((t_cmd *)msh->cmd_table[i])->heredoc_read);
 		}
