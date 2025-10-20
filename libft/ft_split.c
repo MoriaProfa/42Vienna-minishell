@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/06 17:06:37 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/09/23 05:32:09 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/20 13:18:36 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ static size_t	*ft_counter(const char *s, char c)
 	size_t	j;
 	size_t	k;
 
-	counter = (size_t *)malloc(sizeof(size_t) * 2);
+	counter = (size_t *)ft_calloc(2, sizeof(size_t));
 	if (counter == NULL)
 		return (NULL);
 	i = 0;
@@ -44,7 +44,7 @@ static char	*ft_stringcopy(char const *s, char c)
 	int		i;
 
 	i = 0;
-	copy = (char *)malloc(sizeof(char) * (ft_strlen(s) + 1));
+	copy = (char *)ft_calloc(ft_strlen(s) + 1, sizeof(char));
 	if (copy == NULL)
 		return (NULL);
 	while (s[i])
@@ -77,7 +77,7 @@ static char	**ft_fillarray(size_t counter, size_t len, char **arr, char *copy)
 		k = 0;
 		while (copy[i] == '\0' && i <= len)
 			i++;
-		arr[j] = (char *)malloc(sizeof(char) * (ft_strlen(&copy[i]) + 1));
+		arr[j] = (char *)ft_calloc(ft_strlen(&copy[i]) + 1, sizeof(char));
 		if (arr[j] == NULL)
 		{
 			ft_array_free(arr, ft_array_size(arr));
@@ -105,7 +105,7 @@ char	**ft_split(char const *s, char c)
 		counter[1] = 0;
 	if (counter[0] == 0 && s[0] != '\0')
 		counter[1] = 1;
-	arr = (char **)malloc((counter[1] + 1) * sizeof(char *));
+	arr = (char **)ft_calloc(counter[1] + 1, sizeof(char *));
 	if (arr == NULL)
 		return (free(counter), NULL);
 	if (counter[0] == ft_strlen(s) || s[0] == '\0')
