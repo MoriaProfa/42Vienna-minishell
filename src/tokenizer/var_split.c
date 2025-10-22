@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 18:17:55 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/17 23:03:05 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/22 17:38:34 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,7 @@ static void	split_and_insert_tokens(t_list **cur_node, t_token *cur_token,
 	if (!cur_token->value)
 		(ft_array_free(words, ft_array_size(words)), msh_quit(msh,
 				"split and insert token value malloc failed", 1));
+	cur_token->is_split = true;
 	while (words[++i])
 	{
 		new_node = create_new_node(words[i]);

@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 11:55:34 by edarmaev          #+#    #+#             */
-/*   Updated: 2025/10/20 13:08:30 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/22 17:37:12 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,7 @@ typedef struct s_token
 	t_quote_type	quoted;
 	bool			is_adjacent;
 	bool			is_expanded;
+	bool			is_split;
 }					t_token;
 
 typedef struct s_builtin

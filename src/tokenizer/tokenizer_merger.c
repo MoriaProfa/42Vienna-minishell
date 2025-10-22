@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 23:07:36 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/18 17:49:07 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/22 17:39:11 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,8 @@ static void	join_token_content(t_token *previous, t_token *current, t_msh *msh)
 	free(previous->value);
 	previous->value = joined;
 	previous->quoted = merge_quote_types(previous->quoted, current->quoted);
+	if (current->is_split)
+        previous->is_split = true;
 }
 
 void	merge_adjacent_tokens(t_list **tokens, t_msh *msh)

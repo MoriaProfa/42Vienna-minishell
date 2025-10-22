@@ -6,7 +6,7 @@
 /*   By: astehl <astehl@student.42vienna.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 22:10:32 by astehl            #+#    #+#             */
-/*   Updated: 2025/10/18 16:21:26 by astehl           ###   ########.fr       */
+/*   Updated: 2025/10/22 17:38:01 by astehl           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ static void	parse_redirection_token(t_cmd *cmd, t_token *token, t_list **tokens,
 	word_token = get_next_token(tokens);
 	if (!word_token)
 		return ;
-	if (!word_token->value)
+	if (!word_token->value || word_token->is_split)
 		return (msh_print(msh, "ambiguous redirect", 1));
 	word = ft_strdup(word_token->value);
 	if (!word)
