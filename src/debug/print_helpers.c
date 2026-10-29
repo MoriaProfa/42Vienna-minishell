@@ -2,7 +2,7 @@
 #include "minishell.h"
 
 // valgrind command:
-// valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=all --trace-children=yes --suppressions=minishell.supp ./minishell
+// valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=all --trace-children=yes --suppressions=./debug/minishell.supp ./minishell
 // pwd test < file1 > file2 >> file3 test2 << file4 << "file5" | cd hello | ls test3 test4 test5 test6 test7
 
 void	print_tokens(t_list *tokens); // for testing only
